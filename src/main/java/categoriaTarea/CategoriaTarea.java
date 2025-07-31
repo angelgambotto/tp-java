@@ -1,4 +1,4 @@
-package usuarios;
+package categoriaTarea;
 
 public class CategoriaTarea {
 	private int id;
@@ -31,5 +31,4 @@ public class CategoriaTarea {
 	}
 	
 	
-
 }
