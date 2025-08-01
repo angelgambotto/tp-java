@@ -30,5 +30,10 @@ public class CategoriaTarea {
 		this.descripcion = descripcion;
 	}
 	
+	public CategoriaTarea() {
+		super();
+	}
+	
+	
 	
 }
