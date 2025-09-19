@@ -1,15 +1,15 @@
 package clientes;
 
 public class Cliente {
-	private String cuilCuit;
+	private String cuitCuil;
 	private String razonSocial;
 	private String mail;
 	
-	public String getCuilCuit() {
-		return cuilCuit;
+	public String getCuitCuil() {
+		return cuitCuil;
 	}
-	public void setCuilCuit(String cuilCuit) {
-		this.cuilCuit = cuilCuit;
+	public void setCuitCuil(String cuitCuil) {
+		this.cuitCuil = cuitCuil;
 	}
 	public String getRazonSocial() {
 		return razonSocial;
@@ -24,9 +24,12 @@ public class Cliente {
 		this.mail = mail;
 	}
 	
-	public Cliente(String cuilCuit, String razonSocial, String mail) {
+	public Cliente() {
 		super();
-		this.cuilCuit = cuilCuit;
+	}
+	public Cliente(String cuitCuil, String razonSocial, String mail) {
+		super();
+		this.cuitCuil = cuitCuil;
 		this.razonSocial = razonSocial;
 		this.mail = mail;
 	}

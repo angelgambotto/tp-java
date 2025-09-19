@@ -45,7 +45,7 @@ public class UsuariosServlet extends HttpServlet {
 	}
 	}	
 	request.setAttribute("usuarios", userDAO.getAll());
-	request.getRequestDispatcher("usuario.jsp").forward(request, response);
+	request.getRequestDispatcher("usuario/usuario.jsp").forward(request, response);
 	}
 	
 	/**
@@ -62,9 +62,8 @@ public class UsuariosServlet extends HttpServlet {
 		String supervisorUsuario=request.getParameter("usuario");
 		Usuario user=new Usuario(id,nombreUsuario,apellidoUsuario,mailUsuario,claveUsuario,supervisorUsuario,rolUsuario);
 		if(id==0) {
-		
-		userDAO.add(user);}
-		else {
+			userDAO.add(user);
+		} else {
 			userDAO.update(user);
 		}
 		
