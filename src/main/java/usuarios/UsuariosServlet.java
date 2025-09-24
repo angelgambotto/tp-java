@@ -29,13 +29,19 @@ public class UsuariosServlet extends HttpServlet {
 	int idUsuario;
 	if(action!=null) {
 	switch(action) {
+	case "new":
+		 request.setAttribute("usuario", null);
+		 request.setAttribute("abrirModal", true);
+		
+		
+		break;
 	case "edit":
 		idUsuario=Integer.parseInt(request.getParameter("id"));
 		Usuario u=userDAO.getOne(idUsuario);
 		if(u!=null) {
 		request.setAttribute("usuario", u);
-		request.getRequestDispatcher("editarUsuario.jsp").forward(request,	 response);
-		return;
+		request.setAttribute("abrirModal", true);
+
 		}
 		break;
 	case "delete":
@@ -45,7 +51,7 @@ public class UsuariosServlet extends HttpServlet {
 	}
 	}	
 	request.setAttribute("usuarios", userDAO.getAll());
-	request.getRequestDispatcher("usuario/usuario.jsp").forward(request, response);
+	request.getRequestDispatcher("usuario.jsp").forward(request, response);
 	}
 	
 	/**
@@ -53,13 +59,20 @@ public class UsuariosServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String idReq=request.getParameter("id");
-		int id=(idReq==null)?0:Integer.parseInt(idReq);
+		int id=(idReq==null || idReq.isEmpty())?0:Integer.parseInt(idReq);
 		String nombreUsuario=request.getParameter("nombre");
 		String apellidoUsuario=request.getParameter("apellido");
 		String claveUsuario=request.getParameter("clave");
 		String mailUsuario=request.getParameter("mail");
 		String rolUsuario=request.getParameter("rol");
 		String supervisorUsuario=request.getParameter("usuario");
+		if(id!=0) {
+			Usuario userPrevio=userDAO.getOne(id);
+			if(claveUsuario==null||claveUsuario.isEmpty()) {
+				claveUsuario=userPrevio.getClave();
+			}
+		}
+		
 		Usuario user=new Usuario(id,nombreUsuario,apellidoUsuario,mailUsuario,claveUsuario,supervisorUsuario,rolUsuario);
 		if(id==0) {
 			userDAO.add(user);
