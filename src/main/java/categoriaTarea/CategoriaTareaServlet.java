@@ -5,6 +5,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import usuarios.Usuario;
+
 import java.io.IOException;
 
 /**
@@ -22,22 +24,28 @@ public class CategoriaTareaServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-
+        int idCategoria;
         if (action == null) action = "list";
 
         switch (action) {
-            case "edit":
-                int editId = Integer.parseInt(request.getParameter("id"));
-                CategoriaTarea catEdit = dao.getById(editId);
-                request.setAttribute("id", catEdit.getId());
-                request.setAttribute("nombre", catEdit.getNombre());
-                request.setAttribute("descripcion", catEdit.getDescripcion());
-                break;
+	        case "new":
+	   		 request.setAttribute("categoriaTarea", null);
+	   		 request.setAttribute("abrirModal", true);
+	   		break;
+	   		
+	        case "edit":
+	    		idCategoria=Integer.parseInt(request.getParameter("id"));
+	    		CategoriaTarea c=dao.getById(idCategoria);
+	    		if(c!=null) {
+	    		request.setAttribute("categoriaTarea", c);
+	    		request.setAttribute("abrirModal", true);
 
-            case "delete":
-                int deleteId = Integer.parseInt(request.getParameter("id"));
-                dao.delete(deleteId);
-                break;
+	    		}
+	    		break;
+	    	case "delete":
+	    		idCategoria=Integer.parseInt(request.getParameter("id"));
+	    		dao.delete(idCategoria);
+	    		break;
         }
 
         request.setAttribute("categorias", dao.getAll());
