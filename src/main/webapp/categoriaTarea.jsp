@@ -29,9 +29,10 @@
         </button>
     </div>
     <!-- Botón -->
-    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick="toggleModal()">
-      Nuevo
-    </button>
+     <a href="CategoriaTareaServlet?action=new" 
+	   class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+	   Nueva
+	</a>
   </div>
 
 <div class="flex mt-8 bg-white shadow-lg rounded-lg p-6"> 
@@ -57,8 +58,8 @@
             <td class="border border-gray-300 px-4 py-2">
              <a href="CategoriaTareaServlet?action=edit&id=<%= cat.getId() %>" 
                    class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[60px] inline-block text-center">Editar</a>
-                <a href="CategoriaTareaServlet?action=delete&id=<%= cat.getId() %>"
-                   class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[70px] inline-block text-center">Eliminar</a>
+             <a href="CategoriaTareaServlet?action=delete&id=<%= cat.getId() %>"
+                class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[70px] inline-block text-center">Eliminar</a>
             </td>
         </tr>
         <%      }
@@ -68,63 +69,7 @@
     </table>
 </div>
 
-<!--	<div class= "max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-6 my-6"> 
-    	<h2 class= "text-2xl font-bold mb-4">Agregar / Editar Categoría</h2>
-    	<form action="CategoriaTareaServlet" method="post" class="space-y-4">
-       		<input type="hidden" name="id" value="${param.id}" />
-
-            <div>
-                <label class="block font-medium">Nombre:</label>
-                <input type="text" name="nombre" value="${param.nombre}"
-                       required
-                       class="w-full border border-gray-300 rounded px-3 py-2"/>
-            </div>
-
-            <div>
-                <label class="block font-medium">Descripción:</label>
-                <input type="text" name="descripcion" value="${param.descripcion}"
-                       required
-                       class="w-full border border-gray-300 rounded px-3 py-2"/>
-            </div>
-
-            <button type="submit"
-                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Guardar
-            </button>
-    </form>
-</div> -->
-
-<!-- Modal -->
-<div id="modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center">
-    <div class="bg-white rounded-lg p-6 w-full max-w-md">
-        <h2 class="text-2xl font-bold mb-4">Agregar / Editar Categoría</h2>
-        <form action="CategoriaTareaServlet" method="post" class="space-y-4">
-            <input type="hidden" name="id" value="${param.id}" />
-
-            <div>
-                <label class="block font-medium">Nombre:</label>
-                <input type="text" name="nombre" value="${param.nombre}"
-                       required
-                       class="w-full border border-gray-300 rounded px-3 py-2"/>
-            </div>
-
-            <div>
-                <label class="block font-medium">Descripción:</label>
-                <input type="text" name="descripcion" value="${param.descripcion}"
-                       required
-                       class="w-full border border-gray-300 rounded px-3 py-2"/>
-            </div>
-
-            <div class="flex justify-end space-x-4">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                    Guardar
-                </button>
-                <button type="button" class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400" onclick="toggleModal()">
-                    Cancelar
-                </button>
-            </div>
-        </form>
-    </div>
-   </div>
+<!-- Aca esta el form con el modal -->
+<jsp:include page="formCategoriaTarea.jsp" />
 </body>
 </html>
