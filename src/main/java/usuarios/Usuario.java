@@ -65,5 +65,9 @@ public class Usuario {
 		this.rol = rol;
 	}
 	
+	public String getNombreCompleto() {
+		return this.nombre.concat(" ").concat(apellido);
+	}
+	
 	
 }

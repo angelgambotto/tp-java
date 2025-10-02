@@ -3,7 +3,6 @@ package proyectos;
 import java.util.Date;
 import java.util.LinkedList;
 
-import categoriaTarea.CategoriaTarea;
 import usuarios.Usuario;
 
 public class Proyecto {
@@ -14,7 +13,6 @@ public class Proyecto {
 	private Date fechaCreacion;
 	private Usuario supervisor;
 	private LinkedList<Usuario> usuarios;
-	private CategoriaTarea categoria;
 	public int getId() {
 		return id;
 	}
@@ -57,14 +55,11 @@ public class Proyecto {
 	public void setUsuarios(LinkedList<Usuario> usuarios) {
 		this.usuarios = usuarios;
 	}
-	public CategoriaTarea getCategoria() {
-		return categoria;
-	}
-	public void setCategoria(CategoriaTarea categoria) {
-		this.categoria = categoria;
+	public Proyecto() {
+		super();
 	}
 	public Proyecto(int id, String nombre, String descripcion, String cuitCuil, Date fechaCreacion, Usuario supervisor,
-			LinkedList<Usuario> usuarios, CategoriaTarea categoria) {
+			LinkedList<Usuario> usuarios) {
 		super();
 		this.id = id;
 		this.nombre = nombre;
@@ -73,7 +68,6 @@ public class Proyecto {
 		this.fechaCreacion = fechaCreacion;
 		this.supervisor = supervisor;
 		this.usuarios = usuarios;
-		this.categoria = categoria;
 	}
 	
 	
