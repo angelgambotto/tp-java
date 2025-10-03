@@ -18,7 +18,9 @@
     </script>
     <%LinkedList<Usuario> supervisores=(LinkedList<Usuario>)request.getAttribute("supervisores"); %>
 </head>
-<body class="bg-gray-100 p-8">
+<body class="bg-gray-100">
+	<jsp:include page="header.jsp" />
+<div class="p-8">
  <div class="flex items-center justify-between mb-4">
     <!-- Título -->
     <h2 class="text-2xl font-bold text-black">Listado de Proyectos</h2>
@@ -148,6 +150,6 @@
 <% if ("edit".equals(request.getParameter("action"))) { %>
     <script>toggleModal();</script>
 <% } %>
-
+</div>
 </body>
 </html>

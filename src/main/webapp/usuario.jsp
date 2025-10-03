@@ -20,7 +20,9 @@
 
 </head>
 <body>
-<body class="bg-gray-100 p-8">
+<body class="bg-gray-100">
+<jsp:include page="header.jsp" />
+<div class="p-8">
  <div class="flex items-center justify-between mb-4">
  
     <h2 class="text-2xl font-bold text-black">Listado de usuarios</h2>
@@ -86,6 +88,6 @@
 
 
 <jsp:include page="formUsuario.jsp" />
-
+</div>
 </body>
 </html>
