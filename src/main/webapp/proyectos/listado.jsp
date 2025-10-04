@@ -82,7 +82,7 @@
         </tbody>
     </table>
 </div>
-<%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %>
+
 <jsp:include page="formulario.jsp" />
 
 </body>

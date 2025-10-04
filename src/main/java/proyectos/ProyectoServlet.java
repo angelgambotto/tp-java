@@ -35,9 +35,11 @@ public class ProyectoServlet extends HttpServlet {
 
         if (action == null) action = "list";
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         switch (action) {
         	case "new":
-        		request.setAttribute("proyecto", null);
+                String currentDate = sdf.format(new Date());
+                request.setAttribute("fechaCreacion", currentDate);
        		 	request.setAttribute("abrirModal", true);
         		break;
             case "edit":
@@ -47,7 +49,6 @@ public class ProyectoServlet extends HttpServlet {
                 request.setAttribute("nombre", proEdit.getNombre());
                 request.setAttribute("descripcion", proEdit.getDescripcion());
                 request.setAttribute("cuitCuil", proEdit.getCuitCuil());
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 request.setAttribute("fechaCreacion", sdf.format(proEdit.getFechaCreacion()));
                 request.setAttribute("supervisorId", proEdit.getSupervisor().getId());
                 request.setAttribute("abrirModal", true);

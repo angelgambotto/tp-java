@@ -18,7 +18,6 @@
 <%LinkedList<Usuario> supervisores=(LinkedList<Usuario>)request.getAttribute("supervisores"); %>
 </head>
 <body>
-<%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %>
 <div id="modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %>">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
         <h2 class="text-2xl font-bold mb-4">Agregar / Editar Proyecto</h2>
@@ -47,11 +46,11 @@
             </div>
 
             <div>
-                <label class="block font-medium">Fecha Creación:</label>
-                <input type="date" name="fechaCreacion" value="${fechaCreacion}"
-                       required
-                       class="w-full border border-gray-300 rounded px-3 py-2"/>
-            </div>
+			    <label class="block font-medium">Fecha Creación:</label>
+			    <input type="date" name="fechaCreacion" value="${fechaCreacion}" 
+			           readonly 
+			           class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100" />  <!-- bg-gray-100 para visual "no editable" -->
+			</div>
             
             <div>
 			    <label class="block font-medium">Supervisor</label>
