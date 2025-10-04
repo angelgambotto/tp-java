@@ -51,7 +51,7 @@ public class UsuariosServlet extends HttpServlet {
 	}
 	}	
 	request.setAttribute("usuarios", userDAO.getAll());
-	request.getRequestDispatcher("usuario.jsp").forward(request, response);
+	request.getRequestDispatcher("usuarios/listado.jsp").forward(request, response);
 	}
 	
 	/**

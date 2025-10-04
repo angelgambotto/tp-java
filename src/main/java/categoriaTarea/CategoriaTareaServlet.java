@@ -49,7 +49,7 @@ public class CategoriaTareaServlet extends HttpServlet {
         }
 
         request.setAttribute("categorias", dao.getAll());
-        request.getRequestDispatcher("categoriaTarea.jsp").forward(request, response);
+        request.getRequestDispatcher("categorias/listado.jsp").forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

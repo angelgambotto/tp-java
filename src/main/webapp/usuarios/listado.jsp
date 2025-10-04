@@ -21,7 +21,7 @@
 </head>
 <body>
 <body class="bg-gray-100">
-<jsp:include page="header.jsp" />
+<jsp:include page="../header.jsp" />
 <div class="p-8">
  <div class="flex items-center justify-between mb-4">
  
@@ -85,9 +85,8 @@
     </table>
 </div>
 
+<jsp:include page="formulario.jsp" />
 
-
-<jsp:include page="formUsuario.jsp" />
 </div>
 </body>
 </html>

@@ -14,7 +14,7 @@
     </script>
 </head>
 <body class="bg-gray-100">
-<jsp:include page="header.jsp" />
+<jsp:include page="../header.jsp" />
 <div class="p-8">
  <div class="flex items-center justify-between mb-4">
     <!-- Título -->
@@ -72,7 +72,8 @@
 </div>
 
 <!-- Aca esta el form con el modal -->
-<jsp:include page="formCategoriaTarea.jsp" />
+<jsp:include page="formulario.jsp" />
+
 </div>
 </body>
 </html>

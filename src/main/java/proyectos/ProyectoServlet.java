@@ -36,6 +36,10 @@ public class ProyectoServlet extends HttpServlet {
         if (action == null) action = "list";
 
         switch (action) {
+        	case "new":
+        		request.setAttribute("proyecto", null);
+       		 	request.setAttribute("abrirModal", true);
+        		break;
             case "edit":
                 int editId = Integer.parseInt(request.getParameter("id"));
                 Proyecto proEdit = dao.getById(editId);
@@ -46,6 +50,8 @@ public class ProyectoServlet extends HttpServlet {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 request.setAttribute("fechaCreacion", sdf.format(proEdit.getFechaCreacion()));
                 request.setAttribute("supervisorId", proEdit.getSupervisor().getId());
+                request.setAttribute("abrirModal", true);
+                System.out.println("abrir modal seteado en true");
                 break;
 
             case "delete":
@@ -56,7 +62,7 @@ public class ProyectoServlet extends HttpServlet {
 
         request.setAttribute("proyectos", dao.getAll());
         request.setAttribute("supervisores", usuarioDao.getAll());
-        request.getRequestDispatcher("proyecto.jsp").forward(request, response);
+        request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
