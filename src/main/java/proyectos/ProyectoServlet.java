@@ -52,7 +52,6 @@ public class ProyectoServlet extends HttpServlet {
                 request.setAttribute("fechaCreacion", sdf.format(proEdit.getFechaCreacion()));
                 request.setAttribute("supervisorId", proEdit.getSupervisor().getId());
                 request.setAttribute("abrirModal", true);
-                System.out.println("abrir modal seteado en true");
                 break;
 
             case "delete":
@@ -90,7 +89,6 @@ public class ProyectoServlet extends HttpServlet {
         supervisor.setId(supervisorId);
 
         Proyecto pro = new Proyecto(id, nombre, descripcion, cuitCuil, fechaCreacion, supervisor, new LinkedList<>());
-        System.out.println(pro.getSupervisor().getId());
 
         if (id > 0) {
             dao.update(pro);
