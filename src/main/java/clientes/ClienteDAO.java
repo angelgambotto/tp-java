@@ -12,7 +12,7 @@ import utils.ConexionDB;
 public class ClienteDAO {
 
 	    public void insert(Cliente cli) {
-	        String sql = "INSERT INTO Cliente (cuilCuit,razonSocial, mail) VALUES (?,?, ?)";
+	        String sql = "INSERT INTO Cliente (cuitCuil,razonSocial, mail) VALUES (?,?, ?)";
 
 	        try (Connection con = ConexionDB.getConexion();
 	             PreparedStatement ps = con.prepareStatement(sql)) {
@@ -28,7 +28,7 @@ public class ClienteDAO {
 	    }
 
 	    public void update(Cliente cli) {
-	        String sql = "UPDATE Cliente SET razonSocial = ?, mail = ? WHERE id = ?";
+	        String sql = "UPDATE Cliente SET razonSocial = ?, mail = ? WHERE cuitCuil = ?";
 
 	        try (Connection con = ConexionDB.getConexion();
 	             PreparedStatement ps = con.prepareStatement(sql)) {
