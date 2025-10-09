@@ -12,8 +12,10 @@
             const modal = document.getElementById('modalCliente');
             modal.classList.toggle('hidden');
         }
-    </script>
+</script>
+
 <%Cliente cli=(Cliente) request.getAttribute("cliente"); %>
+
 </head>
 <body>
 
@@ -21,6 +23,7 @@
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
         <h2 class="text-2xl font-bold mb-4"><%=cli!=null?"Editar cliente":"Crear cliente" %></h2>
          <form action="ClienteServlet" method="post" class="space-y-4">
+            <input type="hidden" name="id" value="<%= cli != null? cli.getId(): 0%>" />
             <div>
                 <label class="block font-medium">Cuit/Cuil:</label>
                 <input type="text" name="cuitCuil" value="<%= cli != null ? cli.getCuitCuil() : "" %>" 
@@ -48,7 +51,7 @@
                     Cancelar
                 </button>
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                    <%= request.getAttribute("cliente") != null ? "Actualizar" : "Guardar" %>
+                    <%= cli != null ? "Actualizar" : "Guardar" %>
                 </button>
                 
             </div>

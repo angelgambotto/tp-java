@@ -23,22 +23,23 @@ public class ClienteServlet extends HttpServlet {
         String action = request.getParameter("action");
         if (action == null) action = "list";
         String vista = "clientes/listado.jsp";
+        
         switch (action) {
             case "new":
                 request.setAttribute("cliente", null);
                 request.setAttribute("abrirModal", true);
-                vista = "clientes/formulario.jsp";
                 break;
             case "edit":
-                String cuitCuil = request.getParameter("cuitCuil");
-                Cliente cliEdit = dao.getByCuitCuil(cuitCuil);
+                int editId = Integer.parseInt(request.getParameter("id"));
+                System.out.println("El id a editar es:"+editId);
+                Cliente cliEdit = dao.getOne(editId);
+                System.out.println("El id obtenido es:"+cliEdit.getId());               
                 request.setAttribute("cliente", cliEdit);
                 request.setAttribute("abrirModal", true);
-                vista = "clientes/formulario.jsp";
                 break;
             case "delete":
-                String deleteCuitCuil = request.getParameter("cuitCuil");
-                dao.delete(deleteCuitCuil);
+                int deleteId = Integer.parseInt(request.getParameter("id"));
+                dao.delete(deleteId);
                 break;
         }
         
@@ -47,19 +48,15 @@ public class ClienteServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String cuitCuil = request.getParameter("cuitCuil") == null || request.getParameter("cuitCuil").isEmpty()
-                 ? null : request.getParameter("cuitCuil");
+    	int id = request.getParameter("id") == null || request.getParameter("id").isEmpty()
+                ? 0 : Integer.parseInt(request.getParameter("id"));
+    	String cuitCuil = request.getParameter("cuitCuil");
         String razonSocial = request.getParameter("razonSocial");
         String mail = request.getParameter("mail");
         
-        Cliente cli = new Cliente();
-        cli.setCuitCuil(cuitCuil);
-        cli.setRazonSocial(razonSocial);
-        cli.setMail(mail);
+        Cliente cli = new Cliente(id, cuitCuil, razonSocial, mail);
         
-        String cliEdit = request.getParameter("cliente");
-        
-        if (cliEdit != null) {
+        if (id>0) {
             dao.update(cli);
         } else {
             dao.insert(cli);

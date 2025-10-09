@@ -1,9 +1,18 @@
 package clientes;
 
 public class Cliente {
+	private int id;
 	private String cuitCuil;
 	private String razonSocial;
 	private String mail;
+	
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
 	
 	public String getCuitCuil() {
 		return cuitCuil;
@@ -27,8 +36,9 @@ public class Cliente {
 	public Cliente() {
 		super();
 	}
-	public Cliente(String cuitCuil, String razonSocial, String mail) {
+	public Cliente(int id, String cuitCuil, String razonSocial, String mail) {
 		super();
+		this.id = id;
 		this.cuitCuil = cuitCuil;
 		this.razonSocial = razonSocial;
 		this.mail = mail;

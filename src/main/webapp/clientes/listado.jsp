@@ -58,9 +58,9 @@
             <td class="border border-gray-300 px-4 py-2"><%= cli.getRazonSocial() %></td>
             <td class="border border-gray-300 px-4 py-2"><%= cli.getMail() %></td>
             <td class="border border-gray-300 px-4 py-2">
-             <a href="ClienteServlet?action=edit&cuitCuil=<%= cli.getCuitCuil() %>" 
+             <a href="ClienteServlet?action=edit&id=<%= cli.getId() %>" 
                    class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[60px] inline-block text-center">Editar</a>
-             <a href="ClienteServlet?action=delete&cuitCuil=<%= cli.getCuitCuil() %>"
+             <a href="ClienteServlet?action=delete&id=<%= cli.getId() %>"
                 class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[70px] inline-block text-center">Eliminar</a>
             </td>
         </tr>
