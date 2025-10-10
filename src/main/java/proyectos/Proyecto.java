@@ -3,13 +3,15 @@ package proyectos;
 import java.util.Date;
 import java.util.LinkedList;
 
+import clientes.Cliente;
 import usuarios.Usuario;
 
 public class Proyecto {
 	private int id;
 	private String nombre;
 	private String descripcion;
-	private String cuitCuil;
+	private String estado;
+	private Cliente cliente;
 	private Date fechaCreacion;
 	private Usuario supervisor;
 	private LinkedList<Usuario> usuarios;
@@ -31,11 +33,17 @@ public class Proyecto {
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
-	public String getCuitCuil() {
-		return cuitCuil;
+	public String getEstado() {
+		return estado;
 	}
-	public void setCuitCuil(String cuitCuil) {
-		this.cuitCuil = cuitCuil;
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+	public Cliente getCliente() {
+		return cliente;
+	}
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}
 	public Date getFechaCreacion() {
 		return fechaCreacion;
@@ -58,13 +66,14 @@ public class Proyecto {
 	public Proyecto() {
 		super();
 	}
-	public Proyecto(int id, String nombre, String descripcion, String cuitCuil, Date fechaCreacion, Usuario supervisor,
+	public Proyecto(int id, String nombre, String descripcion, String estado, Cliente cliente, Date fechaCreacion, Usuario supervisor,
 			LinkedList<Usuario> usuarios) {
 		super();
 		this.id = id;
 		this.nombre = nombre;
 		this.descripcion = descripcion;
-		this.cuitCuil = cuitCuil;
+		this.estado = estado;
+		this.cliente = cliente;
 		this.fechaCreacion = fechaCreacion;
 		this.supervisor = supervisor;
 		this.usuarios = usuarios;

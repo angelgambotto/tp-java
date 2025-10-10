@@ -14,6 +14,8 @@ import java.util.List;
 
 import usuarios.Usuario;
 import usuarios.UsuariosDAO;
+import clientes.Cliente;
+import clientes.ClienteDAO;
 
 /**
  * Servlet implementation class ProyectoServlet
@@ -23,11 +25,13 @@ public class ProyectoServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private ProyectoDAO dao;
     private UsuariosDAO usuarioDao;
+    private ClienteDAO clienteDAO;
 
     @Override
     public void init() {
         dao = new ProyectoDAO();
         usuarioDao = new UsuariosDAO();
+        clienteDAO = new ClienteDAO();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -48,7 +52,8 @@ public class ProyectoServlet extends HttpServlet {
                 request.setAttribute("id", proEdit.getId());
                 request.setAttribute("nombre", proEdit.getNombre());
                 request.setAttribute("descripcion", proEdit.getDescripcion());
-                request.setAttribute("cuitCuil", proEdit.getCuitCuil());
+                request.setAttribute("estado", proEdit.getEstado());
+                request.setAttribute("cliente", proEdit.getCliente());
                 request.setAttribute("fechaCreacion", sdf.format(proEdit.getFechaCreacion()));
                 request.setAttribute("supervisorId", proEdit.getSupervisor().getId());
                 request.setAttribute("abrirModal", true);
@@ -61,6 +66,7 @@ public class ProyectoServlet extends HttpServlet {
         }
 
         request.setAttribute("proyectos", dao.getAll());
+        request.setAttribute("clientes", clienteDAO.getAll());
         request.setAttribute("supervisores", usuarioDao.getAll());
         request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
     }
@@ -70,8 +76,10 @@ public class ProyectoServlet extends HttpServlet {
                  ? 0 : Integer.parseInt(request.getParameter("id"));
         String nombre = request.getParameter("nombre");
         String descripcion = request.getParameter("descripcion");
-        String cuitCuil = request.getParameter("cuitCuil");
+        String estado = request.getParameter("estado");
         String fechaStr = request.getParameter("fechaCreacion");
+        
+        int clienteId = Integer.parseInt(request.getParameter("clienteId"));
         int supervisorId = Integer.parseInt(request.getParameter("supervisorId"));
 
         Date fechaCreacion = null;
@@ -84,11 +92,14 @@ public class ProyectoServlet extends HttpServlet {
             response.sendRedirect("ProyectoServlet?error=invalid_date");
             return;
         }
+        
+        Cliente cliente = new Cliente();
+        cliente.setId(clienteId);
 
         Usuario supervisor = new Usuario();
         supervisor.setId(supervisorId);
 
-        Proyecto pro = new Proyecto(id, nombre, descripcion, cuitCuil, fechaCreacion, supervisor, new LinkedList<>());
+        Proyecto pro = new Proyecto(id, nombre, descripcion, estado, cliente, fechaCreacion, supervisor, new LinkedList<>());
 
         if (id > 0) {
             dao.update(pro);

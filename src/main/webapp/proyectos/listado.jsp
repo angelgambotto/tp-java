@@ -1,8 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.LinkedList" %>
+<%@ page import="java.util.Arrays" %>
 <%@ page import="proyectos.Proyecto" %>
 <%@ page import="usuarios.Usuario" %>
+<%@ page import="clientes.Cliente" %>
 
 <html>
 <head>
@@ -13,6 +15,31 @@
             const modal = document.getElementById('modal');
             modal.classList.toggle('hidden');
         }
+
+        // Script para manejar los menús de tres puntos (dropdown por click)
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuButtons = document.querySelectorAll('.menu-button');
+            const menus = document.querySelectorAll('.project-menu');
+
+            menuButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const menu = this.nextElementSibling;
+                    const isHidden = menu.classList.contains('hidden');
+                    // Cerrar otros menús
+                    menus.forEach(m => m.classList.add('hidden'));
+                    // Toggle este
+                    if (isHidden) {
+                        menu.classList.remove('hidden');
+                    }
+                });
+            });
+
+            // Cerrar menús al click fuera
+            document.addEventListener('click', function() {
+                menus.forEach(menu => menu.classList.add('hidden'));
+            });
+        });
     </script>
     <% LinkedList<Usuario> supervisores = (LinkedList<Usuario>) request.getAttribute("supervisores"); %>
 </head>
@@ -47,9 +74,10 @@
         LinkedList<Proyecto> inProgress = new LinkedList<>();
         LinkedList<Proyecto> done = new LinkedList<>();
         LinkedList<Proyecto> canceled = new LinkedList<>();
-        /*if (proyectos != null) {
+
+        if (proyectos != null) {
             for (Proyecto pro : proyectos) {
-                String estado = pro.getEstado(); // Asumiendo que existe un método getEstado() en Proyecto que devuelve "To Do", "In Progress", "Done" o "Canceled"
+                String estado = pro.getEstado();
                 if ("To Do".equals(estado)) {
                     todo.add(pro);
                 } else if ("In Progress".equals(estado)) {
@@ -60,119 +88,91 @@
                     canceled.add(pro);
                 }
             }
-        }*/
-        if (proyectos != null) {
-            for (int i = 0; i < proyectos.size(); i++) {
-                Proyecto pro = proyectos.get(i);
-
-                int pos = i % 4; // Para alternar entre los 4 estados si hay más de 4 proyectos
-                switch (pos) {
-                    case 0:
-                        todo.add(pro);
-                        break;
-                    case 1:
-                        inProgress.add(pro);
-                        break;
-                    case 2:
-                        done.add(pro);
-                        break;
-                    case 3:
-                        canceled.add(pro);
-                        break;
-                }
-            }
         }
 
+        // Nueva estructura: lista de columnas y headers para loop único
+        List<LinkedList<Proyecto>> columnas = Arrays.asList(todo, inProgress, done, canceled);
+        String[] headers = {"To Do", "In Progress", "Done", "Canceled"};
     %>
 
     <div class="grid grid-cols-4 gap-6 mt-8">
-        <!-- Columna To Do -->
-        <div class="bg-white shadow-lg rounded-lg p-6">
-            <h3 class="text-xl font-bold mb-4 text-gray-800">To Do</h3>
-            <div class="space-y-4 max-h-96 overflow-y-auto">
-                <% for (Proyecto pro : todo) { %>
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <h4 class="font-semibold text-gray-900"><%= pro.getNombre() %></h4>
-                        <p class="text-sm text-gray-600 mt-1"><%= pro.getDescripcion() %></p>
-                        <p class="text-xs text-gray-500 mt-2">CUIT/CUIL: <%= pro.getCuitCuil() %></p>
-                        <p class="text-xs text-gray-500">Fecha Creación: <%= pro.getFechaCreacion() %></p>
-                        <p class="text-xs text-gray-500">Supervisor: <%= pro.getSupervisor().getNombreCompleto() %></p>
-                        <div class="mt-3 flex space-x-2">
-                            <a href="ProyectoServlet?action=edit&id=<%= pro.getId() %>"
-                               class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 inline-block text-center">Editar</a>
-                            <a href="ProyectoServlet?action=delete&id=<%= pro.getId() %>"
-                               class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 inline-block text-center">Eliminar</a>
-                        </div>
-                    </div>
-                <% } %>
-            </div>
-        </div>
+        <%
+            for (int col = 0; col < 4; col++) {
+                LinkedList<Proyecto> proyectosCol = columnas.get(col);
+        %>
+                <div class="bg-white shadow-lg rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800"><%= headers[col] %></h3>
+                    <div class="space-y-4 max-h-96 overflow-y-auto">
+                        <%
+                            for (Proyecto pro : proyectosCol) {
+                                // Cálculo de iniciales en Java (server-side)
+                                String nombreCompleto = pro.getSupervisor().getNombreCompleto();
+                                String[] partes = nombreCompleto.split(" ");
+                                String initials = "";
+                                if (partes.length > 0) {
+                                    initials += partes[0].substring(0, 1).toUpperCase();
+                                }
+                                if (partes.length > 1) {
+                                    initials += partes[partes.length - 1].substring(0, 1).toUpperCase();
+                                }
+                                int usuariosCount = (pro.getUsuarios() != null) ? pro.getUsuarios().size() : 0;
+                        %>
+                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 relative">
+                                <!-- Descomentar para activar redireccion a EtapaServletal ahcer click sobre una card-->
+                                <%-- <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 relative cursor-pointer" onclick="window.location.href='EtapaServlet?action=view&id=<%= pro.getId() %>';" > --%> 
+                                
+                                    <!-- Menú de tres puntos arriba derecha -->
+                                    <div class="absolute top-2 right-2">
+                                        <button class="menu-button text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-200" aria-label="Opciones">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                            </svg>
+                                        </button>
+                                        <div class="project-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden border">
+                                            <a href="ProyectoServlet?action=edit&id=<%= pro.getId() %>"
+                                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Editar</a>
+                                            <a href="ProyectoServlet?action=delete&id=<%= pro.getId() %>"
+                                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Eliminar</a>
+                                        </div>
+                                    </div>
 
-        <!-- Columna In Progress -->
-        <div class="bg-white shadow-lg rounded-lg p-6">
-            <h3 class="text-xl font-bold mb-4 text-gray-800">In Progress</h3>
-            <div class="space-y-4 max-h-96 overflow-y-auto">
-                <% for (Proyecto pro : inProgress) { %>
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <h4 class="font-semibold text-gray-900"><%= pro.getNombre() %></h4>
-                        <p class="text-sm text-gray-600 mt-1"><%= pro.getDescripcion() %></p>
-                        <p class="text-xs text-gray-500 mt-2">CUIT/CUIL: <%= pro.getCuitCuil() %></p>
-                        <p class="text-xs text-gray-500">Fecha Creación: <%= pro.getFechaCreacion() %></p>
-                        <p class="text-xs text-gray-500">Supervisor: <%= pro.getSupervisor().getNombreCompleto() %></p>
-                        <div class="mt-3 flex space-x-2">
-                            <a href="ProyectoServlet?action=edit&id=<%= pro.getId() %>"
-                               class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 inline-block text-center">Editar</a>
-                            <a href="ProyectoServlet?action=delete&id=<%= pro.getId() %>"
-                               class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 inline-block text-center">Eliminar</a>
-                        </div>
-                    </div>
-                <% } %>
-            </div>
-        </div>
+                                    <!-- Contenido de la card -->
+                                    <h4 class="font-semibold text-gray-900 mb-2"><%= pro.getNombre() %></h4>
+                                    <p class="text-sm text-gray-600 mb-3"><%= pro.getDescripcion() %></p>
 
-        <!-- Columna Done -->
-        <div class="bg-white shadow-lg rounded-lg p-6">
-            <h3 class="text-xl font-bold mb-4 text-gray-800">Done</h3>
-            <div class="space-y-4 max-h-96 overflow-y-auto">
-                <% for (Proyecto pro : done) { %>
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <h4 class="font-semibold text-gray-900"><%= pro.getNombre() %></h4>
-                        <p class="text-sm text-gray-600 mt-1"><%= pro.getDescripcion() %></p>
-                        <p class="text-xs text-gray-500 mt-2">CUIT/CUIL: <%= pro.getCuitCuil() %></p>
-                        <p class="text-xs text-gray-500">Fecha Creación: <%= pro.getFechaCreacion() %></p>
-                        <p class="text-xs text-gray-500">Supervisor: <%= pro.getSupervisor().getNombreCompleto() %></p>
-                        <div class="mt-3 flex space-x-2">
-                            <a href="ProyectoServlet?action=edit&id=<%= pro.getId() %>"
-                               class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 inline-block text-center">Editar</a>
-                            <a href="ProyectoServlet?action=delete&id=<%= pro.getId() %>"
-                               class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 inline-block text-center">Eliminar</a>
-                        </div>
-                    </div>
-                <% } %>
-            </div>
-        </div>
+                                    <!-- Cliente con icono de persona -->
+                                    <div class="flex items-center mb-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        <p class="text-xs text-gray-500"><%= pro.getCliente().getRazonSocial() %></p>
+                                    </div>
 
-        <!-- Columna Canceled -->
-        <div class="bg-white shadow-lg rounded-lg p-6">
-            <h3 class="text-xl font-bold mb-4 text-gray-800">Canceled</h3>
-            <div class="space-y-4 max-h-96 overflow-y-auto">
-                <% for (Proyecto pro : canceled) { %>
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <h4 class="font-semibold text-gray-900"><%= pro.getNombre() %></h4>
-                        <p class="text-sm text-gray-600 mt-1"><%= pro.getDescripcion() %></p>
-                        <p class="text-xs text-gray-500 mt-2">CUIT/CUIL: <%= pro.getCuitCuil() %></p>
-                        <p class="text-xs text-gray-500">Fecha Creación: <%= pro.getFechaCreacion() %></p>
-                        <p class="text-xs text-gray-500">Supervisor: <%= pro.getSupervisor().getNombreCompleto() %></p>
-                        <div class="mt-3 flex space-x-2">
-                            <a href="ProyectoServlet?action=edit&id=<%= pro.getId() %>"
-                               class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 inline-block text-center">Editar</a>
-                            <a href="ProyectoServlet?action=delete&id=<%= pro.getId() %>"
-                               class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 inline-block text-center">Eliminar</a>
-                        </div>
+                                    <!-- Fecha de creación y cantidad de usuarios -->
+                                    <p class="text-xs text-gray-500 mb-2">Fecha Creación: <%= pro.getFechaCreacion() %></p>
+                                    <p class="text-xs text-gray-500 mb-4">Usuarios asignados: <%= usuariosCount %></p>
+
+                                    <!-- Supervisor: Círculo abajo derecha con tooltip SOLO en hover del círculo -->
+                                    <div class="absolute bottom-2 right-2">
+                                        <div class="relative group"> <!-- Group movido AQUÍ: solo hover en el círculo -->
+                                            <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold" title="<%= pro.getSupervisor().getNombreCompleto() %>">
+                                                <%= initials %>
+                                            </div>
+                                            <div class="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition whitespace-nowrap z-10">
+                                                <%= pro.getSupervisor().getNombreCompleto() %>
+                                                <div class="absolute top-full right-0 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        <%
+                            }
+                        %>
                     </div>
-                <% } %>
-            </div>
-        </div>
+                </div>
+        <%
+            }
+        %>
     </div>
 
 <jsp:include page="formulario.jsp" />
