@@ -6,8 +6,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import usuarios.Usuario;
-
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Servlet implementation class ServletCategoriaTarea
@@ -25,8 +26,16 @@ public class CategoriaTareaServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         int idCategoria;
-        if (action == null) action = "list";
-
+        if (action == null) {
+        	try {
+                List<CategoriaTarea> categorias = dao.getAll(); // Obtén las categorías
+                request.setAttribute("categorias", categorias); // Pasá la lista al JSP
+                request.getRequestDispatcher("categoriaTarea.jsp").forward(request, response); // Ajustá la ruta
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al cargar las categorías");
+            }
+        }
         switch (action) {
 	        case "new":
 	   		 request.setAttribute("categoriaTarea", null);
@@ -47,9 +56,10 @@ public class CategoriaTareaServlet extends HttpServlet {
 	    		dao.delete(idCategoria);
 	    		break;
         }
-
-        request.setAttribute("categorias", dao.getAll());
+        /*Esto es para recargar la lista actualizada*/
+       request.setAttribute("categorias", dao.getAll());
         request.getRequestDispatcher("categoriaTarea.jsp").forward(request, response);
+    
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
