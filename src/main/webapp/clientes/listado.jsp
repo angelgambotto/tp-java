@@ -1,10 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
-<%@ page import="categoriaTarea.CategoriaTarea" %>
+<%@ page import="clientes.Cliente" %>
 
 <html>
 <head>
-    <title>ABM Categoría Tarea</title>
+    <title>ABM Cliente</title>
      <script src="https://cdn.tailwindcss.com"></script>
      <script>
         function toggleModal() {
@@ -13,10 +13,12 @@
         }
     </script>
 </head>
-<body class="bg-gray-100 p-8">
+<body class="bg-gray-100">
+<jsp:include page="../header.jsp" />
+<div class="p-8">
  <div class="flex items-center justify-between mb-4">
     <!-- Título -->
-    <h2 class="text-2xl font-bold text-black">Listado de Categorías</h2>
+    <h2 class="text-2xl font-bold text-black">Listado de Clientes</h2>
 
      <!-- Buscador con ícono de lupa -->
     <div class="relative flex-1 max-w-md">
@@ -29,9 +31,9 @@
         </button>
     </div>
     <!-- Botón -->
-     <a href="CategoriaTareaServlet?action=new" 
+     <a href="ClienteServlet?action=new" 
 	   class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-	   Nueva
+	   Nuevo
 	</a>
   </div>
 
@@ -39,30 +41,37 @@
     <table class="w-full border-collapse border border-gray-300">
     	<thead>
         <tr>
-            <th class="border border-gray-300 px-4 py-2">ID</th>
-            <th class="border border-gray-300 px-4 py-2">Nombre</th>
-            <th class="border border-gray-300 px-4 py-2">Descripción</th>
+            <th class="border border-gray-300 px-4 py-2">Cuit/Cuil</th>
+            <th class="border border-gray-300 px-4 py-2">Razon Social</th>
+            <th class="border border-gray-300 px-4 py-2">Mail</th>
             <th class="border border-gray-300 px-4 py-2  w-[180px]">Acciones</th>
         </tr>
         </thead>
         <tbody>        
         <%
-            List<CategoriaTarea> categorias = (List<CategoriaTarea>) request.getAttribute("categorias");
-            if (categorias != null) {
-                for (CategoriaTarea cat : categorias) {
+            List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");
+            if (clientes != null  && !clientes.isEmpty()) {
+                for (Cliente cli : clientes) {
         %>
         <tr class="hover:bg-gray-100">
-            <td class="border border-gray-300 px-4 py-2"><%= cat.getId() %></td>
-            <td class="border border-gray-300 px-4 py-2"><%= cat.getNombre() %></td>
-            <td class="border border-gray-300 px-4 py-2"><%= cat.getDescripcion() %></td>
+            <td class="border border-gray-300 px-4 py-2"><%= cli.getCuitCuil() %></td>
+            <td class="border border-gray-300 px-4 py-2"><%= cli.getRazonSocial() %></td>
+            <td class="border border-gray-300 px-4 py-2"><%= cli.getMail() %></td>
             <td class="border border-gray-300 px-4 py-2">
-             <a href="CategoriaTareaServlet?action=edit&id=<%= cat.getId() %>" 
+             <a href="ClienteServlet?action=edit&id=<%= cli.getId() %>" 
                    class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[60px] inline-block text-center">Editar</a>
-             <a href="CategoriaTareaServlet?action=delete&id=<%= cat.getId() %>"
+             <a href="ClienteServlet?action=delete&id=<%= cli.getId() %>"
                 class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[70px] inline-block text-center">Eliminar</a>
             </td>
         </tr>
         <%      }
+            }
+            else {
+        %>
+            	<tr>
+            		<td colspan="4" class="border border-gray-300 px-4 py-2 text-center">Sin clientes </td>
+            	</tr>
+        <%
             }
         %>
         </tbody>
@@ -70,6 +79,8 @@
 </div>
 
 <!-- Aca esta el form con el modal -->
-<jsp:include page="formCategoriaTarea.jsp" />
+<jsp:include page="formulario.jsp" />
+
+</div>
 </body>
 </html>

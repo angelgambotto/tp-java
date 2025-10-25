@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
 /**
  * Servlet implementation class ServletCliente
  */
@@ -22,40 +21,42 @@ public class ClienteServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-
         if (action == null) action = "list";
-
+        String vista = "clientes/listado.jsp";
+        
         switch (action) {
-            case "edit":
-                String cuitCuil = request.getParameter("cuitCuil");
-                Cliente cliEdit = dao.getByCuitCuil(cuitCuil);
-                request.setAttribute("cuitCuil", cliEdit.getCuitCuil());
-                request.setAttribute("razonSocial", cliEdit.getRazonSocial());
-                request.setAttribute("mail", cliEdit.getMail());
+            case "new":
+                request.setAttribute("cliente", null);
+                request.setAttribute("abrirModal", true);
                 break;
-
+            case "edit":
+                int editId = Integer.parseInt(request.getParameter("id"));
+                System.out.println("El id a editar es:"+editId);
+                Cliente cliEdit = dao.getOne(editId);
+                System.out.println("El id obtenido es:"+cliEdit.getId());               
+                request.setAttribute("cliente", cliEdit);
+                request.setAttribute("abrirModal", true);
+                break;
             case "delete":
-                String deleteCuitCuil = request.getParameter("cuitCuil");
-                dao.delete(deleteCuitCuil);
+                int deleteId = Integer.parseInt(request.getParameter("id"));
+                dao.delete(deleteId);
                 break;
         }
-
+        
         request.setAttribute("clientes", dao.getAll());
-        request.getRequestDispatcher("cliente.jsp").forward(request, response);
+        request.getRequestDispatcher(vista).forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String cuitCuil = request.getParameter("cuitCuil") == null || request.getParameter("cuitCuil").isEmpty()
-                 ? null : request.getParameter("cuitCuil");
+    	int id = request.getParameter("id") == null || request.getParameter("id").isEmpty()
+                ? 0 : Integer.parseInt(request.getParameter("id"));
+    	String cuitCuil = request.getParameter("cuitCuil");
         String razonSocial = request.getParameter("razonSocial");
         String mail = request.getParameter("mail");
-
-        Cliente cli = new Cliente();
-        cli.setCuitCuil(cuitCuil);
-        cli.setRazonSocial(razonSocial);
-        cli.setMail(mail);
-
-        if (cuitCuil != null) {
+        
+        Cliente cli = new Cliente(id, cuitCuil, razonSocial, mail);
+        
+        if (id>0) {
             dao.update(cli);
         } else {
             dao.insert(cli);

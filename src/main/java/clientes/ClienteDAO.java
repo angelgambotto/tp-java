@@ -12,7 +12,7 @@ import utils.ConexionDB;
 public class ClienteDAO {
 
 	    public void insert(Cliente cli) {
-	        String sql = "INSERT INTO Cliente (cuilCuit,razonSocial, mail) VALUES (?,?, ?)";
+	        String sql = "INSERT INTO Cliente (cuitCuil,razonSocial, mail) VALUES (?,?, ?)";
 
 	        try (Connection con = ConexionDB.getConexion();
 	             PreparedStatement ps = con.prepareStatement(sql)) {
@@ -28,7 +28,7 @@ public class ClienteDAO {
 	    }
 
 	    public void update(Cliente cli) {
-	        String sql = "UPDATE Cliente SET razonSocial = ?, mail = ? WHERE id = ?";
+	        String sql = "UPDATE Cliente SET razonSocial = ?, mail = ?, cuitCuil = ? WHERE id = ?";
 
 	        try (Connection con = ConexionDB.getConexion();
 	             PreparedStatement ps = con.prepareStatement(sql)) {
@@ -36,6 +36,7 @@ public class ClienteDAO {
 	            ps.setString(1, cli.getRazonSocial());
 	            ps.setString(2, cli.getMail());
 	            ps.setString(3, cli.getCuitCuil());
+	            ps.setInt(4, cli.getId());
 	            ps.executeUpdate();
 
 	        } catch (Exception e) {
@@ -43,13 +44,13 @@ public class ClienteDAO {
 	        }
 	    }
 
-	    public void delete(String cuitCuil) {
-	        String sql = "DELETE FROM Cliente WHERE cuitCuil = ?";
+	    public void delete(int id) {
+	        String sql = "DELETE FROM Cliente WHERE id = ?";
 
 	        try (Connection con = ConexionDB.getConexion();
 	             PreparedStatement ps = con.prepareStatement(sql)) {
 
-	            ps.setString(1, cuitCuil);
+	            ps.setInt(1, id);
 	            ps.executeUpdate();
 
 	        } catch (Exception e) {
@@ -69,6 +70,7 @@ public class ClienteDAO {
 
 	            if (rs.next()) {
 	                cli = new Cliente();
+	                cli.setId(rs.getInt("id"));
 	                cli.setCuitCuil(rs.getString("cuitCuil"));
 	                cli.setRazonSocial(rs.getString("razonSocial"));
 	                cli.setMail(rs.getString("mail"));
@@ -91,6 +93,7 @@ public class ClienteDAO {
 
 	            while (rs.next()) {
 	                Cliente cli = new Cliente();
+	                cli.setId(rs.getInt("id"));
 	                cli.setCuitCuil(rs.getString("cuitCuil"));
 	                cli.setRazonSocial(rs.getString("razonSocial"));
 	                cli.setMail(rs.getString("mail"));
@@ -103,4 +106,29 @@ public class ClienteDAO {
 
 	        return lista;
 	    }
+	    
+	    public Cliente getOne(int id) {
+	        String sql = "SELECT * FROM Cliente WHERE id = ?";
+	        Cliente cli = null;
+
+	        try (Connection con = ConexionDB.getConexion();
+	             PreparedStatement ps = con.prepareStatement(sql)) {
+
+	            ps.setInt(1, id);
+	            ResultSet rs = ps.executeQuery();
+
+	            if (rs.next()) {
+	                cli = new Cliente();
+	                cli.setId(rs.getInt("id"));
+	                cli.setCuitCuil(rs.getString("cuitCuil"));
+	                cli.setRazonSocial(rs.getString("razonSocial"));
+	                cli.setMail(rs.getString("mail"));
+	            }
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+
+	        return cli;
+	    } 
 	}
