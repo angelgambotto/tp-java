@@ -34,17 +34,37 @@ public class CategoriaTareaServlet extends HttpServlet {
 	   		break;
 	   		
 	        case "edit":
-	    		idCategoria=Integer.parseInt(request.getParameter("id"));
-	    		CategoriaTarea c=dao.getById(idCategoria);
-	    		if(c!=null) {
-	    		request.setAttribute("categoriaTarea", c);
-	    		request.setAttribute("abrirModal", true);
-
-	    		}
-	    		break;
+	        	try {
+	        		
+	        		idCategoria=Integer.parseInt(request.getParameter("id"));
+	        		CategoriaTarea c=dao.getById(idCategoria);
+	        		if(c!=null) {
+	        			request.setAttribute("categoriaTarea", c);
+	        			request.setAttribute("abrirModal", true);	        			
+	        		} else {
+                        request.setAttribute("error", "No se encontró la categoría con ID: " + idCategoria);
+	        		}
+	        	} catch (NumberFormatException e) {
+                    request.setAttribute("error", "ID de categoría inválido.");
+                }
+        	break;
+	        	
 	    	case "delete":
+	    		
+	    	try{
 	    		idCategoria=Integer.parseInt(request.getParameter("id"));
-	    		dao.delete(idCategoria);
+	    		CategoriaTarea cat = dao.getById(idCategoria);
+	    		if (cat != null) {
+	    			request.setAttribute("categoriaTarea", cat);
+	    			request.setAttribute("abrirModalEliminar", true);
+	    		}else {
+                    request.setAttribute("error", "No se encontró la categoría con ID: " + idCategoria);
+        		}
+	    		
+	    	} catch (NumberFormatException e) {
+                request.setAttribute("error", "ID de categoría inválido.");
+            }
+	    		//dao.delete(idCategoria);
 	    		break;
         }
 
@@ -53,11 +73,39 @@ public class CategoriaTareaServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int id = request.getParameter("id") == null || request.getParameter("id").isEmpty()
+        //Trae el id de la request
+    	int id = request.getParameter("id") == null || request.getParameter("id").isEmpty()
                  ? 0 : Integer.parseInt(request.getParameter("id"));
+    	
+    	// trae el nombre y descripcion por si hay que hacer insert/update
         String nombre = request.getParameter("nombre");
         String descripcion = request.getParameter("descripcion");
+        
+        //trae la accion para eliminar
+        String action = request.getParameter("action");
 
+        if ("confirmDelete".equals(action)) {
+        	try {
+                id = Integer.parseInt(request.getParameter("id"));
+                if (id > 0 && dao.getById(id) != null) {
+                    dao.delete(id);
+                } else {
+                    request.setAttribute("error", "No se pudo eliminar la categoría: ID inválido.");
+                    request.setAttribute("categorias", dao.getAll());
+                    request.getRequestDispatcher("categorias/listado.jsp").forward(request, response);
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                request.setAttribute("error", "ID de categoría inválido.");
+                request.setAttribute("categorias", dao.getAll());
+                request.getRequestDispatcher("categorias/listado.jsp").forward(request, response);
+                return;
+            }
+        	
+        	response.sendRedirect("CategoriaTareaServlet");
+        	return;
+        	}
+        
         CategoriaTarea cat = new CategoriaTarea();
         cat.setId(id);
         cat.setNombre(nombre);

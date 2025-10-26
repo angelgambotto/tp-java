@@ -7,14 +7,30 @@
     <title>ABM Categoría Tarea</title>
      <script src="https://cdn.tailwindcss.com"></script>
      <script>
-        function toggleModal() {
-            const modal = document.getElementById('modal');
+     	//para cerrar el modal
+        function toggleModal(nameModal) {
+            const modal = document.getElementById(nameModal);
             modal.classList.toggle('hidden');
+        }
+        
+        function openDeleteModal(id) {
+            // Establecer el ID de la categoría en el formulario del modal
+            document.getElementById('deleteCategoriaId').value = id;
+            toggleModal('delete');
         }
     </script>
 </head>
 <body class="bg-gray-100">
 <jsp:include page="../header.jsp" />
+
+<!-- Mostrar errores -->
+<div class="p-8">
+    <% if (request.getAttribute("error") != null) { %>
+        <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
+            <%= request.getAttribute("error") %>
+        </div>
+    <% } %>
+
 <div class="p-8">
  <div class="flex items-center justify-between mb-4">
     <!-- Título -->
@@ -41,7 +57,6 @@
     <table class="w-full border-collapse border border-gray-300">
     	<thead>
         <tr>
-            <th class="border border-gray-300 px-4 py-2">ID</th>
             <th class="border border-gray-300 px-4 py-2">Nombre</th>
             <th class="border border-gray-300 px-4 py-2">Descripción</th>
             <th class="border border-gray-300 px-4 py-2  w-[180px]">Acciones</th>
@@ -54,14 +69,13 @@
                 for (CategoriaTarea cat : categorias) {
         %>
         <tr class="hover:bg-gray-100">
-            <td class="border border-gray-300 px-4 py-2"><%= cat.getId() %></td>
             <td class="border border-gray-300 px-4 py-2"><%= cat.getNombre() %></td>
             <td class="border border-gray-300 px-4 py-2"><%= cat.getDescripcion() %></td>
             <td class="border border-gray-300 px-4 py-2">
              <a href="CategoriaTareaServlet?action=edit&id=<%= cat.getId() %>" 
                    class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[60px] inline-block text-center">Editar</a>
-             <a href="CategoriaTareaServlet?action=delete&id=<%= cat.getId() %>"
-                class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[70px] inline-block text-center">Eliminar</a>
+              <a href="CategoriaTareaServlet?action=delete&id=<%= cat.getId() %>"
+                class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-red-700 w-[70px] inline-block text-center">Eliminar</a>           
             </td>
         </tr>
         <%      }
@@ -73,7 +87,7 @@
 
 <!-- Aca esta el form con el modal -->
 <jsp:include page="formulario.jsp" />
-
+<jsp:include page="modalEliminar.jsp" />
 </div>
 </body>
 </html>

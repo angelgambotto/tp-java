@@ -49,7 +49,6 @@
     <table class="w-full border-collapse border border-gray-300">
     	<thead>
         <tr>
-            <th class="border border-gray-300 px-4 py-2">ID</th>
             <th class="border border-gray-300 px-4 py-2">Nombre</th>
             <th class="border border-gray-300 px-4 py-2">Apellido</th>
              <th class="border border-gray-300 px-4 py-2">Mail</th>
@@ -65,7 +64,6 @@
         for(Usuario user :usuarios){ %>
        
         <tr class="hover:bg-gray-100">
-            <td class="border border-gray-300 px-4 py-2"><%= user.getId() %></td>
             <td class="border border-gray-300 px-4 py-2"><%= user.getNombre() %></td>
             <td class="border border-gray-300 px-4 py-2"><%= user.getApellido() %></td>
             <td class="border border-gray-300 px-4 py-2"><%= user.getMail() %></td>
