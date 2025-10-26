@@ -9,8 +9,8 @@
 <title>Listado de usuarios</title>
 <script src="https://cdn.tailwindcss.com"></script>
      <script>
-        function toggleModal() {
-            const modal = document.getElementById('modal');
+        function toggleModal(nameModal) {
+            const modal = document.getElementById(nameModal);
             modal.classList.toggle('hidden');
         }
     </script>
@@ -22,6 +22,14 @@
 <body>
 <body class="bg-gray-100">
 <jsp:include page="../header.jsp" />
+<!-- Mostrar errores -->
+<div class="p-8">
+    <% if (request.getAttribute("error") != null) { %>
+        <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
+            <%= request.getAttribute("error") %>
+        </div>
+    <% } %>
+</div>
 <div class="p-8">
  <div class="flex items-center justify-between mb-4">
  
@@ -73,7 +81,7 @@
              <a href="UsuariosServlet?action=edit&id=<%= user.getId() %>" class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[70px] inline-block text-center"  >Editar</a>
 
                 <a href="UsuariosServlet?action=delete&id=<%= user.getId() %>"
-                   class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[70px] inline-block text-center">Eliminar</a>
+                   class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-red-700 w-[70px] inline-block text-center">Eliminar</a>
             </td>
         </tr>
         <%      }
@@ -84,6 +92,7 @@
 </div>
 
 <jsp:include page="formulario.jsp" />
+<jsp:include page= "modalEliminar.jsp"/>
 
 </div>
 </body>

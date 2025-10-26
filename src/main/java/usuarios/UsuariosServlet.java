@@ -45,8 +45,18 @@ public class UsuariosServlet extends HttpServlet {
 		}
 		break;
 	case "delete":
-		idUsuario=Integer.parseInt(request.getParameter("id"));
-		userDAO.delete(idUsuario);
+		try {			
+			idUsuario=Integer.parseInt(request.getParameter("id"));
+			Usuario usu = userDAO.getOne(idUsuario);
+			request.setAttribute("usuario", usu);
+			request.setAttribute("abrirModalEliminar", true);
+		} catch (NumberFormatException e) {
+			request.setAttribute("error", "ID de usuario inválido.");
+            request.setAttribute("usuarios", userDAO.getAll());
+            request.getRequestDispatcher("usuarios/listado.jsp").forward(request, response);
+            return;
+		}
+		//userDAO.delete(idUsuario);
 		break;
 	}
 	}	
@@ -60,6 +70,27 @@ public class UsuariosServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String idReq=request.getParameter("id");
 		int id=(idReq==null || idReq.isEmpty())?0:Integer.parseInt(idReq);
+		String action = (request.getParameter("action")) != null ? request.getParameter("action") : "Desconocido";
+		
+		if (action.equals("confirmDelete")) {
+			try {
+				if(id> 0 && userDAO.getOne(id) != null) {
+					userDAO.delete(id);
+				} else {
+					request.setAttribute("error", "ID de usuario inválido");
+					request.setAttribute("usuarios", userDAO.getAll());
+					request.getRequestDispatcher("usuarios/listado.jsp").forward(request, response);
+				}
+			} catch (NumberFormatException e) {
+				request.setAttribute("error", "No se pudo eliminar el usuario");
+				request.setAttribute("usuarios", userDAO.getAll());
+				request.getRequestDispatcher("usuarios/listado.jsp").forward(request, response);
+				return;
+			}
+			response.sendRedirect("UsuariosServlet");
+        	return;
+		}
+		
 		String nombreUsuario=request.getParameter("nombre");
 		String apellidoUsuario=request.getParameter("apellido");
 		String claveUsuario=request.getParameter("clave");

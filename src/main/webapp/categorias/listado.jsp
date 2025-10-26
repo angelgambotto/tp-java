@@ -12,12 +12,6 @@
             const modal = document.getElementById(nameModal);
             modal.classList.toggle('hidden');
         }
-        
-        function openDeleteModal(id) {
-            // Establecer el ID de la categoría en el formulario del modal
-            document.getElementById('deleteCategoriaId').value = id;
-            toggleModal('delete');
-        }
     </script>
 </head>
 <body class="bg-gray-100">
@@ -30,7 +24,7 @@
             <%= request.getAttribute("error") %>
         </div>
     <% } %>
-
+</div>
 <div class="p-8">
  <div class="flex items-center justify-between mb-4">
     <!-- Título -->

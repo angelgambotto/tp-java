@@ -7,12 +7,7 @@
 <meta charset="UTF-8">
 <title>Listado de usuarios</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-        function toggleModal() {
-            const modal = document.getElementById('modal');
-            modal.classList.toggle('hidden');
-        }
-    </script>
+
 <%Usuario user=(Usuario) request.getAttribute("usuario"); %>
 </head>
 <body>
