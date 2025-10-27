@@ -7,19 +7,13 @@
 <meta charset="UTF-8">
 <title>Listado clientes</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-        function toggleModal() {
-            const modal = document.getElementById('modalCliente');
-            modal.classList.toggle('hidden');
-        }
-</script>
 
 <%Cliente cli=(Cliente) request.getAttribute("cliente"); %>
 
 </head>
 <body>
 
-<div id="modalCliente" class="fixed inset-0 bg-gray-900 bg-opacity-50 <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %> flex items-center justify-center">
+<div id="insert/update" class="fixed inset-0 bg-gray-900 bg-opacity-50 <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %> flex items-center justify-center">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
         <h2 class="text-2xl font-bold mb-4"><%=cli!=null?"Editar cliente":"Crear cliente" %></h2>
          <form action="ClienteServlet" method="post" class="space-y-4">
@@ -47,7 +41,7 @@
             </div>
 
             <div class="flex justify-end space-x-4">
-                <button type="button" class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400" onclick="toggleModal()">
+                <button type="button" class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400" onclick="toggleModal('insert/update')">
                     Cancelar
                 </button>
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">

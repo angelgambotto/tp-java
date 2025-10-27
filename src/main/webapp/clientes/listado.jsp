@@ -7,8 +7,8 @@
     <title>ABM Cliente</title>
      <script src="https://cdn.tailwindcss.com"></script>
      <script>
-        function toggleModal() {
-            const modal = document.getElementById('modal');
+        function toggleModal(nameModal) {
+            const modal = document.getElementById(nameModal);
             modal.classList.toggle('hidden');
         }
     </script>
@@ -61,7 +61,7 @@
              <a href="ClienteServlet?action=edit&id=<%= cli.getId() %>" 
                    class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[60px] inline-block text-center">Editar</a>
              <a href="ClienteServlet?action=delete&id=<%= cli.getId() %>"
-                class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[70px] inline-block text-center">Eliminar</a>
+                class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-red-700 w-[70px] inline-block text-center">Eliminar</a>
             </td>
         </tr>
         <%      }
@@ -80,6 +80,7 @@
 
 <!-- Aca esta el form con el modal -->
 <jsp:include page="formulario.jsp" />
+<jsp:include page="modalEliminar.jsp" />
 
 </div>
 </body>

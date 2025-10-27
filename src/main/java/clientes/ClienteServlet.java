@@ -38,8 +38,22 @@ public class ClienteServlet extends HttpServlet {
                 request.setAttribute("abrirModal", true);
                 break;
             case "delete":
-                int deleteId = Integer.parseInt(request.getParameter("id"));
-                dao.delete(deleteId);
+            	try {
+            		int deleteId = Integer.parseInt(request.getParameter("id"));
+            		if (deleteId != 0) {
+            			try {
+            				Cliente cli = dao.getOne(deleteId);
+            				request.setAttribute("cliente", cli);
+            				request.setAttribute("abrirModalEliminar", true);
+            				
+            			} catch(NumberFormatException e) {
+            				request.setAttribute("error", "No se encontro al cliente");
+            			}
+            		}
+            	} catch (NumberFormatException e) {
+            		request.setAttribute("error", "Hubo un error al intentar eliminarlo, intente de nuevo");
+            	}
+                //dao.delete(deleteId);
                 break;
         }
         
@@ -50,6 +64,35 @@ public class ClienteServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	int id = request.getParameter("id") == null || request.getParameter("id").isEmpty()
                 ? 0 : Integer.parseInt(request.getParameter("id"));
+    	
+    	//para delete
+    	String action = request.getParameter("action");
+    	
+    	if("confirmDelete".equals(action)) {
+    		try {
+    			int deleteId = Integer.parseInt(request.getParameter("id"));
+                if (id > 0 && dao.getOne(deleteId) != null) {
+                	dao.delete(deleteId);              
+                } else {
+                    request.setAttribute("error", "No se pudo eliminar el cliente: ID inválido.");
+                    request.setAttribute("clientes", dao.getAll());
+                    request.getRequestDispatcher("clientes/listado.jsp").forward(request, response);
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                request.setAttribute("error", "ID de cliente inválido.");
+                request.setAttribute("clientes", dao.getAll());
+                request.getRequestDispatcher("clientes/listado.jsp").forward(request, response);
+                return;
+            }
+        	
+        	response.sendRedirect("ClienteServlet");
+        	return;
+    		
+    	}
+    	
+    	
+    	//para insert o update
     	String cuitCuil = request.getParameter("cuitCuil");
         String razonSocial = request.getParameter("razonSocial");
         String mail = request.getParameter("mail");
