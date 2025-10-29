@@ -2,10 +2,10 @@
 <%@page import="usuarios.Usuario"%>
 <script>
 <%Usuario user = (Usuario) request.getAttribute("usuario");
-	String nombre = (user.getNombre() != null ? user.getNombre(): "Desconocido");
-	String apellido = (user.getApellido() != null ? user.getApellido(): "Desconocido");
-	String mail = (user.getMail() != null ? user.getMail() : "Desconocido");
-	int id = (user.getId() != 0 ? user.getId() : 0);
+	String nombre = (user != null && user.getNombre() != null ? user.getNombre(): "Desconocido");
+	String apellido = (user != null && user.getApellido() != null ? user.getApellido(): "Desconocido");
+	String mail = (user != null && user.getMail() != null ? user.getMail() : "Desconocido");
+	String id = user != null ? String.valueOf(user.getId()) : "";
 	
 %>
 </script>

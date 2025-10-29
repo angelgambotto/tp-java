@@ -1,13 +1,14 @@
 package categoriaTarea;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import usuarios.Usuario;
-
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import exceptions.DAOException;
 
 /**
  * Servlet implementation class ServletCategoriaTarea
@@ -16,6 +17,16 @@ import java.io.IOException;
 public class CategoriaTareaServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private CategoriaTareaDAO dao;
+	
+	//metodo para cargar las tareas y no tener problemas con el bloque try catch
+	private List<CategoriaTarea> cargarCategoriasSeguro(HttpServletRequest request) {
+	    try {
+	        return dao.getAll();
+	    } catch (DAOException e) {
+	        request.setAttribute("error", "No se pudieron cargar las categorías: " + e.getMessage());
+	        return new ArrayList<>();
+	    }
+	}
 
     @Override
     public void init() {
@@ -44,8 +55,8 @@ public class CategoriaTareaServlet extends HttpServlet {
 	        		} else {
                         request.setAttribute("error", "No se encontró la categoría con ID: " + idCategoria);
 	        		}
-	        	} catch (NumberFormatException e) {
-                    request.setAttribute("error", "ID de categoría inválido.");
+	        	} catch (DAOException e) {
+                    request.setAttribute("error", e);
                 }
         	break;
 	        	
@@ -61,14 +72,13 @@ public class CategoriaTareaServlet extends HttpServlet {
                     request.setAttribute("error", "No se encontró la categoría con ID: " + idCategoria);
         		}
 	    		
-	    	} catch (NumberFormatException e) {
-                request.setAttribute("error", "ID de categoría inválido.");
+	    	} catch (DAOException e) {
+                request.setAttribute("error", e);
             }
-	    		//dao.delete(idCategoria);
 	    		break;
         }
 
-        request.setAttribute("categorias", dao.getAll());
+        request.setAttribute("categorias", cargarCategoriasSeguro(request));
         request.getRequestDispatcher("categorias/listado.jsp").forward(request, response);
     }
 
@@ -84,40 +94,50 @@ public class CategoriaTareaServlet extends HttpServlet {
         //trae la accion para eliminar
         String action = request.getParameter("action");
 
-        if ("confirmDelete".equals(action)) {
-        	try {
+        //bloque try general
+       try {
+    	   
+    	   if ("confirmDelete".equals(action)) {
                 id = Integer.parseInt(request.getParameter("id"));
                 if (id > 0 && dao.getById(id) != null) {
                     dao.delete(id);
                 } else {
                     request.setAttribute("error", "No se pudo eliminar la categoría: ID inválido.");
-                    request.setAttribute("categorias", dao.getAll());
+                    request.setAttribute("categorias", cargarCategoriasSeguro(request));
                     request.getRequestDispatcher("categorias/listado.jsp").forward(request, response);
                     return;
                 }
-            } catch (NumberFormatException e) {
-                request.setAttribute("error", "ID de categoría inválido.");
-                request.setAttribute("categorias", dao.getAll());
-                request.getRequestDispatcher("categorias/listado.jsp").forward(request, response);
+                response.sendRedirect("CategoriaTareaServlet");
                 return;
-            }
+    	   }
+    	   
+    	   CategoriaTarea cat = new CategoriaTarea();
+    	   cat.setId(id);
+    	   cat.setNombre(nombre);
+    	   cat.setDescripcion(descripcion);
+    	   
+    	   if (id > 0) {
+    		   dao.update(cat);
+    	   } else {
+    			   dao.insert(cat);        		
+    	   }
+    	   
+    	   response.sendRedirect("CategoriaTareaServlet");
+    	   
+       } catch (DAOException e) {
+           request.setAttribute("error", e.getMessage());
+           request.setAttribute("categorias", cargarCategoriasSeguro(request));
+           request.getRequestDispatcher("categorias/listado.jsp").forward(request, response);
+            
+       } catch (NumberFormatException e) {
+	        request.setAttribute("error", "ID de categoría inválido.");
+	        request.setAttribute("categorias", cargarCategoriasSeguro(request));
+	        request.getRequestDispatcher("categorias/listado.jsp").forward(request, response);
+	        return;
+       }
         	
-        	response.sendRedirect("CategoriaTareaServlet");
-        	return;
-        	}
-        
-        CategoriaTarea cat = new CategoriaTarea();
-        cat.setId(id);
-        cat.setNombre(nombre);
-        cat.setDescripcion(descripcion);
-
-        if (id > 0) {
-            dao.update(cat);
-        } else {
-            dao.insert(cat);
-        }
-
-        response.sendRedirect("CategoriaTareaServlet");
     }
-
-}
+        
+    }
+    
+    

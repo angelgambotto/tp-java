@@ -12,7 +12,7 @@
 </head>
 <body>
 
-<div id="modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %> flex items-center justify-center">
+<div id="insert/update" class="fixed inset-0 bg-gray-900 bg-opacity-50 <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %> flex items-center justify-center">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
         <h2 class="text-2xl font-bold mb-4"><%=user!=null?"Editar usuario":"Crear usuario" %></h2>
         <form action="UsuariosServlet" method="post" class="space-y-4">
@@ -63,7 +63,7 @@
             
 
             <div class="flex justify-end space-x-4">
-                <button type="button" class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400" onclick="toggleModal()">
+                <button type="button" class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400" onclick="toggleModal('insert/update')">
                     Cancelar
                 </button>
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">

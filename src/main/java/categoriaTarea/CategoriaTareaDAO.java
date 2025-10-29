@@ -6,9 +6,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import exceptions.DAOException;
+
 public class CategoriaTareaDAO {
 
-    public void insert(CategoriaTarea cat) {
+    public void insert(CategoriaTarea cat) throws DAOException {
         String sql = "INSERT INTO categoriatarea (nombre, descripcion) VALUES (?, ?)";
 
         try (Connection con = ConexionDB.getConexion();
@@ -18,12 +20,12 @@ public class CategoriaTareaDAO {
             ps.setString(2, cat.getDescripcion());
             ps.executeUpdate();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+        	throw new DAOException("Error al insertar categoría"+ cat.getNombre(), e);
         }
     }
 
-    public void update(CategoriaTarea cat) {
+    public void update(CategoriaTarea cat) throws DAOException {
         String sql = "UPDATE categoriatarea SET nombre = ?, descripcion = ? WHERE id = ?";
 
         try (Connection con = ConexionDB.getConexion();
@@ -34,12 +36,12 @@ public class CategoriaTareaDAO {
             ps.setInt(3, cat.getId());
             ps.executeUpdate();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+        	throw new DAOException("Error al actualizar categoría"+ cat.getNombre(), e);
         }
     }
 
-    public void delete(int id) {
+    public void delete(int id) throws DAOException {
         String sql = "DELETE FROM categoriatarea WHERE id = ?";
 
         try (Connection con = ConexionDB.getConexion();
@@ -48,12 +50,12 @@ public class CategoriaTareaDAO {
             ps.setInt(1, id);
             ps.executeUpdate();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+        	throw new DAOException("Error al eliminar la categoría con id: "+ id, e);
         }
     }
 
-    public CategoriaTarea getById(int id) {
+    public CategoriaTarea getById(int id) throws DAOException {
         String sql = "SELECT * FROM categoriatarea WHERE id = ?";
         CategoriaTarea cat = null;
 
@@ -70,14 +72,14 @@ public class CategoriaTareaDAO {
                 cat.setDescripcion(rs.getString("descripcion"));
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new DAOException("Error al recuperar la categoria con id: " + id, e);
         }
 
         return cat;
     }
 
-    public List<CategoriaTarea> getAll() {
+    public List<CategoriaTarea> getAll() throws DAOException {
         String sql = "SELECT * FROM categoriatarea";
         List<CategoriaTarea> lista = new ArrayList<>();
 
@@ -93,8 +95,8 @@ public class CategoriaTareaDAO {
                 lista.add(cat);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+        	throw new DAOException("Error al obtener todas las categorias", e);
         }
 
         return lista;
