@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +17,7 @@ import usuarios.Usuario;
 import usuarios.UsuariosDAO;
 import clientes.Cliente;
 import clientes.ClienteDAO;
+import exceptions.DAOException;
 
 /**
  * Servlet implementation class ProyectoServlet
@@ -26,6 +28,44 @@ public class ProyectoServlet extends HttpServlet {
     private ProyectoDAO dao;
     private UsuariosDAO usuarioDao;
     private ClienteDAO clienteDAO;
+    
+	//metodo para cargar los clientes y no tener problemas con el bloque try catch
+	private List<Cliente> cargarClientesSeguro(HttpServletRequest request) {
+	    try {
+	        return clienteDAO.getAll();
+	    } catch (DAOException e) {
+	        request.setAttribute("error", "No se pudieron cargar los clientes: " + e.getMessage());
+	        return new ArrayList<>();
+	    }
+	}
+	
+	//metodo para cargar los usuarios y no tener problemas con el bloque try catch
+	private List<Usuario> cargarUsuariosSeguro(HttpServletRequest request) {
+	    try {
+	        return usuarioDao.getAll();
+	    } catch (DAOException e) {
+	        request.setAttribute("error", "No se pudieron cargar los clientes: " + e.getMessage());
+	        return new ArrayList<>();
+	    }
+	}
+	//metodo para cargar los proyectos y no tener problemas con el bloque try catch
+	private List<Proyecto> cargarProyectosSeguro(HttpServletRequest request) {
+	    try {
+	        return dao.getAll();
+	    } catch (DAOException e) {
+	        request.setAttribute("error", "No se pudieron cargar los clientes: " + e.getMessage());
+	        return new ArrayList<>();
+	    }
+	}
+	//metodo para cargar un proyecto y no tener problemas con el bloque try catch
+	private Proyecto cargarProSeguro(HttpServletRequest request, int id) {
+	    try {
+	        return dao.getById(id);
+	    } catch (DAOException e) {
+	        request.setAttribute("error", "No se pudieron cargar los clientes: " + e.getMessage());
+	        return new Proyecto();
+	    }
+	}	
 
     @Override
     public void init() {
@@ -48,7 +88,7 @@ public class ProyectoServlet extends HttpServlet {
         		break;
             case "edit":
                 int editId = Integer.parseInt(request.getParameter("id"));
-                Proyecto proEdit = dao.getById(editId);
+                Proyecto proEdit = cargarProSeguro(request, editId);
                 request.setAttribute("id", proEdit.getId());
                 request.setAttribute("nombre", proEdit.getNombre());
                 request.setAttribute("descripcion", proEdit.getDescripcion());
@@ -61,19 +101,33 @@ public class ProyectoServlet extends HttpServlet {
 
             case "delete":
                 int deleteId = Integer.parseInt(request.getParameter("id"));
-                dao.delete(deleteId);
+                Proyecto pro = cargarProSeguro(request, deleteId);
+                request.setAttribute("proyecto", pro);
+                //request.setAttribute("abrirModalEliminar", true);
+             
+                
+                try {                	
+                	dao.delete(deleteId);
+                } catch (DAOException e) {
+                	request.setAttribute("error", e.getMessage());
+        	    	request.setAttribute("supervisores", cargarUsuariosSeguro(request));
+        	        request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
+                }
+                
                 break;
         }
 
-        request.setAttribute("proyectos", dao.getAll());
-        request.setAttribute("clientes", clienteDAO.getAll());
-        request.setAttribute("supervisores", usuarioDao.getAll());
+        request.setAttribute("proyectos", cargarProyectosSeguro(request));
+        request.setAttribute("clientes", cargarClientesSeguro(request));
+        request.setAttribute("supervisores", cargarUsuariosSeguro(request));
         request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int id = request.getParameter("id") == null || request.getParameter("id").isEmpty()
                  ? 0 : Integer.parseInt(request.getParameter("id"));
+        
+        //para hacer el update/insert
         String nombre = request.getParameter("nombre");
         String descripcion = request.getParameter("descripcion");
         String estado = request.getParameter("estado");
@@ -101,13 +155,20 @@ public class ProyectoServlet extends HttpServlet {
 
         Proyecto pro = new Proyecto(id, nombre, descripcion, estado, cliente, fechaCreacion, supervisor, new LinkedList<>());
 
-        if (id > 0) {
-            dao.update(pro);
-        } else {
-            dao.insert(pro);
+        try {        	
+        	if (id > 0) {
+        		dao.update(pro);
+        	} else {
+        		dao.insert(pro);
+        	}
+        	response.sendRedirect("ProyectoServlet");
+        	
+        } catch (DAOException e) {
+        	request.setAttribute("error", e.getMessage());
+	    	request.setAttribute("supervisores", cargarUsuariosSeguro(request));
+	        request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
         }
+        
+    } //cierra el doPost
 
-        response.sendRedirect("ProyectoServlet");
-    }
-
-}
+} //cierra el servlet

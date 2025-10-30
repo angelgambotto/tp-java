@@ -6,6 +6,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import categoriaTarea.CategoriaTarea;
+import exceptions.DAOException;
 /**
  * Servlet implementation class ServletCliente
  */
@@ -13,7 +18,25 @@ import java.io.IOException;
 public class ClienteServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ClienteDAO dao;
-
+	
+	//metodo para cargar los clientes y no tener problemas con el bloque try catch
+	private List<Cliente> cargarClientesSeguro(HttpServletRequest request) {
+	    try {
+	        return dao.getAll();
+	    } catch (DAOException e) {
+	        request.setAttribute("error", "No se pudieron cargar los clientes: " + e.getMessage());
+	        return new ArrayList<>();
+	    }
+	}
+	//metodo para cargar un cliente y no tener problemas con el bloque try catch
+	private Cliente cargarCliSeguro(HttpServletRequest request, int id) {
+	    try {
+	        return dao.getOne(id);
+	    } catch (DAOException e) {
+	        request.setAttribute("error", "No se pudieron cargar las categorías: " + e.getMessage());
+	        return new Cliente();
+	    }
+	}
     @Override
     public void init() {
         dao = new ClienteDAO();
@@ -32,7 +55,7 @@ public class ClienteServlet extends HttpServlet {
             case "edit":
                 int editId = Integer.parseInt(request.getParameter("id"));
                 System.out.println("El id a editar es:"+editId);
-                Cliente cliEdit = dao.getOne(editId);
+                Cliente cliEdit = cargarCliSeguro(request, editId);
                 System.out.println("El id obtenido es:"+cliEdit.getId());               
                 request.setAttribute("cliente", cliEdit);
                 request.setAttribute("abrirModal", true);
@@ -42,7 +65,7 @@ public class ClienteServlet extends HttpServlet {
             		int deleteId = Integer.parseInt(request.getParameter("id"));
             		if (deleteId != 0) {
             			try {
-            				Cliente cli = dao.getOne(deleteId);
+            				Cliente cli = cargarCliSeguro(request, deleteId);
             				request.setAttribute("cliente", cli);
             				request.setAttribute("abrirModalEliminar", true);
             				
@@ -57,7 +80,7 @@ public class ClienteServlet extends HttpServlet {
                 break;
         }
         
-        request.setAttribute("clientes", dao.getAll());
+        request.setAttribute("clientes", cargarClientesSeguro(request));
         request.getRequestDispatcher(vista).forward(request, response);
     }
 
@@ -68,44 +91,46 @@ public class ClienteServlet extends HttpServlet {
     	//para delete
     	String action = request.getParameter("action");
     	
-    	if("confirmDelete".equals(action)) {
-    		try {
+    	try {
+    		if("confirmDelete".equals(action)) {
     			int deleteId = Integer.parseInt(request.getParameter("id"));
                 if (id > 0 && dao.getOne(deleteId) != null) {
                 	dao.delete(deleteId);              
                 } else {
-                    request.setAttribute("error", "No se pudo eliminar el cliente: ID inválido.");
-                    request.setAttribute("clientes", dao.getAll());
+                    request.setAttribute("clientes", cargarClientesSeguro(request));
                     request.getRequestDispatcher("clientes/listado.jsp").forward(request, response);
                     return;
                 }
-            } catch (NumberFormatException e) {
-                request.setAttribute("error", "ID de cliente inválido.");
-                request.setAttribute("clientes", dao.getAll());
-                request.getRequestDispatcher("clientes/listado.jsp").forward(request, response);
+                response.sendRedirect("ClienteServlet");
                 return;
-            }
-        	
-        	response.sendRedirect("ClienteServlet");
-        	return;
+    		}
     		
-    	}
-    	
-    	
-    	//para insert o update
-    	String cuitCuil = request.getParameter("cuitCuil");
-        String razonSocial = request.getParameter("razonSocial");
-        String mail = request.getParameter("mail");
-        
-        Cliente cli = new Cliente(id, cuitCuil, razonSocial, mail);
-        
-        if (id>0) {
-            dao.update(cli);
-        } else {
-            dao.insert(cli);
+    		//para insert o update
+    		String cuitCuil = request.getParameter("cuitCuil");
+    		String razonSocial = request.getParameter("razonSocial");
+    		String mail = request.getParameter("mail");
+    		
+    		Cliente cli = new Cliente(id, cuitCuil, razonSocial, mail);
+    		
+    		if (id>0) {
+    			dao.update(cli);
+    		} else {
+    			dao.insert(cli);
+    		}
+    		
+    		response.sendRedirect("ClienteServlet");
+    		
+		} catch (DAOException e){
+			request.setAttribute("error", e.getMessage());
+	        request.setAttribute("clientess", cargarClientesSeguro(request));
+	        request.getRequestDispatcher("clientes/listado.jsp").forward(request, response);
+		}
+         catch (NumberFormatException e) {
+            request.setAttribute("error", e.getMessage());
+            request.setAttribute("clientes", cargarClientesSeguro(request));
+            request.getRequestDispatcher("clientes/listado.jsp").forward(request, response);
+            return;
         }
-
-        response.sendRedirect("ClienteServlet");
-    }
-
-}
+    } // cierra doPost
+} //cierra servlet
+   

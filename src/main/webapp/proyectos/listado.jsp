@@ -174,6 +174,7 @@
             }
         %>
     </div>
+</div>
 
 <jsp:include page="formulario.jsp" />
 

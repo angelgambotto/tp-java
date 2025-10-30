@@ -6,12 +6,11 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.LinkedList" %>
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-    function toggleModal() {
-        const modal = document.getElementById('modal');
-        modal.classList.toggle('hidden');
-    }
-</script>
+<script>        function toggleModal() {
+    const modal = document.getElementById('modal');
+    modal.classList.toggle('hidden');
+}</script>
+
 <% 
     LinkedList<Usuario> supervisores = (LinkedList<Usuario>) request.getAttribute("supervisores");
     List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");  // <-- CAMBIO AQUÍ: List en vez de LinkedList

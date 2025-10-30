@@ -3,15 +3,17 @@ package clientes;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import exceptions.DAOException;
 import utils.ConexionDB;
 
 public class ClienteDAO {
 
-	    public void insert(Cliente cli) {
+	    public void insert(Cliente cli) throws DAOException {
 	        String sql = "INSERT INTO Cliente (cuitCuil,razonSocial, mail) VALUES (?,?, ?)";
 
 	        try (Connection con = ConexionDB.getConexion();
@@ -22,12 +24,12 @@ public class ClienteDAO {
 	            ps.setString(3, cli.getMail());
 	            ps.executeUpdate();
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
+	        } catch (SQLException e) {
+	        	throw new DAOException("Error al guardar al nuevo cliente: "+ cli.getRazonSocial(), e);
 	        }
 	    }
 
-	    public void update(Cliente cli) {
+	    public void update(Cliente cli) throws DAOException {
 	        String sql = "UPDATE Cliente SET razonSocial = ?, mail = ?, cuitCuil = ? WHERE id = ?";
 
 	        try (Connection con = ConexionDB.getConexion();
@@ -39,12 +41,12 @@ public class ClienteDAO {
 	            ps.setInt(4, cli.getId());
 	            ps.executeUpdate();
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
+	        } catch (SQLException e) {
+	            throw new DAOException("Error al actualizar al cliente: "+cli.getRazonSocial(), e);
 	        }
 	    }
 
-	    public void delete(int id) {
+	    public void delete(int id) throws DAOException {
 	        String sql = "DELETE FROM Cliente WHERE id = ?";
 
 	        try (Connection con = ConexionDB.getConexion();
@@ -53,12 +55,12 @@ public class ClienteDAO {
 	            ps.setInt(1, id);
 	            ps.executeUpdate();
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
+	        } catch (SQLException e) {
+	            throw new DAOException("Error al eliminar al cliente con id: " + id, e);
 	        }
 	    }
 
-	    public Cliente getByCuitCuil(String cuitCuil) {
+	    public Cliente getByCuitCuil(String cuitCuil) throws DAOException {
 	        String sql = "SELECT * FROM Cliente WHERE cuitCuil = ?";
 	        Cliente cli = null;
 
@@ -76,14 +78,14 @@ public class ClienteDAO {
 	                cli.setMail(rs.getString("mail"));
 	            }
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
+	        } catch (SQLException e) {
+	            throw new DAOException("Error al obtener al cliente con cuit/cuil: " + cuitCuil, e);
 	        }
 
 	        return cli;
 	    }
 
-	    public List<Cliente> getAll() {
+	    public List<Cliente> getAll() throws DAOException {
 	        String sql = "SELECT * FROM Cliente";
 	        List<Cliente> lista = new ArrayList<>();
 
@@ -100,14 +102,14 @@ public class ClienteDAO {
 	                lista.add(cli);
 	            }
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
+	        } catch (SQLException e) {
+	            throw new DAOException("Error al obtener a todos los clientes", e);
 	        }
 
 	        return lista;
 	    }
 	    
-	    public Cliente getOne(int id) {
+	    public Cliente getOne(int id) throws DAOException {
 	        String sql = "SELECT * FROM Cliente WHERE id = ?";
 	        Cliente cli = null;
 
@@ -125,8 +127,8 @@ public class ClienteDAO {
 	                cli.setMail(rs.getString("mail"));
 	            }
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
+	        } catch (SQLException e) {
+	        	throw new DAOException("Error al obtener al cliente con id: " + id, e);
 	        }
 
 	        return cli;
