@@ -13,7 +13,8 @@ public class Etapa {
 	private Date fechaInicio;
 	private Date fechaFin;
 	private Date fechaTentativa;
-	private Proyecto proyecto;
+	// private Proyecto proyecto;
+	private int idProyecto;
 	private List<Tarea> tareas;
 	
 	public int getId() {
@@ -71,13 +72,13 @@ public class Etapa {
 		this.fechaTentativa = fechaTentativa;
 	}
 
-	public Proyecto getProyecto() {
-		return proyecto;
-	}
-
-	public void setProyecto(Proyecto proyecto) {
-		this.proyecto = proyecto;
-	}
+//	public Proyecto getProyecto() {
+//		return proyecto;
+//	}
+//
+//	public void setProyecto(Proyecto proyecto) {
+//		this.proyecto = proyecto;
+//	}
 	
 	
 	public List<Tarea> getTareas() {
@@ -91,6 +92,13 @@ public class Etapa {
 	// Constructor
 	public Etapa() {
 		super();
+	}
+	
+	public int getIdProyecto() {
+		return idProyecto;
+	}
+	public void setIdProyecto(int idProyecto) {
+		this.idProyecto = idProyecto;
 	}
 
 }

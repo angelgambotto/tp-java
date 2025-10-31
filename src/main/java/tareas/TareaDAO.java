@@ -100,13 +100,6 @@ public class TareaDAO {
 		                CategoriaTarea cat = cdao.getById(rs.getInt("idCategoria"));
 		                tarea.setCategoria(cat);
 		                
-		                /* ESTO NO PQ NOS VA A DAR BUCLE INFINITO
-		                //para traer la etapa
-		                EtapaDAO edao = new EtapaDAO();
-		                Etapa etapa = edao.getOne(rs.getInt("idEtapa"));
-		                tarea.setEtapa(etapa);
-		                 */
-		                
 		            }
 			} catch (SQLException e) {
 	        	throw new DAOException("Error al eliminar la tarea con id: "+ id, e);
@@ -130,13 +123,6 @@ public class TareaDAO {
 	                tarea.setFechaInicio(rs.getDate("fechaInicio"));
 	                tarea.setFechaFin(rs.getDate("fechaFin"));
 	                tarea.setIdEtapa(rs.getInt("idEtapa"));
-	                
-	               /* Esto lo vamos a hacer en la etapa 
-	                 //para traer la etapa
-	                EtapaDAO edao = new EtapaDAO();
-	                Etapa etapa = edao.getOne(rs.getInt("idEtapa"));
-	                tarea.setEtapa(etapa);
-	                */
 	                //para traer la categoriaTarea
 	                CategoriaTareaDAO cdao = new CategoriaTareaDAO();
 	                CategoriaTarea cat = cdao.getById(rs.getInt("idCategoria"));
@@ -148,5 +134,35 @@ public class TareaDAO {
 			
 		return tareas;
 		} 
+		
+		public List<Tarea> getByEtapaId(int idEtapa) throws DAOException {
+		    String sql = "SELECT * FROM tarea WHERE idEtapa = ? ORDER BY fechaInicio ASC"; // Orden lógico por fecha
+		    List<Tarea> tareas = new ArrayList<>();
+		    try (Connection con = ConexionDB.getConexion();
+		         PreparedStatement ps = con.prepareStatement(sql)) {
+		        ps.setInt(1, idEtapa);
+		        ResultSet rs = ps.executeQuery();
+		        while (rs.next()) {
+		            Tarea tarea = new Tarea();
+		            tarea.setId(rs.getInt("id"));
+		            tarea.setNombre(rs.getString("nombre"));
+		            tarea.setDescripcion(rs.getString("descripcion"));
+		            tarea.setEstado(rs.getString("estado"));
+		            tarea.setFechaInicio(rs.getDate("fechaInicio"));
+		            tarea.setFechaFin(rs.getDate("fechaFin"));
+		            tarea.setIdEtapa(rs.getInt("idEtapa")); // ID para referencia, sin cargar Etapa completa
+
+		            // Cargar CategoriaTarea (como en tu getAll)
+		            CategoriaTareaDAO cdao = new CategoriaTareaDAO();
+		            CategoriaTarea cat = cdao.getById(rs.getInt("idCategoria"));
+		            tarea.setCategoria(cat);
+
+		            tareas.add(tarea);
+		        }
+		    } catch (SQLException e) {
+		        throw new DAOException("Error al obtener tareas para etapa id: " + idEtapa, e);
+		    }
+		    return tareas;
+		}
 
 }

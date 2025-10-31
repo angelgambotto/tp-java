@@ -2,8 +2,10 @@ package proyectos;
 
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 import clientes.Cliente;
+import etapas.Etapa;
 import usuarios.Usuario;
 
 public class Proyecto {
@@ -15,6 +17,7 @@ public class Proyecto {
 	private Date fechaCreacion;
 	private Usuario supervisor;
 	private LinkedList<Usuario> usuarios;
+	private List<Etapa> etapas;
 	public int getId() {
 		return id;
 	}
@@ -66,9 +69,14 @@ public class Proyecto {
 	public Proyecto() {
 		super();
 	}
+	public List<Etapa> getEtapas() {
+		return etapas;
+	}
+	public void setEtapas(List<Etapa> estapas) {
+		this.etapas = estapas;
+	}
 	public Proyecto(int id, String nombre, String descripcion, String estado, Cliente cliente, Date fechaCreacion, Usuario supervisor,
 			LinkedList<Usuario> usuarios) {
-		super();
 		this.id = id;
 		this.nombre = nombre;
 		this.descripcion = descripcion;

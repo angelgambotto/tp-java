@@ -11,6 +11,7 @@ import java.util.List;
 
 import clientes.Cliente;
 import clientes.ClienteDAO;
+import etapas.EtapaDAO;
 import exceptions.DAOException;
 import utils.ConexionDB;
 import java.sql.Date;
@@ -79,25 +80,26 @@ public class ProyectoDAO {
                 pro.setDescripcion(rs.getString("descripcion"));
                 pro.setEstado(rs.getString("estado"));
                 pro.setFechaCreacion(rs.getDate("fechaCreacion"));
-                
+
                 ClienteDAO clienteDAO = new ClienteDAO();
                 Cliente cli = clienteDAO.getOne(rs.getInt("idCliente"));
                 pro.setCliente(cli);
-                
-                // Cargar supervisor mediante el DAO
+
                 UsuariosDAO usuarioDAO = new UsuariosDAO();
                 Usuario sup = usuarioDAO.getOne(rs.getInt("idSupervisor"));
                 pro.setSupervisor(sup);
-                
-                // Cargar usuarios relacionados (si es necesario)
-                pro.setUsuarios(new LinkedList<>());
+
+                pro.setUsuarios(new LinkedList<>()); // Si lo cargas lazy, aquí vacío
+
+                EtapaDAO etapaDAO = new EtapaDAO();
+                pro.setEtapas(etapaDAO.getByProyectoIdConTareas(id));
             }
         } catch (SQLException e) {
-        	throw new DAOException("Error al obtener el proyecto con id: " + id, e);
+            throw new DAOException("Error al obtener el proyecto con id: " + id, e);
         }
         return pro;
     }
-
+    
     public List<Proyecto> getAll() throws DAOException {
         String sql = "SELECT * FROM Proyecto";
         List<Proyecto> lista = new ArrayList<>();
@@ -122,6 +124,7 @@ public class ProyectoDAO {
                 
                 // Cargar usuarios relacionados (si es necesario)
                 pro.setUsuarios(new LinkedList<>());
+                pro.setEtapas(new LinkedList<>());
                 lista.add(pro);
             }
         } catch (SQLException e) {

@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import exceptions.DAOException;
 import proyectos.Proyecto;
@@ -30,7 +31,7 @@ public class EtapaDAO {
 	            ps.setDate(4, new Date(etapa.getFechaInicio().getTime()));
 	            ps.setDate(5, new Date(etapa.getFechaFin().getTime()));
 	            ps.setDate(6, new Date(etapa.getFechaTentativa().getTime()));
-	            ps.setInt(7, etapa.getProyecto().getId());
+	            ps.setInt(7, etapa.getIdProyecto());
 	            ps.executeUpdate();
 
 	        } catch (SQLException e) {
@@ -52,7 +53,7 @@ public class EtapaDAO {
 	            ps.setDate(4, new Date(etapa.getFechaInicio().getTime()));
 	            ps.setDate(5, new Date(etapa.getFechaFin().getTime()));
 	            ps.setDate(6, new Date(etapa.getFechaTentativa().getTime()));
-	            ps.setInt(7, etapa.getProyecto().getId());
+	            ps.setInt(7, etapa.getIdProyecto());
 	            ps.executeUpdate();
 
 	        } catch (SQLException e) {
@@ -84,7 +85,7 @@ public class EtapaDAO {
 			ps.setInt(1, id);
 	        try (ResultSet rs = ps.executeQuery()) {
 
-	            ProyectoDAO pdao = new ProyectoDAO();
+	            // ProyectoDAO pdao = new ProyectoDAO();
 	            TareaDAO tdao = new TareaDAO();
 
 	            while (rs.next()) {
@@ -98,11 +99,12 @@ public class EtapaDAO {
 	                    etapa.setFechaInicio(rs.getDate("fechaInicio"));
 	                    etapa.setFechaFin(rs.getDate("fechaFin"));
 	                    etapa.setFechaTentativa(rs.getDate("fechaTentativa"));
+	                    etapa.setIdProyecto(rs.getInt("idProyecto"));
 
-	                    int idProyecto = rs.getInt("idProyecto");
-	                    if (idProyecto > 0) {
-	                        etapa.setProyecto(pdao.getById(idProyecto));
-	                    }
+	                    // int idProyecto = rs.getInt("idProyecto");
+		                 // if (idProyecto > 0) {
+		                 //     etapa.setProyecto(pdao.getById(idProyecto));
+	                    // }
 	                }
 
 	                // Si hay tarea (puede ser NULL en LEFT JOIN)
@@ -124,6 +126,8 @@ public class EtapaDAO {
 
 	}
 	
+	
+	//Segun la logica de negocio, nunca vamos a traer todas las etapas en el sistema. Solo las vamos a traer para un proyecto particular (creo) -Angel
 	public List<Etapa> getAll() throws DAOException{
 		String sql = "SELECT etapa.*, tarea.id as tarea_id FROM etapa LEFT JOIN tarea ON etapa.id = tarea.idEtapa";
 		List<Etapa> etapas = new ArrayList<>();
@@ -141,10 +145,7 @@ public class EtapaDAO {
                 etapa.setFechaInicio(rs.getDate("fechaInicio"));
                 etapa.setFechaFin(rs.getDate("fechaFin"));
                 etapa.setFechaTentativa(rs.getDate("fechaTentativa"));
-                
-                ProyectoDAO pdao = new ProyectoDAO();
-                Proyecto pro = pdao.getById(rs.getInt("idProyecto"));
-                etapa.setProyecto(pro);
+                etapa.setIdProyecto(rs.getInt("idProyecto"));
                 
                 // Si hay tarea (puede ser NULL en LEFT JOIN)
                 TareaDAO tdao = new TareaDAO();
@@ -163,6 +164,41 @@ public class EtapaDAO {
 		
 	return etapas;
 	} 
+	
+	public List<Etapa> getByProyectoId(int idProyecto) throws DAOException {
+	    String sql = "SELECT * FROM Etapa WHERE idProyecto = ? ORDER BY fechaInicio ASC"; 
+	    List<Etapa> etapas = new ArrayList<>();
+	    try (Connection con = ConexionDB.getConexion();
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+	        ps.setInt(1, idProyecto);
+	        ResultSet rs = ps.executeQuery();
+	        while (rs.next()) {
+	            Etapa etapa = new Etapa();
+	            etapa.setId(rs.getInt("id"));
+	            etapa.setNombre(rs.getString("nombre"));
+	            etapa.setDescripcion(rs.getString("descripcion"));
+	            etapa.setEstado(rs.getString("estado"));
+	            etapa.setFechaInicio(rs.getDate("fechaInicio"));
+	            etapa.setFechaFin(rs.getDate("fechaFin"));
+	            etapa.setIdProyecto(idProyecto);
+	            etapas.add(etapa);
+	        }
+	    } catch (SQLException e) {
+	        throw new DAOException("Error al obtener etapas para proyecto id: " + idProyecto, e);
+	    }
+	    return etapas;
+	}
+	
+	public List<Etapa> getByProyectoIdConTareas(int idProyecto) throws DAOException {
+	    List<Etapa> etapas = getByProyectoId(idProyecto);
+	    TareaDAO tareaDAO = new TareaDAO();
+	    for (Etapa etapa : etapas) {
+	        List<Tarea> tareas = tareaDAO.getByEtapaId(etapa.getId());
+	        etapa.setTareas(new LinkedList<>(tareas));
+	        for(Tarea t : tareas) t.setIdEtapa(etapa.getId());
+	    }
+	    return etapas;
+	}
 	
 
 }
