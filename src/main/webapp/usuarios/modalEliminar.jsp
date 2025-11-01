@@ -1,7 +1,7 @@
 
 <%@page import="usuarios.Usuario"%>
 <script>
-<%Usuario user = (Usuario) request.getAttribute("usuario");
+<%Usuario user = (Usuario) request.getAttribute("user");
 	String nombre = (user != null && user.getNombre() != null ? user.getNombre(): "Desconocido");
 	String apellido = (user != null && user.getApellido() != null ? user.getApellido(): "Desconocido");
 	String mail = (user != null && user.getMail() != null ? user.getMail() : "Desconocido");

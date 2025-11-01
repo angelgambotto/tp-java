@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     <%@page import = "usuarios.Usuario" %>  
+    <%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,7 +9,9 @@
 <title>Listado de usuarios</title>
 <script src="https://cdn.tailwindcss.com"></script>
 
-<%Usuario user=(Usuario) request.getAttribute("usuario"); %>
+<%Usuario user=(Usuario) request.getAttribute("user");
+List<Usuario> supervisores=(List<Usuario>) request.getAttribute("supervisores");
+%>
 </head>
 <body>
 
@@ -41,25 +44,60 @@
                        class="w-full border border-gray-300 rounded px-3 py-2"/>
             </div>
             <div>
-                <label class="block font-medium">Rol:</label>
-                <input type="text" name="rol"
-                value="<%=user != null?user.getRol():"" %>"
-                       required
-                       class="w-full border border-gray-300 rounded px-3 py-2"/>
-            </div>
-            <div>
-                <label class="block font-medium">Supervisor:</label>
+                <label class="block font-medium">Usuario:</label>
                 <input type="text" name="usuario" 
                 value="<%=user != null?user.getUsuario():"" %>"
                        required
                        class="w-full border border-gray-300 rounded px-3 py-2"/>
             </div>
+            
+            
+            
             <div>
                 <label class="block font-medium">Clave:</label>
                 <input type="password" name="clave"  
                  
                        class="w-full border border-gray-300 rounded px-3 py-2"/>
             </div>
+           <div>
+           <label class="block font-medium">Rol:</label>
+           <select name="rol" required class="w-full border border-gray-300 rounded px-3 py-2">
+           
+           <option value="">Seleccione un rol</option>
+        <option value="Administrador" <%= (user != null && "Administrador".equals(user.getRol())) ? "selected" : "" %>>
+            Administrador
+        </option>
+        <option value="Supervisor" <%= (user != null && "Supervisor".equals(user.getRol())) ? "selected" : "" %>>
+            Supervisor
+        </option>
+        <option value="Usuario" <%= (user != null && "Usuario".equals(user.getRol())) ? "selected" : "" %>>
+            Usuario (sin privilegios)
+        </option></select>
+           </div>
+            <div>
+                <label class="block font-medium">Supervisor:</label>
+                <select name="supervisor"  class="w-full border border-gray-300 rounded px-3 py-2">
+                    <option value="">Sin supervisor</option>
+                    <%
+                        if (supervisores != null) {
+                            for (Usuario s : supervisores) {  
+                                String selected = "";
+                                if (request.getAttribute("user") != null) {
+                                    Usuario selectedUsuario = (Usuario) request.getAttribute("user");
+                                    if (selectedUsuario.getSupervisor()!=null && (s.getId() == selectedUsuario.getSupervisor())) {
+                                        selected = "selected";
+                                    }
+                                }
+                    %>
+                                <option value="<%= s.getId() %>" <%= selected %>><%= s.getNombreCompleto() %></option>
+                    <%
+                            }
+                        }
+                    %>
+                </select>
+            </div>
+            
+            
             
 
             <div class="flex justify-end space-x-4">
@@ -67,7 +105,7 @@
                     Cancelar
                 </button>
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                    <%= request.getAttribute("usuario") != null ? "Actualizar" : "Guardar" %>
+                    <%= request.getAttribute("user") != null ? "Actualizar" : "Guardar" %>
                 </button>
             </div>
         </form>

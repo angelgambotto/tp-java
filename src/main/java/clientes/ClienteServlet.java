@@ -5,6 +5,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import usuarios.Usuario;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +45,12 @@ public class ClienteServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
+    	Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
+	    if (usuario == null || !"Administrador".equalsIgnoreCase(usuario.getRol())) {
+	        response.sendRedirect("login.jsp");
+	        return; 
+	    }
+    	String action = request.getParameter("action");
         if (action == null) action = "list";
         String vista = "clientes/listado.jsp";
         
@@ -85,6 +92,11 @@ public class ClienteServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
+	    if (usuario == null || !"Administrador".equalsIgnoreCase(usuario.getRol())) {
+	        response.sendRedirect("login.jsp");
+	        return; 
+	    }
     	int id = request.getParameter("id") == null || request.getParameter("id").isEmpty()
                 ? 0 : Integer.parseInt(request.getParameter("id"));
     	

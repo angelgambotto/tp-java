@@ -60,6 +60,7 @@
             <th class="border border-gray-300 px-4 py-2">Nombre</th>
             <th class="border border-gray-300 px-4 py-2">Apellido</th>
              <th class="border border-gray-300 px-4 py-2">Mail</th>
+              <th class="border border-gray-300 px-4 py-2">Usuario</th>
             <th class="border border-gray-300 px-4 py-2">Rol</th>
             <th class="border border-gray-300 px-4 py-2">Supervisor</th>
             <th class="border border-gray-300 px-4 py-2  w-[180px]">Acciones</th>
@@ -75,8 +76,9 @@
             <td class="border border-gray-300 px-4 py-2"><%= user.getNombre() %></td>
             <td class="border border-gray-300 px-4 py-2"><%= user.getApellido() %></td>
             <td class="border border-gray-300 px-4 py-2"><%= user.getMail() %></td>
-            <td class="border border-gray-300 px-4 py-2"><%= user.getRol() %></td>
-            <td class="border border-gray-300 px-4 py-2"><%= user.getUsuario() %></td>
+              <td class="border border-gray-300 px-4 py-2"><%= user.getUsuario() %></td> 
+                         <td class="border border-gray-300 px-4 py-2"><%= user.getRol() %></td>
+            <td class="border border-gray-300 px-4 py-2"><%= user.getNombreSupervisor() %></td>
             <td class="border border-gray-300 px-4 py-2">
              <a href="UsuariosServlet?action=edit&id=<%= user.getId() %>" class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[70px] inline-block text-center"  >Editar</a>
 

@@ -1,5 +1,7 @@
 package usuarios;
 
+import exceptions.DAOException;
+
 public class Usuario {
 	private int id;
 	private String nombre;
@@ -8,9 +10,17 @@ public class Usuario {
 	private String clave;
 	private String usuario;
 	private String rol;
+	private Integer supervisor;
+	private String nombreSupervisor;
 	
 	public int getId() {
 		return id;
+	}
+	public void setNombreSupervisor(String nombreSupervisor) {
+		this.nombreSupervisor=nombreSupervisor;
+	}
+	public String getNombreSupervisor() {
+		return nombreSupervisor;
 	}
 	public void setId(int id) {
 		this.id = id;
@@ -42,6 +52,12 @@ public class Usuario {
 	public String getUsuario() {
 		return usuario;
 	}
+	public Integer getSupervisor() {
+		return supervisor;
+	}
+	public void setSupervisor(Integer supervisor) {
+		this.supervisor=supervisor;
+	}
 	public void setUsuario(String usuario) {
 		this.usuario = usuario;
 	}
@@ -54,7 +70,7 @@ public class Usuario {
 	public Usuario() {
 		super();
 	}
-	public Usuario(int id, String nombre, String apellido, String mail, String clave, String usuario, String rol) {
+	public Usuario(int id, String nombre, String apellido, String mail, String clave, String usuario, String rol, Integer supervisor) {
 		super();
 		this.id = id;
 		this.nombre = nombre;
@@ -63,11 +79,10 @@ public class Usuario {
 		this.clave = clave;
 		this.usuario = usuario;
 		this.rol = rol;
+		this.supervisor=supervisor;
 	}
 	
 	public String getNombreCompleto() {
 		return this.nombre.concat(" ").concat(apellido);
 	}
-	
-	
-}
+	}

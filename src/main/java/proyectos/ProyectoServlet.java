@@ -75,7 +75,12 @@ public class ProyectoServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
+    	Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
+	    if (usuario == null || !"Administrador".equalsIgnoreCase(usuario.getRol())) {
+	        response.sendRedirect("login.jsp");
+	        return; 
+	    }
+    	String action = request.getParameter("action");
 
         if (action == null) action = "list";
 
@@ -124,7 +129,12 @@ public class ProyectoServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int id = request.getParameter("id") == null || request.getParameter("id").isEmpty()
+    	Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
+	    if (usuario == null || !"Administrador".equalsIgnoreCase(usuario.getRol())) {
+	        response.sendRedirect("login.jsp");
+	        return; 
+	    }
+    	int id = request.getParameter("id") == null || request.getParameter("id").isEmpty()
                  ? 0 : Integer.parseInt(request.getParameter("id"));
         
         //para hacer el update/insert
