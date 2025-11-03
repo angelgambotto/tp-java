@@ -52,6 +52,10 @@
                 Ingresar
             </button>
         </div>
+        <p class="text-sm text-center text-gray-700 mt-4">
+            ¿No tenés cuenta?
+            <a href="signup.jsp" class="text-blue-600 hover:underline">Registrate acá</a>
+        </p>
     </form>
 </div>
 

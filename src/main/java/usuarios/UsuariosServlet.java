@@ -130,46 +130,64 @@ public class UsuariosServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+
 		Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
-	    if (usuario == null || !"Administrador".equalsIgnoreCase(usuario.getRol())) {
-	        response.sendRedirect("login.jsp");
-	        return; 
-	    }
+		boolean esAdmin = (usuario != null && "Administrador".equalsIgnoreCase(usuario.getRol()));
+
+		
+		
 		String idReq=request.getParameter("id");
 		int id=(idReq==null || idReq.isEmpty())?0:Integer.parseInt(idReq);
 		String action = (request.getParameter("action")) != null ? request.getParameter("action") : "Desconocido";
-		
+		if (!esAdmin && !"signup".equalsIgnoreCase(action)) {
+		    response.sendRedirect("login.jsp");
+		    return;
+		}
 		try {
-			if (action.equals("confirmDelete")) {
-				if(id> 0 && cargarUsuSeguro(request, id) != null) {
-					userDAO.delete(id);
-				} else {
-					request.setAttribute("error", "ID de usuario inválido");
-					request.setAttribute("usuarios", cargarUsuariosSeguro(request));
-					request.getRequestDispatcher("usuarios/listado.jsp").forward(request, response);
-				}
-				response.sendRedirect("UsuariosServlet");
-				return;
-			}
 			
-			String nombreUsuario=request.getParameter("nombre");
-			String apellidoUsuario=request.getParameter("apellido");
-			String claveUsuario=request.getParameter("clave");
-			String mailUsuario=request.getParameter("mail");
-			String rolUsuario=request.getParameter("rol");
-			String usuarioUsuario=request.getParameter("usuario");
-			String s = request.getParameter("supervisor");
-			Integer supervisor = null; 
-
-			if (s != null && !s.isEmpty()) {
-			    supervisor = Integer.parseInt(s);
+			if("signup".equalsIgnoreCase(action)){
+				String nombre=request.getParameter("nombre");
+				String apellido=request.getParameter("apellido");
+				String user=request.getParameter("usuario");
+				String mail=request.getParameter("mail");
+				String clave=request.getParameter("clave");
+				String rol="Usuario";
+				Integer supervisor=null;
+				Usuario u=new Usuario(0,nombre,apellido,mail,clave,user,rol,supervisor);
+				userDAO.add(u);
 			}
-
-			if(id!=0) {
-				Usuario userPrevio=userDAO.getOne(id);
-				if(claveUsuario==null||claveUsuario.isEmpty()) {
-					claveUsuario=userPrevio.getClave();
+			if(esAdmin) {
+				if (action.equals("confirmDelete")) {
+					if(id> 0 && cargarUsuSeguro(request, id) != null) {
+						userDAO.delete(id);
+					} else {
+						request.setAttribute("error", "ID de usuario inválido");
+						request.setAttribute("usuarios", cargarUsuariosSeguro(request));
+						request.getRequestDispatcher("usuarios/listado.jsp").forward(request, response);
+					}
+					response.sendRedirect("UsuariosServlet");
+					return;
 				}
+				
+				String nombreUsuario=request.getParameter("nombre");
+				String apellidoUsuario=request.getParameter("apellido");
+				String claveUsuario=request.getParameter("clave");
+				String mailUsuario=request.getParameter("mail");
+				String rolUsuario=request.getParameter("rol");
+				String usuarioUsuario=request.getParameter("usuario");
+				String s = request.getParameter("supervisor");
+				Integer supervisor = null; 
+	
+				if (s != null && !s.isEmpty()) {
+				    supervisor = Integer.parseInt(s);
+				}
+	
+				if(id!=0) {
+					Usuario userPrevio=userDAO.getOne(id);
+					if(claveUsuario==null||claveUsuario.isEmpty()) {
+						claveUsuario=userPrevio.getClave();
+					}
 			}
 			
 			Usuario user=new Usuario(id,nombreUsuario,apellidoUsuario,mailUsuario,claveUsuario,usuarioUsuario,rolUsuario,supervisor);
@@ -178,7 +196,7 @@ public class UsuariosServlet extends HttpServlet {
 			} else {
 				userDAO.update(user);
 			}
-			
+			}
 			response.sendRedirect("UsuariosServlet");
 			
 		} catch(DAOException e) {
