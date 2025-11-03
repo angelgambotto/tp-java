@@ -18,6 +18,8 @@ public class Proyecto {
 	private Usuario supervisor;
 	private LinkedList<Usuario> usuarios;
 	private List<Etapa> etapas;
+	
+	
 	public int getId() {
 		return id;
 	}
