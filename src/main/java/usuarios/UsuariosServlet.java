@@ -53,13 +53,7 @@ public class UsuariosServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
-	    if (usuario == null || !"Administrador".equalsIgnoreCase(usuario.getRol())) {
-	        response.sendRedirect("login.jsp");
-	        return; 
-	    }
-		
-		
+	
 		String action=request.getParameter("action");
 	int idUsuario;
 	if(action!=null) {

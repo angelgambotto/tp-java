@@ -58,9 +58,26 @@ public class LoginServlet extends HttpServlet {
 		
 		Usuario user=buscarParaLoginSeguro(request,usuario, password);
 		if(user!=null) {
-			HttpSession session=request.getSession();
-			session.setAttribute("usuario", user);
-			response.sendRedirect(request.getContextPath() + "/UsuariosServlet");
+			HttpSession session = request.getSession();
+		    session.setAttribute("usuario", user);
+		    System.out.println(user.getRol().toLowerCase());
+		    switch (user.getRol().toLowerCase()) {
+		        case "administrator":
+		            response.sendRedirect(request.getContextPath() + "/UsuariosServlet");
+		            break;
+		        case "empleado":
+		            response.sendRedirect(request.getContextPath() + "/ProyectoServlet");
+		            break;
+		        //case "empleado":
+		        //    response.sendRedirect(request.getContextPath() + "/TareasServlet");
+		        //    break;
+		        //case "cliente":
+		        //    response.sendRedirect(request.getContextPath() + "/ProyectosClienteServlet");
+		        //    break;
+		        default:
+		            response.sendRedirect("login.jsp");
+		            break;
+		    }
 			
 		}
 		else {
@@ -68,5 +85,18 @@ public class LoginServlet extends HttpServlet {
 			request.getRequestDispatcher("login.jsp").forward(request, response);
 		}
 	}
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    // Si alguien entra por GET, lo redirigís al formulario de login
+	    request.getRequestDispatcher("login.jsp").forward(request, response);
+	}
+
+	@Override
+	public void destroy() {
+	    utils.ConexionDB.shutdownCleanupThread();
+	    super.destroy();
+	}
+
+
 
 }

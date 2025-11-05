@@ -16,4 +16,12 @@ public class ConexionDB {
             throw new RuntimeException("Error al conectar a la BD: " + e.getMessage());
         }
     }
+    public static void shutdownCleanupThread() {
+        try {
+            com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.checkedShutdown();
+            System.out.println("[INFO] Limpieza del hilo de conexión MySQL completada");
+        } catch (Exception e) {
+            System.err.println("[WARN] Error al cerrar hilo de limpieza MySQL: " + e.getMessage());
+        }
+    }
 }

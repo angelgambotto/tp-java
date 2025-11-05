@@ -75,11 +75,8 @@ public class ProyectoServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
-	    if (usuario == null || !"Administrador".equalsIgnoreCase(usuario.getRol())) {
-	        response.sendRedirect("login.jsp");
-	        return; 
-	    }
+    	
+	    
     	String action = request.getParameter("action");
 
         if (action == null) action = "list";
