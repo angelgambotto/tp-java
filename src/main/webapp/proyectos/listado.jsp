@@ -119,7 +119,7 @@
                         %>
                                 <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 relative">
                                 <!-- Descomentar para activar redireccion a EtapaServletal ahcer click sobre una card-->
-                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 relative cursor-pointer" onclick="window.location.href='EtapaServlet?action=view&id=<%= pro.getId() %>';" >
+                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 relative cursor-pointer" onclick="window.location.href='EtapaServlet?action=list&idProyecto=<%= pro.getId() %>';" >
                                 
                                     <!-- Menú de tres puntos arriba derecha -->
                                     <div class="absolute top-2 right-2">
