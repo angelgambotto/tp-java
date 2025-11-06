@@ -1,9 +1,8 @@
 package etapas;
 import java.sql.Date;
 import java.util.List;
-
-import proyectos.Proyecto;
 import tareas.Tarea;
+
 
 public class Etapa {
 	private int id;
@@ -93,6 +92,7 @@ public class Etapa {
 	public Etapa() {
 		super();
 	}
+	
 	
 	public int getIdProyecto() {
 		return idProyecto;

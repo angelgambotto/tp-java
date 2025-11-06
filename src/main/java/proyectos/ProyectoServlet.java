@@ -62,7 +62,7 @@ public class ProyectoServlet extends HttpServlet {
 	    try {
 	        return dao.getById(id);
 	    } catch (DAOException e) {
-	        request.setAttribute("error", "No se pudieron cargar los clientes: " + e.getMessage());
+	        request.setAttribute("error", "No se pudo cargar el proyecto: " + e.getMessage());
 	        return new Proyecto();
 	    }
 	}	

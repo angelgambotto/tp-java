@@ -2,6 +2,7 @@ package tareas;
 
 import java.sql.Date;
 import categoriaTarea.CategoriaTarea;
+import usuarios.Usuario;
 
 
 public class Tarea {
@@ -13,7 +14,7 @@ public class Tarea {
 	private Date fechaFin;
 	private int idEtapa;
 	private CategoriaTarea categoria;
-	
+	private Usuario usuario;
 	
 	public int getId() {
 		return id;
@@ -77,6 +78,15 @@ public class Tarea {
 
 	public void setCategoria(CategoriaTarea categoria) {
 		this.categoria = categoria;
+	}
+	
+	
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	//Constructor

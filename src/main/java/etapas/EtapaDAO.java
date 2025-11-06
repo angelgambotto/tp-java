@@ -20,19 +20,37 @@ public class EtapaDAO {
 	
 	public void insert(Etapa etapa) throws DAOException {
 		String sql = "INSERT INTO etapa "
-				+ "(nombre, descripcion, estado, fechaInicio, fechaFin, fechaTentativa, idProyecto;) VALUES (?, ?, ?, ?, ?, ?, ?)";
+				+ "(nombre, descripcion, estado, fechaInicio, fechaFin, fechaTentativa, idProyecto) VALUES (?, ?, ?, ?, ?, ?, ?)";
 		
 		try (Connection con = ConexionDB.getConexion();
+				
 	             PreparedStatement ps = con.prepareStatement(sql)) {
 
 	            ps.setString(1, etapa.getNombre());
 	            ps.setString(2, etapa.getDescripcion());
 	            ps.setString(3, etapa.getEstado());
-	            ps.setDate(4, new Date(etapa.getFechaInicio().getTime()));
-	            ps.setDate(5, new Date(etapa.getFechaFin().getTime()));
-	            ps.setDate(6, new Date(etapa.getFechaTentativa().getTime()));
+	         //FECHA INICIO (obligatoria) 
+	            ps.setDate(4, etapa.getFechaInicio() != null ? 
+	                new java.sql.Date(etapa.getFechaInicio().getTime()) : null);
+
+	            // FECHA FIN (opcional) 
+	            ps.setDate(5, etapa.getFechaFin() != null ? 
+	                new java.sql.Date(etapa.getFechaFin().getTime()) : null);
+
+	            // FECHA TENTATIVA (opcional) 
+	            ps.setDate(6, etapa.getFechaTentativa() != null ? 
+	                new java.sql.Date(etapa.getFechaTentativa().getTime()) : null);
 	            ps.setInt(7, etapa.getIdProyecto());
-	            ps.executeUpdate();
+	            
+	            // para debug
+	            int filas = ps.executeUpdate();
+	            System.out.println("FILAS INSERTADAS: " + filas);  
+
+	            // Para ver si se insertó de verdad
+	            ResultSet rs = ps.getGeneratedKeys();
+	            if (rs.next()) {
+	                System.out.println("ID NUEVO: " + rs.getInt(1));  // ← ¿Aparece?
+	            }
 
 	        } catch (SQLException e) {
 	        	throw new DAOException("Error al insertar la etapa: "+ etapa.getNombre(), e);
@@ -41,8 +59,8 @@ public class EtapaDAO {
 	
 	public void update(Etapa etapa) throws DAOException{
 		 String sql = "UPDATE etapa SET nombre = ?, descripcion = ?, "
-		 		+ "	SET estado = ?, SET fechaInicio = ?, SET fechaFin = ?, SET fechaTentativa = ?"
-		 		+ " WHERE id = ?";
+		 		+ " estado = ?, fechaInicio = ?, fechaFin = ?, fechaTentativa = ?,"
+		 		+ " idProyecto = ? WHERE id = ?";
 		 
 		 try (Connection con = ConexionDB.getConexion();
 	             PreparedStatement ps = con.prepareStatement(sql)) {
@@ -50,10 +68,16 @@ public class EtapaDAO {
 	            ps.setString(1, etapa.getNombre());
 	            ps.setString(2, etapa.getDescripcion());
 	            ps.setString(3, etapa.getEstado());
-	            ps.setDate(4, new Date(etapa.getFechaInicio().getTime()));
-	            ps.setDate(5, new Date(etapa.getFechaFin().getTime()));
-	            ps.setDate(6, new Date(etapa.getFechaTentativa().getTime()));
+	            ps.setDate(4, etapa.getFechaInicio() != null ? 
+	                    new java.sql.Date(etapa.getFechaInicio().getTime()) : null);
+
+                ps.setDate(5, etapa.getFechaFin() != null ? 
+                    new java.sql.Date(etapa.getFechaFin().getTime()) : null);
+
+                ps.setDate(6, etapa.getFechaTentativa() != null ? 
+                    new java.sql.Date(etapa.getFechaTentativa().getTime()) : null);
 	            ps.setInt(7, etapa.getIdProyecto());
+	            ps.setInt(8, etapa.getId());
 	            ps.executeUpdate();
 
 	        } catch (SQLException e) {
@@ -75,7 +99,7 @@ public class EtapaDAO {
 	}
 	
 	public Etapa getOne(int id) throws DAOException{
-		String sql = "SELECT etapa.*, tarea.id as tarea_id FROM etapa LEFT JOIN tarea ON etapa.id = tarea.idEtapa WHERE id = ?";
+		String sql = "SELECT etapa.*, tarea.id as tarea_id FROM etapa LEFT JOIN tarea ON etapa.id = tarea.idEtapa WHERE etapa.id = ?";
 		Etapa etapa = null;
 		List<Tarea> tareas = new ArrayList<>();
 		
@@ -120,7 +144,7 @@ public class EtapaDAO {
 	            }
 	        }
 		} catch (SQLException e) {
-        	throw new DAOException("Error al eliminar la etapa con id: "+ id, e);
+        	throw new DAOException("Error al cargar la etapa con id: "+ id, e);
         }
 		return etapa;
 
