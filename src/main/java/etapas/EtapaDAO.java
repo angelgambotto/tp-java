@@ -24,7 +24,7 @@ public class EtapaDAO {
 		
 		try (Connection con = ConexionDB.getConexion();
 				
-	             PreparedStatement ps = con.prepareStatement(sql)) {
+	             PreparedStatement ps = con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)) {
 
 	            ps.setString(1, etapa.getNombre());
 	            ps.setString(2, etapa.getDescripcion());
