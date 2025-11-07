@@ -66,7 +66,7 @@ public class LoginServlet extends HttpServlet {
 		            response.sendRedirect(request.getContextPath() + "/UsuariosServlet");
 		            break;
 		        case "empleado":
-		            response.sendRedirect(request.getContextPath() + "/ProyectoServlet");
+		        	response.sendRedirect(request.getContextPath() + "/TareaServlet?action=mis-tareas");
 		            break;
 		        //case "empleado":
 		        //    response.sendRedirect(request.getContextPath() + "/TareasServlet");

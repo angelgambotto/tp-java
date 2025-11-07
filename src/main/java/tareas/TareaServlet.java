@@ -69,19 +69,39 @@ public class TareaServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			
-		Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
-        if (usuario == null || !"Administrador".equalsIgnoreCase(usuario.getRol())) {
+			Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
+			String rol = usuario != null ? usuario.getRol().toLowerCase() : "";
+
+			if (usuario == null || (!"administrador".equals(rol) && !"empleado".equals(rol))) {
+			    response.sendRedirect("login.jsp");
+			    return;
+			}   
+        boolean esAdmin = "administrador".equals(rol);
+        boolean esEmpleado = "empleado".equals(rol);
+
+        if (!esAdmin && !esEmpleado) {
             response.sendRedirect("login.jsp");
             return;
         }
+
+        // Acción por defecto según rol
         String action = request.getParameter("action");
+        if (action == null) {
+            action = esAdmin ? "list" : "mis-tareas";
+        }
+        
         switch(action) {
         case "list":
+        	if (!esAdmin) {
+                response.sendRedirect("TareaServlet?action=mis-tareas");
+                return;
+            }
         	int idEtapa=Integer.parseInt(request.getParameter("idEtapa"));
         	List<Tarea> tareas=tdao.getByEtapaId(idEtapa);
         	request.setAttribute("tareas", tareas);
         	Etapa e=edao.getOne(idEtapa);
         	request.setAttribute("etapa", e);
+        	request.setAttribute("esAdmin", true);
         	request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);
         	break;
         case "new":
@@ -109,6 +129,12 @@ public class TareaServlet extends HttpServlet {
             request.setAttribute("idEtapa", tarea.getIdEtapa());
             request.getRequestDispatcher("/tareas/formulario.jsp").forward(request, response);
             break;
+        case "mis-tareas":
+            List<Tarea> misTareas = tdao.getByUsuarioId(usuario.getId());
+            request.setAttribute("tareas", misTareas);
+            request.setAttribute("esEmpleado", true);
+            request.getRequestDispatcher("/tareas/mis-tareas.jsp").forward(request, response);
+            break;
         }
         
 		}
@@ -123,6 +149,15 @@ public class TareaServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		
+		// DESPUES VER DE NO PERMITIRLE CIERTAS COSAS AL EMPLEADO
+		/*Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
+	    if (usuario == null || !"administrador".equalsIgnoreCase(usuario.getRol())) {
+	        response.sendRedirect("TareaServlet"); // o "mis-tareas"
+		
+	        response.sendRedirect("TareaServlet?action=mis-tareas");
+	        return;
+	    }*/
 		String action=request.getParameter("action");
 		switch(action) {
 		case "insert":

@@ -13,10 +13,21 @@
 
        
         <nav class="flex justify-center space-x-8">
+        	<% 
+        	switch(usuario.getRol()){
+        	case "Administrador":
+        	%>
             <a href="UsuariosServlet" class="hover:underline">Usuarios</a>
             <a href="ProyectoServlet" class="hover:underline">Proyectos</a>
             <a href="ClienteServlet" class="hover:underline">Clientes</a>
             <a href="CategoriaTareaServlet" class="hover:underline">Categorías</a>
+            <% break;
+        	case "Empleado":
+            	%>
+            	<a href="TareaServlet" class="hover:underline">Mis tareas</a>
+            	<%
+            	break;
+            	} %>
         </nav>
 
        
