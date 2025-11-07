@@ -1,6 +1,9 @@
 package tareas;
 
 import java.sql.Date;
+
+import java.util.List;
+
 import categoriaTarea.CategoriaTarea;
 import usuarios.Usuario;
 
@@ -13,8 +16,8 @@ public class Tarea {
 	private Date fechaInicio;
 	private Date fechaFin;
 	private int idEtapa;
-	private CategoriaTarea categoria;
-	private Usuario usuario;
+	private int idCategoria;
+	private List<Usuario> usuarios;
 	
 	public int getId() {
 		return id;
@@ -72,21 +75,21 @@ public class Tarea {
 		this.idEtapa = idEtapa;
 	}
 
-	public CategoriaTarea getCategoria() {
-		return categoria;
+	public int getIdCategoria() {
+		return idCategoria;
 	}
 
-	public void setCategoria(CategoriaTarea categoria) {
-		this.categoria = categoria;
+	public void setIdCategoria(int idCategoria) {
+		this.idCategoria = idCategoria;
 	}
 	
 	
-	public Usuario getUsuario() {
-		return usuario;
+	public List<Usuario> getUsuarios() {
+		return usuarios;
 	}
 
-	public void setUsuario(Usuario usuario) {
-		this.usuario = usuario;
+	public void setUsuarios(List<Usuario> usuarios) {
+		this.usuarios = usuarios;
 	}
 
 	//Constructor

@@ -14,55 +14,124 @@ import categoriaTarea.CategoriaTareaDAO;
 //import etapas.Etapa;
 //import etapas.EtapaDAO;
 import exceptions.DAOException;
+import usuarios.Usuario;
 import utils.ConexionDB;
 
 public class TareaDAO {
 
-	 public void insert(Tarea tarea) throws DAOException {
+	 public void insert(Tarea tarea,List<Integer> usuarios) throws DAOException {
 	        String sql = "INSERT INTO tarea (nombre, descripcion, estado, fechaInicio, fechaFin, idEtapa, idCategoria) VALUES (?,?,?,?,?,?,?)";
-	        try (Connection con = ConexionDB.getConexion();
-	             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+	        String sql2="INSERT INTO tarea_usuario (idTarea,idEmpleado) VALUES (?,?)";
+	        try {Connection con = ConexionDB.getConexion();
+	             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 	        	
 	            ps.setString(1, tarea.getNombre());
 	            ps.setString(2, tarea.getDescripcion());
 	            ps.setString(3, tarea.getEstado());
 	            ps.setDate(4,new Date(tarea.getFechaInicio().getTime()));
-	            ps.setDate(5, new Date(tarea.getFechaFin().getTime()));
+	            ps.setDate(5,new Date(tarea.getFechaFin().getTime()));
 	            ps.setInt(6, tarea.getIdEtapa());
-	            ps.setInt(7, tarea.getCategoria().getId());
+	            ps.setInt(7, tarea.getIdCategoria());
 	            ps.executeUpdate();
-	            try (ResultSet rs = ps.getGeneratedKeys()) {
+	            ResultSet rs = ps.getGeneratedKeys(); 
 	                if (rs.next()) {
 	                    tarea.setId(rs.getInt(1));
 	                }
+	            PreparedStatement ps2=con.prepareStatement(sql2);
+	            for(Integer idUsuario:usuarios) {
+	            	ps2.setInt(1, tarea.getId());
+	            	ps2.setInt(2, idUsuario);
+	            	ps2.executeUpdate();
 	            }
 	        } catch (SQLException e) {
 	            throw new DAOException("Error al agregar la tarea: " + tarea.getNombre(), e);
 	        }
 	    }
 	 
-	 public void update(Tarea tarea) throws DAOException{
-		 String sql = "UPDATE tarea SET nombre = ?, descripcion = ?, "
-		 		+ "	SET estado = ?, SET fechaInicio = ?, SET fechaFin = ?, SET idEtapa = ?, SET idCategoria = ?"
-		 		+ " WHERE id = ?";
-		 
-		 try (Connection con = ConexionDB.getConexion();
-	             PreparedStatement ps = con.prepareStatement(sql)) {
+	 public void update(Tarea tarea, List<Integer> usuariosSeleccionados) throws DAOException {
 
-			 	ps.setString(1, tarea.getNombre());
-	            ps.setString(2, tarea.getDescripcion());
-	            ps.setString(3, tarea.getEstado());
-	            ps.setDate(4,new Date(tarea.getFechaInicio().getTime()));
-	            ps.setDate(5, new Date(tarea.getFechaFin().getTime()));
-	            ps.setInt(6, tarea.getIdEtapa());
-	            ps.setInt(7, tarea.getCategoria().getId());
-	            ps.executeUpdate();
+		    String sqlUpdate = "UPDATE tarea SET nombre=?, descripcion=?, fechaInicio=?, fechaFin=?, idCategoria=? WHERE id=?";
+		    String sqlUsuariosActuales = "SELECT idUsuario FROM tarea_usuario WHERE idTarea=?";
+		    String sqlInsertUsuario = "INSERT INTO tarea_usuario (idTarea, idUsuario) VALUES (?, ?)";
+		    String sqlDeleteUsuario = "DELETE FROM tarea_usuario WHERE idTarea=? AND idUsuario=?";
 
-	        } catch (SQLException e) {
-	        	throw new DAOException("Error al actualizar la tarea: "+ tarea.getNombre(), e);
-	        }
-	 }
-	 
+		    try {
+		        Connection con=ConexionDB.getConexion();
+		        PreparedStatement ps = con.prepareStatement(sqlUpdate);
+		        ps.setString(1, tarea.getNombre());
+		        ps.setString(2, tarea.getDescripcion());
+		        ps.setDate(3, tarea.getFechaInicio());
+		        ps.setDate(4, tarea.getFechaFin());
+		        ps.setInt(5, tarea.getIdCategoria());
+		        ps.setInt(6, tarea.getId());
+		        ps.executeUpdate();
+PreparedStatement psUsuariosAct = con.prepareStatement(sqlUsuariosActuales);
+		        psUsuariosAct.setInt(1, tarea.getId());
+		        ResultSet rs = psUsuariosAct.executeQuery();
+		        List<Integer> usuariosActualesBD = new ArrayList<>();
+
+		        while (rs.next()) {
+		            usuariosActualesBD.add(rs.getInt(1));
+		        }
+
+		       
+		        PreparedStatement psInsert = con.prepareStatement(sqlInsertUsuario);
+		        for (Integer u : usuariosSeleccionados) {
+		            if (!usuariosActualesBD.contains(u)) {
+		                
+		            	
+		            	
+		            		psInsert.setInt(1, tarea.getId());
+		                psInsert.setInt(2, u);
+		                psInsert.executeUpdate();
+		            }
+		        }
+		       
+		        PreparedStatement psDelete = con.prepareStatement(sqlDeleteUsuario);
+		        for (Integer u : usuariosActualesBD) {
+		            if (!usuariosSeleccionados.contains(u)) {
+		                psDelete.setInt(1, tarea.getId());
+		                psDelete.setInt(2, u);
+		                psDelete.executeUpdate();
+		            }
+		        }
+
+		    } catch (SQLException e) {
+		        throw new DAOException("Error actualizando tarea", e);
+		    }
+		}
+
+	 public List<Usuario> getUsuariosAsignados(int idTarea) throws DAOException {
+		    List<Usuario> usuarios = new ArrayList<>();
+
+		    String sql = "SELECT u.id, u.usuario, u.mail FROM usuario u  INNER JOIN tarea_usuario tu ON tu.idUsuario = u.idUsuario WHERE tu.idTarea = ?"; 
+		                 
+		                  
+		                 
+
+		    try (Connection con = ConexionDB.getConexion();
+		         PreparedStatement ps = con.prepareStatement(sql)) {
+
+		        ps.setInt(1, idTarea);
+
+		        try (ResultSet rs = ps.executeQuery()) {
+
+		            while (rs.next()) {
+		                Usuario u = new Usuario();
+		                u.setId(rs.getInt("id"));
+		                u.setNombre(rs.getString("usuario"));
+		                u.setMail(rs.getString("mail"));
+
+		                usuarios.add(u);
+		            }
+		        }
+		    } catch (SQLException e) {
+		        throw new DAOException("Error obteniendo usuarios asignados a la tarea", e);
+		    }
+
+		    return usuarios;
+		}
+
 		public void delete(int id) throws DAOException {
 			String sql = "DELETE FROM tarea WHERE id = ?";
 			
@@ -96,9 +165,9 @@ public class TareaDAO {
 		                tarea.setIdEtapa(rs.getInt("idEtapa"));
 		                
 		                //para traer la categoriaTarea
-		                CategoriaTareaDAO cdao = new CategoriaTareaDAO();
-		                CategoriaTarea cat = cdao.getById(rs.getInt("idCategoria"));
-		                tarea.setCategoria(cat);
+		                //CategoriaTareaDAO cdao = new CategoriaTareaDAO();
+		                //CategoriaTarea cat = cdao.getById(rs.getInt("idCategoria"));
+		                tarea.setIdCategoria(rs.getInt("idCategoria"));
 		                
 		            }
 			} catch (SQLException e) {
@@ -124,9 +193,9 @@ public class TareaDAO {
 	                tarea.setFechaFin(rs.getDate("fechaFin"));
 	                tarea.setIdEtapa(rs.getInt("idEtapa"));
 	                //para traer la categoriaTarea
-	                CategoriaTareaDAO cdao = new CategoriaTareaDAO();
-	                CategoriaTarea cat = cdao.getById(rs.getInt("idCategoria"));
-	                tarea.setCategoria(cat);
+	                //CategoriaTareaDAO cdao = new CategoriaTareaDAO();
+	                //CategoriaTarea cat = cdao.getById(rs.getInt("idCategoria"));
+	                tarea.setIdCategoria(rs.getInt("idCategoria"));
 	            }
 			} catch (SQLException e) {
 	        	throw new DAOException("Error al obtener todas las tareas ", e);
@@ -152,10 +221,10 @@ public class TareaDAO {
 		            tarea.setFechaFin(rs.getDate("fechaFin"));
 		            tarea.setIdEtapa(rs.getInt("idEtapa")); // ID para referencia, sin cargar Etapa completa
 
-		            // Cargar CategoriaTarea (como en tu getAll)
-		            CategoriaTareaDAO cdao = new CategoriaTareaDAO();
-		            CategoriaTarea cat = cdao.getById(rs.getInt("idCategoria"));
-		            tarea.setCategoria(cat);
+		            // Cargar CategoriaTarea 
+		            //CategoriaTareaDAO cdao = new CategoriaTareaDAO();
+		            //CategoriaTarea cat = cdao.getById());
+		            tarea.setIdCategoria(rs.getInt("idCategoria"));
 
 		            tareas.add(tarea);
 		        }

@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import usuarios.Usuario;
 
-@WebFilter("/*ProyectoServlet")
+@WebFilter("/UsuariosServlet")
 public class SeguridadFilter implements Filter {
 
     @Override
@@ -37,13 +37,13 @@ public class SeguridadFilter implements Filter {
         String rol = usuario.getRol().toUpperCase();
 
         // Reglas de acceso
-        if (path.contains("/UsuariosServlet") && !rol.equals("ADMINISTRATOR")) {
+        if (path.contains("/UsuariosServlet") && !rol.equals("ADMINISTRADOR")) {
             res.sendRedirect(req.getContextPath() + "/sinPermiso.jsp");
             return;
         }
 
         if (path.contains("/ProyectoServlet") &&
-                !(rol.equals("ADMINISTRATOR") || rol.equals("SUPERVISOR"))) {
+                !(rol.equals("ADMINISTRADOR") || rol.equals("SUPERVISOR"))) {
             res.sendRedirect(req.getContextPath() + "/sinPermiso.jsp");
             return;
         }
