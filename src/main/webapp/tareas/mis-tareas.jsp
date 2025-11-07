@@ -19,14 +19,56 @@
         <p class="text-gray-500">No tienes tareas asignadas.</p>
     <% } else { %>
         <table class="min-w-full">
-            <thead><tr><th>Nombre</th><th>Etapa</th><th>Estado</th><th>Fin</th></tr></thead>
+            
+            <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripcion</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Etapa</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha inicio</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha fin</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                </thead>
             <tbody>
             <% for (Tarea t : tareas) { %>
                 <tr>
-                    <td><%= t.getNombre() %></td>
-                    <td><%= t.getIdEtapa() %></td>
-                    <td><%= t.getEstado() %></td>
-                    <td><%= t.getFechaFin() %></td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900"><%= t.getNombre() %></div> 
+               </td>
+               <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900"><%= t.getDescripcion() %></div> 
+               </td>
+               <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900"><%= t.getIdEtapa() %></div> 
+               </td>
+               <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900"><%= t.getEstado() %></div> 
+               </td>
+               <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900"><%= t.getFechaInicio() %></div> 
+               </td>
+               <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900">
+                      <% if(t.getFechaFin()!= null){ %>
+                      <%= t.getFechaFin() %>
+                      <%} else{
+                    	  %>
+                    	  ---</div> 
+                      <% }%>
+               </td>
+               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="/"
+                                   class="text-indigo-600 hover:text-indigo-900 mr-4">
+                                    Editar
+                                </a>
+                                <a href="/"
+                                   class="text-indigo-600 hover:text-indigo-900">
+                                    Agregar horas
+                                </a>
+                            </td>
+                   
                 </tr>
             <% } %>
             </tbody>
