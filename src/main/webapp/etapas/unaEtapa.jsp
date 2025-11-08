@@ -42,7 +42,7 @@
                 <button onclick="window.location.href='TareaServlet?action=new&idEtapa=<%= etapa.getId() %>'" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg shadow transition">
                     + Nueva Tarea
                 </button>
-            </a>
+            
         </div>
     <% } %>
 
@@ -69,7 +69,7 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     <% for (Tarea t : tareas) { %>
                         <tr class="hover:bg-gray-50 transition"
-                            onclick="window.location.href='TareaServlet?action=detalle&idTarea=<%= t.getId() %>'">
+                            >
 
                            
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -101,16 +101,20 @@
 
                            
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="TareaServlet?action=edit&idTarea=<%= t.getId() %>"
+                                <a href="TareaServlet?action=edit&idTarea=<%= t.getId() %>&idEtapa=<%= etapa.getId() %>"
                                    class="text-indigo-600 hover:text-indigo-900 mr-4">
                                     Editar
                                 </a>
 
-                                <a href="TareaServlet?action=delete&idTarea=<%= t.getId() %>&idEtapa=<%= etapa.getId() %>"
-                                   class="text-red-600 hover:text-red-900"
-                                   onclick="return confirm('¿Eliminar tarea <%= t.getNombre() %>?')">
-                                    Eliminar
-                                </a>
+                               <form action="TareaServlet" method="post" style="display:inline" onsubmit="return confirm('¿Eliminar tarea <%= t.getNombre() %>?');">
+    <input type="hidden" name="action" value="delete">
+    <input type="hidden" name="idTarea" value="<%= t.getId() %>">
+    <input type="hidden" name="idEtapa" value="<%= etapa.getId() %>">
+    <button type="submit" class="text-red-600 hover:text-red-900 bg-transparent border-0 p-0 cursor-pointer">
+        Eliminar
+    </button>
+</form>
+
                             </td>
 
                         </tr>

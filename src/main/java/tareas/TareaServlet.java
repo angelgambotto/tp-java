@@ -92,12 +92,21 @@ public class TareaServlet extends HttpServlet {
             request.setAttribute("categorias", categorias);
             request.setAttribute("idEtapa", idEtapa);
             request.setAttribute("abrirModal", true);
+           
 
-            request.getRequestDispatcher("/tareas/formulario.jsp").forward(request, response);
+            request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);
             break;
         case "edit":
-        	int idTarea = Integer.parseInt(request.getParameter("id"));
+        	int idTarea = Integer.parseInt(request.getParameter("idTarea"));
             Tarea tarea = tdao.getOne(idTarea);
+
+            
+            String idEtapaParam = request.getParameter("idEtapa");
+            if (idEtapaParam != null && !idEtapaParam.isEmpty()) {
+                idEtapa = Integer.parseInt(idEtapaParam);
+            } else {
+                idEtapa = tarea.getIdEtapa();
+            }
             usuariosDisponibles = udao.getAll();
             categorias = cdao.getAll();
             List<Usuario> usuariosAsignados = tdao.getUsuariosAsignados(idTarea);
@@ -105,14 +114,16 @@ public class TareaServlet extends HttpServlet {
             request.setAttribute("usuarios", usuariosDisponibles);
             request.setAttribute("usuariosAsignados", usuariosAsignados);
             request.setAttribute("categorias", categorias);
+           
+            request.setAttribute("idEtapa", idEtapa);
             request.setAttribute("abrirModal", true);
-            request.setAttribute("idEtapa", tarea.getIdEtapa());
-            request.getRequestDispatcher("/tareas/formulario.jsp").forward(request, response);
+            request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);
             break;
         }
         
 		}
 		catch(DAOException e) {
+			System.out.println("DAOException en : " + e.getMessage());
 			e.printStackTrace();
 			throw new ServletException("Error en tareaservlet get");
 		}
@@ -139,13 +150,20 @@ public class TareaServlet extends HttpServlet {
 		
 	}
 	private void borrarTarea(HttpServletRequest request,HttpServletResponse response) throws IOException{
-		int idTarea=Integer.parseInt(request.getParameter("idTarea"));
-		int idEtapa=Integer.parseInt(request.getParameter("idEtapa"));
+		String idTareaParam=(request.getParameter("idTarea"));
+		String idEtapaParam=(request.getParameter("idEtapa"));
+		if (idTareaParam == null || idEtapaParam == null) {
+	        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Faltan parámetros para eliminar la tarea");
+	        return;
+	    }
+		int idTarea = Integer.parseInt(idTareaParam);
+	    int idEtapa = Integer.parseInt(idEtapaParam);
 		try{
 			tdao.delete(idTarea);
 		}
 		catch(DAOException e) {
 			request.setAttribute("error al eliminar la tarea: ", e);
+		
 		}
 		response.sendRedirect("EtapaServlet?action=list&idEtapa="+idEtapa);
 		
