@@ -23,6 +23,12 @@
 			            <a href="ClienteServlet" class="hover:underline">Clientes</a>
 			            <a href="CategoriaTareaServlet" class="hover:underline">Categorías</a>
 			            <% break;
+		        	case "supervisor":
+		            	%>
+		            	<a href="ProyectoServlet" class="hover:underline">Proyectos</a>
+		            	<a href="TareaServlet" class="hover:underline">Mis tareas</a>
+		            	<%
+		            	break;
 		        	case "empleado":
 		            	%>
 		            	<a href="TareaServlet" class="hover:underline">Mis tareas</a>
