@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import usuarios.Usuario;
 
-@WebFilter("/UsuariosServlet")
+@WebFilter("/")
 public class SeguridadFilter implements Filter {
 
     @Override
@@ -49,20 +49,20 @@ public class SeguridadFilter implements Filter {
         }
 
         if (path.contains("/ClienteServlet") &&
-                !(rol.equals("ADMINISTRATOR") || rol.equals("SUPERVISOR"))) {
+                !(rol.equals("ADMINISTRADOR") || rol.equals("SUPERVISOR"))) {
             res.sendRedirect(req.getContextPath() + "/sinPermiso.jsp");
             return;
         }
 
         if (path.contains("/CategoriaTareaServlet") &&
-                !(rol.equals("ADMINISTRATOR") || rol.equals("SUPERVISOR"))) {
+                !(rol.equals("ADMINISTRADOR") || rol.equals("SUPERVISOR"))) {
             res.sendRedirect(req.getContextPath() + "/sinPermiso.jsp");
             return;
         }
 
         // (opcional) proteger ABMC Tareas / Etapas
         if (path.contains("/TareaServlet") &&
-                !(rol.equals("ADMINISTRATOR") || rol.equals("SUPERVISOR") || rol.equals("EMPLEADO"))) {
+                !(rol.equals("ADMINISTRADOR") || rol.equals("SUPERVISOR") || rol.equals("EMPLEADO") || rol.equals("USUARIO"))) {
             res.sendRedirect(req.getContextPath() + "/sinPermiso.jsp");
             return;
         }

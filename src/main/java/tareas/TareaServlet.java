@@ -72,17 +72,9 @@ public class TareaServlet extends HttpServlet {
 			Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
 			String rol = usuario != null ? usuario.getRol().toLowerCase() : "";
 
-			if (usuario == null || (!"administrador".equals(rol) && !"empleado".equals(rol))) {
-			    response.sendRedirect("login.jsp");
-			    return;
-			}   
+			
         boolean esAdmin = "administrador".equals(rol);
         boolean esEmpleado = "empleado".equals(rol);
-
-        if (!esAdmin && !esEmpleado) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
 
         // Acción por defecto según rol
         String action = request.getParameter("action");

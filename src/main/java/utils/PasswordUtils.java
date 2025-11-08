@@ -2,16 +2,26 @@ package utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 public class PasswordUtils {
 
-    // Hashea la contraseña en SHA-256
-    public static String hashPassword(String password) {
+    // Genera un salt aleatorio (16 bytes)
+    public static String generateSalt() {
+        byte[] salt = new byte[16];
+        new SecureRandom().nextBytes(salt);
+        return Base64.getEncoder().encodeToString(salt);
+    }
+
+    // Hashea la contraseña + salt
+    public static String hashPassword(String password, String salt) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hashBytes = md.digest(password.getBytes());
+            md.update(Base64.getDecoder().decode(salt)); // añade el salt al digest
+            byte[] hashedBytes = md.digest(password.getBytes());
             StringBuilder sb = new StringBuilder();
-            for (byte b : hashBytes) {
+            for (byte b : hashedBytes) {
                 sb.append(String.format("%02x", b));
             }
             return sb.toString();
@@ -20,9 +30,9 @@ public class PasswordUtils {
         }
     }
 
-    // Compara contraseña ingresada con la almacenada
-    public static boolean verifyPassword(String plainPassword, String hashedPassword) {
-        String hashedInput = hashPassword(plainPassword);
-        return hashedInput.equals(hashedPassword);
+    // Verifica contraseña ingresada vs almacenada
+    public static boolean verifyPassword(String plainPassword, String storedHash, String storedSalt) {
+        String hashedInput = hashPassword(plainPassword, storedSalt);
+        return hashedInput.equals(storedHash);
     }
 }

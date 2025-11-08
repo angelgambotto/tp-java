@@ -10,22 +10,15 @@ public class UsuariosDAO {
 	public Usuario buscarParaLogin(String usuario, String clave) throws DAOException {
 	    Usuario user = null;
 	    try (Connection conn = ConexionDB.getConexion()) {
-	        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM usuario WHERE usuario=?");
+	        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM usuario WHERE usuario = ?");
 	        stmt.setString(1, usuario);
 	        ResultSet rs = stmt.executeQuery();
 
 	        if (rs != null && rs.next()) {
 	            String hashedPassword = rs.getString("clave");
-	            
-	            System.out.println("====================================");
-	            System.out.println("[DEBUG] Usuario ingresado: " + usuario);
-	            System.out.println("[DEBUG] Contraseña ingresada: " + clave);
-	            System.out.println("[DEBUG] Contraseña en BD: " + hashedPassword);
-	            System.out.println("[DEBUG] Hash calculado: " + utils.PasswordUtils.hashPassword(clave));
-	            System.out.println("====================================");
+	            String salt = rs.getString("salt");
 
-	            if (PasswordUtils.verifyPassword(clave, hashedPassword)) {
-	            	System.out.println(PasswordUtils.verifyPassword(clave, hashedPassword));
+	            if (PasswordUtils.verifyPassword(clave, hashedPassword, salt)) {
 	                user = new Usuario(
 	                    rs.getInt("id"),
 	                    rs.getString("nombre"),
@@ -38,18 +31,14 @@ public class UsuariosDAO {
 	                );
 	            }
 	        }
-	        if(rs!=null) {
-				rs.close();
-			}
-			if(stmt!=null) {
-				stmt.close();
-			}
-			conn.close();
+	        rs.close();
+	        stmt.close();
 	    } catch (SQLException e) {
 	        throw new DAOException("Error al obtener usuario", e);
 	    }
 	    return user;
 	}
+
 	public LinkedList<Usuario> getPorRol(String rol) throws DAOException{
 		LinkedList<Usuario> usuarios=new LinkedList<>();
 		try {
@@ -150,64 +139,63 @@ public class UsuariosDAO {
 		return user;
 	}
 	public void add(Usuario user) throws DAOException {
-		
-		PreparedStatement stmt=null;
-		ResultSet rs=null;
-		try {	
-			Connection conn=ConexionDB.getConexion();
-			String hashed = PasswordUtils.hashPassword(user.getClave());
-			stmt=conn.prepareStatement("insert into usuario (nombre,apellido,rol,usuario,mail,clave,supervisor) VALUES(?,?,?,?,?,?,?)",PreparedStatement.RETURN_GENERATED_KEYS);
-			stmt.setString(1,user.getNombre());
-			stmt.setString(2, user.getApellido());
-			stmt.setString(3, user.getRol());
-			stmt.setString(4, user.getUsuario());
-			stmt.setString(5, user.getMail());
-			stmt.setString(6, hashed);
-	        if (user.getSupervisor() != null) stmt.setInt(7, user.getSupervisor());
-	        else stmt.setNull(7, java.sql.Types.INTEGER);
+	    try (Connection conn = ConexionDB.getConexion()) {
+	        String salt = PasswordUtils.generateSalt();
+	        String hashed = PasswordUtils.hashPassword(user.getClave(), salt);
+
+	        PreparedStatement stmt = conn.prepareStatement(
+	            "INSERT INTO usuario (nombre, apellido, rol, usuario, mail, clave, salt, supervisor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+	            PreparedStatement.RETURN_GENERATED_KEYS
+	        );
+
+	        stmt.setString(1, user.getNombre());
+	        stmt.setString(2, user.getApellido());
+	        stmt.setString(3, user.getRol());
+	        stmt.setString(4, user.getUsuario());
+	        stmt.setString(5, user.getMail());
+	        stmt.setString(6, hashed);
+	        stmt.setString(7, salt);
+	        if (user.getSupervisor() != null) stmt.setInt(8, user.getSupervisor());
+	        else stmt.setNull(8, java.sql.Types.INTEGER);
+
 	        stmt.executeUpdate();
-			rs=stmt.getGeneratedKeys();
-			if(rs!=null && rs.next()) {
-				user.setId(rs.getInt(1));
-			}
-			if(rs!=null) {
-				rs.close();
-			}
-			if(stmt!=null) {
-				stmt.close();
-			}
-			conn.close();
-			
-		}
-		catch(SQLException e) {
-			throw new DAOException("Error al agregar al usuario: " + user.getMail(),e);
-		}
-		
+	        ResultSet rs = stmt.getGeneratedKeys();
+	        if (rs != null && rs.next()) user.setId(rs.getInt(1));
+
+	        rs.close();
+	        stmt.close();
+	    } catch (SQLException e) {
+	        throw new DAOException("Error al agregar al usuario: " + user.getMail(), e);
+	    }
 	}
+
 	public void update(Usuario user) throws DAOException {
-		PreparedStatement stmt=null;
-		try {
-			Connection conn=ConexionDB.getConexion();
-			stmt=conn.prepareStatement("Update usuario set nombre=?,apellido=?,clave=?,usuario=?,rol=?,mail=?,supervisor=? where id=?");
-			stmt.setString(1,user.getNombre());
-			stmt.setString(2, user.getApellido());
-			stmt.setString(3, PasswordUtils.hashPassword(user.getClave()));
-			stmt.setString(4, user.getUsuario());
-			stmt.setString(5,user.getRol());
-			stmt.setString(6, user.getMail());
-			if (user.getSupervisor() != null) {
-			    stmt.setInt(7, user.getSupervisor());
-			} else {
-			    stmt.setNull(7, java.sql.Types.INTEGER);
-			}
-			stmt.setInt(8, user.getId());
-			stmt.executeUpdate();
-			conn.close();
-		}
-		catch(SQLException e) {
-			throw new DAOException("Error al actualizar al usuario: " + user.getMail());
-		}
+	    try (Connection conn = ConexionDB.getConexion()) {
+	        String salt = PasswordUtils.generateSalt();
+	        String hashed = PasswordUtils.hashPassword(user.getClave(), salt);
+
+	        PreparedStatement stmt = conn.prepareStatement(
+	            "UPDATE usuario SET nombre=?, apellido=?, clave=?, salt=?, usuario=?, rol=?, mail=?, supervisor=? WHERE id=?"
+	        );
+
+	        stmt.setString(1, user.getNombre());
+	        stmt.setString(2, user.getApellido());
+	        stmt.setString(3, hashed);
+	        stmt.setString(4, salt);
+	        stmt.setString(5, user.getUsuario());
+	        stmt.setString(6, user.getRol());
+	        stmt.setString(7, user.getMail());
+	        if (user.getSupervisor() != null) stmt.setInt(8, user.getSupervisor());
+	        else stmt.setNull(8, java.sql.Types.INTEGER);
+	        stmt.setInt(9, user.getId());
+
+	        stmt.executeUpdate();
+	        stmt.close();
+	    } catch (SQLException e) {
+	        throw new DAOException("Error al actualizar usuario: " + user.getMail(), e);
+	    }
 	}
+
 	public void delete(int idABorrar) throws DAOException {
 		PreparedStatement stmt=null;
 		try {
