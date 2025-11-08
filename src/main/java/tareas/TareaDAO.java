@@ -233,5 +233,36 @@ PreparedStatement psUsuariosAct = con.prepareStatement(sqlUsuariosActuales);
 		    }
 		    return tareas;
 		}
+		
+		public List<Tarea> getByUsuarioId(int idEmpleado) throws DAOException {
+		    String sql = "SELECT t.* FROM tarea t INNER JOIN tarea_usuario tu ON t.id = tu.idTarea "
+		    		+ " WHERE idEmpleado = ? ORDER BY fechaInicio ASC"; // Orden lógico por fecha
+		    List<Tarea> tareas = new ArrayList<>();
+		    try (Connection con = ConexionDB.getConexion();
+		         PreparedStatement ps = con.prepareStatement(sql)) {
+		        ps.setInt(1, idEmpleado);
+		        ResultSet rs = ps.executeQuery();
+		        while (rs.next()) {
+		            Tarea tarea = new Tarea();
+		            tarea.setId(rs.getInt("id"));
+		            tarea.setNombre(rs.getString("nombre"));
+		            tarea.setDescripcion(rs.getString("descripcion"));
+		            tarea.setEstado(rs.getString("estado"));
+		            tarea.setFechaInicio(rs.getDate("fechaInicio"));
+		            tarea.setFechaFin(rs.getDate("fechaFin"));
+		            tarea.setIdEtapa(rs.getInt("idEtapa")); // ID para referencia, sin cargar Etapa completa
+
+		            // Cargar CategoriaTarea 
+		            //CategoriaTareaDAO cdao = new CategoriaTareaDAO();
+		            //CategoriaTarea cat = cdao.getById());
+		            tarea.setIdCategoria(rs.getInt("idCategoria"));
+
+		            tareas.add(tarea);
+		        }
+		    } catch (SQLException e) {
+		        throw new DAOException("Error al obtener tareas para el usuario id: " + idEmpleado, e);
+		    }
+		    return tareas;
+		}
 
 }

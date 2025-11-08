@@ -67,6 +67,9 @@ List<Usuario> supervisores=(List<Usuario>) request.getAttribute("supervisores");
         <option value="Administrador" <%= (user != null && "Administrador".equals(user.getRol())) ? "selected" : "" %>>
             Administrador
         </option>
+       <option value="Empleado" <%= (user != null && "Empleado".equals(user.getRol())) ? "selected" : "" %>>
+		    Empleado
+		</option>
         <option value="Supervisor" <%= (user != null && "Supervisor".equals(user.getRol())) ? "selected" : "" %>>
             Supervisor
         </option>
