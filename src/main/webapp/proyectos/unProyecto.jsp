@@ -26,6 +26,12 @@
         }
     </script>
 </head>
+<style>
+    tr.clickable-row, tr.clickable-row td {
+        cursor: pointer;
+    }
+</style>
+
 <body class="bg-gray-100 font-sans">
 
 <jsp:include page="../header.jsp" />
@@ -86,7 +92,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <% for (Etapa e : etapas) { %>
-                        <tr class="hover:bg-gray-50 transition" onclick="window.location.href='TareaServlet?action=list&idEtapa=<%= e.getId() %>'">
+                        <tr class="hover:bg-gray-50 transition clickable-row" onclick="window.location.href='TareaServlet?action=list&idEtapa=<%= e.getId() %>'">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div>
                                     <div class="text-sm font-medium text-gray-900"><%= e.getNombre() %></div>

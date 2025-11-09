@@ -102,7 +102,7 @@ public class EtapaServlet extends HttpServlet {
         
         System.out.println("=== EDIT DEBUG ===");
         System.out.println("action: " + action);
-        System.out.println("id parámetro: " + request.getParameter("id"));
+        System.out.println("id parámetro: " + request.getParameter("idEtapa"));
         System.out.println("idProyecto: " + request.getParameter("idProyecto"));
 
         // ACCIONES 

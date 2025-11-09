@@ -15,13 +15,13 @@
 <div id="modalFormTarea"
      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
 
-    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl">
+    <div class="bg-white rounded-lg shadow-lg  w-full max-w-2xl max-h-[90vh] flex flex-col p-6	">
 
         <h2 class="text-2xl font-bold mb-4 text-gray-800">
             <%= tarea == null ? "Nueva Tarea" : "Editar Tarea" %>
         </h2>
 
-        <form action="TareaServlet" method="post">
+       <form action="TareaServlet" method="post" class="overflow-y-auto flex-1 space-y-4 pr-2">
 
             <input type="hidden" name="action" value="<%= tarea == null ? "insert" : "update" %>">
             <input type="hidden" name="idEtapa"
@@ -81,18 +81,28 @@
             </div>
 
             <div class="mb-6">
-                <label class="block text-gray-700 mb-1">Asignar usuarios</label>
-                <select name="idUsuariosAsignados" multiple class="w-full border rounded-lg px-4 py-2" size="5">
-                    <% if(usuarios != null){
-                        for (Usuario u : usuarios) {
-                           boolean seleccionado = usuariosAsignados != null && usuariosAsignados.stream().anyMatch(us -> us.getId() == u.getId());
-                    %>
-                        <option value="<%= u.getId() %>" <%= seleccionado ? "selected" : "" %>>
-                            <%= u.getNombre() %> <%= u.getApellido() %>
-                        </option>
-                    <% }} %>
-                </select>
-            </div>
+    <label class="block text-gray-700 mb-1">Asignar usuarios</label>
+
+    <div class="border rounded-lg px-4 py-3 max-h-40 overflow-y-auto">
+
+        <% if (usuarios != null) {
+            for (Usuario u : usuarios) {
+                boolean seleccionado = usuariosAsignados != null &&
+                        usuariosAsignados.stream().anyMatch(us -> us.getId() == u.getId());
+        %>
+
+            <label class="flex items-center space-x-2 mb-2 cursor-pointer">
+                <input type="checkbox"
+                       name="usuarios"
+                       value="<%= u.getId() %>"
+                       <%= seleccionado ? "checked" : "" %>
+                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <span><%= u.getNombre() %> <%= u.getApellido() %></span>
+            </label>
+
+        <% } } %>
+    </div>
+</div>
 
             <div class="flex justify-end space-x-4">
                 <button type="button"

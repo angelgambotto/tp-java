@@ -185,14 +185,23 @@ public class TareaServlet extends HttpServlet {
 	    }
 		int idTarea = Integer.parseInt(idTareaParam);
 	    int idEtapa = Integer.parseInt(idEtapaParam);
+	   
+	    
+	    System.out.println("el valor de id tarea es: "+ idTarea);
+	    System.out.println("El valor de id etapa es:  "+idEtapa);
+	    int idProyecto=0;
 		try{
 			tdao.delete(idTarea);
+			Etapa etapa=edao.getOne(idEtapa);
+			idProyecto=etapa.getIdProyecto(); 
+			request.setAttribute("idProyecto", idProyecto);
 		}
 		catch(DAOException e) {
 			request.setAttribute("error al eliminar la tarea: ", e);
 		
 		}
-		response.sendRedirect("EtapaServlet?action=list&idEtapa="+idEtapa);
+	
+		response.sendRedirect("EtapaServlet?action=list&idEtapa="+idEtapa+"&idProyecto="+idProyecto);
 		
 	}
 private void insertarTarea(HttpServletRequest request,HttpServletResponse response) throws IOException{
@@ -206,15 +215,23 @@ private void insertarTarea(HttpServletRequest request,HttpServletResponse respon
 	tarea.setIdCategoria(Integer.parseInt(request.getParameter("idCategoria")));
 	String[] usuarios=request.getParameterValues("usuarios");
 	List<Integer> ids=new ArrayList<>();
+	System.out.println("===== DEBUG USUARIOS =====");
+    System.out.println("usuarios array es null? " + (usuarios == null));
+    if (usuarios != null) {
+        System.out.println("Cantidad de usuarios recibidos: " + usuarios.length);
+    }
 	
 	if(usuarios!=null) {
 		for (String u:usuarios) {
+		
 			ids.add(Integer.parseInt(u));
+			System.out.println("usuario: "+u);
+		
 			
 		}
 	}
 	
-	
+		System.out.println(ids);
 		tdao.insert(tarea, ids);
 		response.sendRedirect("TareaServlet?action=list&idEtapa=" + tarea.getIdEtapa());
 	}
@@ -230,17 +247,15 @@ private void actualizarTarea(HttpServletRequest request,HttpServletResponse resp
 
 	    try {
 	        Tarea tarea = new Tarea();
-	        tarea.setId(Integer.parseInt(request.getParameter("id")));
+	        tarea.setId(Integer.parseInt(request.getParameter("idTarea")));
 	        tarea.setNombre(request.getParameter("nombre"));
 	        tarea.setDescripcion(request.getParameter("descripcion"));
 	        tarea.setIdEtapa(Integer.parseInt(request.getParameter("idEtapa")));
 	        tarea.setIdCategoria(Integer.parseInt(request.getParameter("idCategoria")));
-
+	        tarea.setEstado(request.getParameter("estado"));
 	        tarea.setFechaInicio(Date.valueOf(request.getParameter("fechaInicio")));
 	        tarea.setFechaFin(Date.valueOf(request.getParameter("fechaFin")));
-
-	 
-	        String[] usuariosForm = request.getParameterValues("idUsuariosAsignados");
+	        String[] usuariosForm = request.getParameterValues("usuarios");
 
 	        List<Integer> usuariosSeleccionados = new ArrayList<>();
 	        if (usuariosForm != null) {
