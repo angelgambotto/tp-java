@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import exceptions.DAOException;
@@ -20,7 +21,7 @@ public class HoraTrabajadaDAO {
 
             ps.setInt(1, hora.getIdTarea());
             ps.setInt(2, hora.getIdEmpleado());
-            ps.setDate(3, new Date(hora.getFecha().getTime()));
+            ps.setTimestamp(3, new java.sql.Timestamp(hora.getFecha().getTime()));
             ps.setInt(4, hora.getCantidad());
             ps.executeUpdate();
 
@@ -69,7 +70,10 @@ public class HoraTrabajadaDAO {
             	 hora = new HoraTrabajada();
                  hora.setIdTarea(rs.getInt("idTarea"));
                  hora.setIdEmpleado(rs.getInt("idEmpleado"));
-                 hora.setFecha(rs.getDate("fecha"));
+                 Timestamp timestamp = rs.getTimestamp("fecha");
+                 if (timestamp != null) {
+                     hora.setFecha(new Date(timestamp.getTime()));
+                 }
                  hora.setCantidad(rs.getInt("cantidad"));
             }
 
@@ -91,7 +95,10 @@ public class HoraTrabajadaDAO {
             	HoraTrabajada hora = new HoraTrabajada();
                 hora.setIdTarea(rs.getInt("idTarea"));
                 hora.setIdEmpleado(rs.getInt("idEmpleado"));
-                hora.setFecha(rs.getDate("fecha"));
+                Timestamp timestamp = rs.getTimestamp("fecha");
+                if (timestamp != null) {
+                    hora.setFecha(new Date(timestamp.getTime()));
+                }
                 hora.setCantidad(rs.getInt("cantidad"));
                 lista.add(hora);
             }

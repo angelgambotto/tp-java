@@ -26,44 +26,12 @@
   
     <% if (etapa != null) { %>
         <div class="bg-white rounded-lg shadow p-6 mb-6 relative">
-        <div class="flex justify-between items-start">
+        
             <h1 class="text-2xl font-bold text-gray-800"><%= etapa.getNombre() %></h1>
             <p class="text-gray-600">ID Etapa: <%= etapa.getId() %></p>
             
-    <!-- Menú de tres puntos arriba derecha -->
-			<div class="relative inline-block text-left">
-			    <button type="button" 
-			            class="menu-button inline-flex justify-center w-full rounded-full p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-			            id="menu-button-<%= etapa.getId() %>"
-			            aria-expanded="false" 
-			            aria-haspopup="true">
-			        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-			            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-			                  d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-			        </svg>
-			    </button>
-			
-			    <!-- Menú desplegable -->
-			    <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden z-50"
-			         role="menu" 
-			         aria-orientation="vertical" 
-			         aria-labelledby="menu-button-<%= etapa.getId() %>"
-			         id="menu-<%= etapa.getId() %>">
-			        <div class="py-1" role="none">
-			            <a href="EtapaServlet?action=edit&id=<%= etapa.getId() %>&idProyecto=<%= etapa.getIdProyecto() %>"
-			               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-			                Editar Etapa
-			            </a>
-			            <a href="EtapaServlet?action=delete&id=<%= etapa.getId() %>&idProyecto=<%= etapa.getIdProyecto() %>"
-			               class="block px-4 py-2 text-sm text-red-700 hover:bg-red-50" role="menuitem"
-			               onclick="return confirm('¿Estás seguro de eliminar la etapa <%= etapa.getNombre() %>?')">
-			                Eliminar Etapa
-			            </a>
-			        </div>
-			    </div>
-			</div>
-			</div>
-       </div>
+    		</div>
+   
     <% } else { %>
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
             Etapa no encontrada
@@ -159,7 +127,7 @@
 
         <% } %>
     </div>
-</div>
+   </div>
 
 <jsp:include page="../tareas/formulario.jsp" />
 <script>
@@ -173,35 +141,6 @@ function toggleModal(modalId) {
     window.onload = () => toggleModal("modalFormTarea");
 <% } %>
 </script>
-
-
-<script>
-// Mostrar/ocultar menú de tres puntos
-document.addEventListener('DOMContentLoaded', function () {
-    const button = document.getElementById('menu-button-<%= etapa.getId() %>');
-    const menu = document.getElementById('menu-<%= etapa.getId() %>');
-
-    if (!button || !menu) return;
-
-    button.addEventListener('click', function () {
-        const isHidden = menu.classList.contains('hidden');
-        // Cerrar todos los menús primero
-        document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add('hidden'));
-        // Mostrar el actual
-        if (isHidden) {
-            menu.classList.remove('hidden');
-        }
-    });
-
-    // Cerrar al hacer clic fuera
-    document.addEventListener('click', function (e) {
-        if (!button.contains(e.target) && !menu.contains(e.target)) {
-            menu.classList.add('hidden');
-        }
-    });
-});
-</script>
-
 </body>
 </html>
 
