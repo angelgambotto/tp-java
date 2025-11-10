@@ -196,14 +196,14 @@
         
         
     <!-- VISTA KANBAN -->
-    <div id="vistaKanban" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div id="vistaKanban" class="flex gap-6 overflow-x-auto pb-4">
     	<% for (Etapa etapa : etapas) { 
             List<Tarea> tareasEtapa = etapa.getTareas();
             System.out.println(tareasEtapa);
             int numTareas = (tareasEtapa != null) ? tareasEtapa.size() : 0;
         %>
         <!-- ETAPAS -->
-        <div class="bg-white shadow-lg rounded-lg p-6 column-container cursor-pointer etapa" onclick="window.location.href='TareaServlet?action=list&idEtapa=<%= etapa.getId() %>'">
+        <div class="bg-white shadow-lg rounded-lg p-6 column-container cursor-pointer etapa flex-shrink-0 w-80" onclick="window.location.href='TareaServlet?action=list&idEtapa=<%= etapa.getId() %>'">
             
 			
 			<!-- HEADER DE LA ETAPA -->
@@ -346,7 +346,7 @@
                     
                     <div class="flex items-center justify-between text-xs text-gray-500">
 	                    
-                    <% if ("To Do".equals(estado)) { %>
+                    <% if (!"Done".equals(estado)) { %>
                         <div class="flex items-center">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
