@@ -31,7 +31,7 @@ public class EtapaServlet extends HttpServlet {
 
     private List<Etapa> cargarEtapasSeguro(HttpServletRequest request) {
         try {
-            return edao.getByProyectoId(Integer.parseInt(request.getParameter("idProyecto")));
+            return edao.getByProyectoIdConTareas(Integer.parseInt(request.getParameter("idProyecto")));
         } catch (DAOException e) {
             request.setAttribute("error", e.getMessage());
             return new ArrayList<>();
