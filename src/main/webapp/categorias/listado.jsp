@@ -59,6 +59,7 @@
         <tbody>        
         <%
             List<CategoriaTarea> categorias = (List<CategoriaTarea>) request.getAttribute("categorias");
+        	System.out.println("categorias en categorias: "+categorias);
             if (categorias != null) {
                 for (CategoriaTarea cat : categorias) {
         %>

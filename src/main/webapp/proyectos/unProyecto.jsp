@@ -306,7 +306,7 @@
 	            String estado = tarea.getEstado();
 	            int idCat = tarea.getIdCategoria();
 	            String nombreCat = "Sin categoría";
-	            
+	            System.out.println("categorias"+categorias);
 	            if (categorias != null) {
 	                for (CategoriaTarea c : categorias) {
 						if (c.getId() == idCat) {

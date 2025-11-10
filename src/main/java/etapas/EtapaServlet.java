@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import proyectos.Proyecto;
 import proyectos.ProyectoDAO;
+import categoriaTarea.CategoriaTarea;
+import categoriaTarea.CategoriaTareaDAO;
 import usuarios.Usuario;
 
 @WebServlet("/EtapaServlet")
@@ -21,14 +23,24 @@ public class EtapaServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private EtapaDAO edao;
     private ProyectoDAO pdao;
+    private CategoriaTareaDAO cdao;
 
     @Override
     public void init() {
         edao = new EtapaDAO();
         pdao = new ProyectoDAO();
+        cdao = new CategoriaTareaDAO();
     }
 
-
+	private List<CategoriaTarea> cargarCategoriasSeguro(HttpServletRequest request) {
+	    try {
+	        return cdao.getAll();
+	    } catch (DAOException e) {
+	        request.setAttribute("error", "No se pudieron cargar las categorías: " + e.getMessage());
+	        return new ArrayList<>();
+	    }
+	}
+    
     private List<Etapa> cargarEtapasSeguro(HttpServletRequest request) {
         try {
             return edao.getByProyectoIdConTareas(Integer.parseInt(request.getParameter("idProyecto")));
@@ -90,6 +102,7 @@ public class EtapaServlet extends HttpServlet {
         }
 
         // --- PASAR DATOS COMUNES ---
+        request.setAttribute("categorias", cargarCategoriasSeguro(request));
         request.setAttribute("proyecto", proyecto);
         request.setAttribute("etapas", etapas);
         request.setAttribute("idProyecto", idProyecto);
