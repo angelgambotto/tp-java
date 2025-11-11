@@ -30,12 +30,12 @@ public class HoraTrabajadaDAO {
         }
     }
 	public void update(HoraTrabajada hora) throws DAOException {
-        String sql = "UPDATE Proyecto SET fecha = ?, cantidad = ? WHERE idTarea = ? and idEmpleado = ?";
+        String sql = "UPDATE hora_trabajada SET fecha = ?, cantidad = ? WHERE idTarea = ? and idEmpleado = ?";
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
         	ps.setInt(1, hora.getIdTarea());
             ps.setInt(2, hora.getIdEmpleado());
-            ps.setDate(3, new Date(hora.getFecha().getTime()));
+            ps.setTimestamp(3, new java.sql.Timestamp(hora.getFecha().getTime()));
             ps.setInt(4, hora.getCantidad());
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -44,7 +44,7 @@ public class HoraTrabajadaDAO {
     }
 	
     public void delete(int idTarea, int idEmpleado) throws DAOException {
-        String sql = "DELETE FROM Proyecto WHERE idTarea = ? and idEmpleado = ?";
+        String sql = "DELETE FROM hora_trabajada WHERE idTarea = ? and idEmpleado = ?";
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
         	ps.setInt(1, idTarea);
