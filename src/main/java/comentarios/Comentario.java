@@ -1,12 +1,12 @@
-package horastrabajadas;
+package comentarios;
 
 import java.util.Date;
 
-public class HoraTrabajada {
+public class Comentario {
 	private int idTarea;
 	private int idEmpleado;
 	private Date fecha;
-	private int cantidad;
+	private String texto;
 	
 	public int getIdTarea() {
 		return idTarea;
@@ -26,15 +26,14 @@ public class HoraTrabajada {
 	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
-	public int getCantidad() {
-		return cantidad;
+	public String getTexto() {
+		return texto;
 	}
-	public void setCantidad(int cantidad) {
-		this.cantidad = cantidad;
+	public void setTexto(String texto) {
+		this.texto = texto;
 	}
 	
-	public HoraTrabajada() {
+	public Comentario() {
 		super();
 	}
-	
 }

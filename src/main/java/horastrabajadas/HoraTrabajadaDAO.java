@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import exceptions.DAOException;
@@ -20,7 +21,7 @@ public class HoraTrabajadaDAO {
 
             ps.setInt(1, hora.getIdTarea());
             ps.setInt(2, hora.getIdEmpleado());
-            ps.setDate(3, new Date(hora.getFecha().getTime()));
+            ps.setTimestamp(3, new java.sql.Timestamp(hora.getFecha().getTime()));
             ps.setInt(4, hora.getCantidad());
             ps.executeUpdate();
 
@@ -29,12 +30,12 @@ public class HoraTrabajadaDAO {
         }
     }
 	public void update(HoraTrabajada hora) throws DAOException {
-        String sql = "UPDATE Proyecto SET fecha = ?, cantidad = ? WHERE idTarea = ? and idEmpleado = ?";
+        String sql = "UPDATE hora_trabajada SET fecha = ?, cantidad = ? WHERE idTarea = ? and idEmpleado = ?";
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
         	ps.setInt(1, hora.getIdTarea());
             ps.setInt(2, hora.getIdEmpleado());
-            ps.setDate(3, new Date(hora.getFecha().getTime()));
+            ps.setTimestamp(3, new java.sql.Timestamp(hora.getFecha().getTime()));
             ps.setInt(4, hora.getCantidad());
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -43,7 +44,7 @@ public class HoraTrabajadaDAO {
     }
 	
     public void delete(int idTarea, int idEmpleado) throws DAOException {
-        String sql = "DELETE FROM Proyecto WHERE idTarea = ? and idEmpleado = ?";
+        String sql = "DELETE FROM hora_trabajada WHERE idTarea = ? and idEmpleado = ?";
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
         	ps.setInt(1, idTarea);
@@ -69,7 +70,10 @@ public class HoraTrabajadaDAO {
             	 hora = new HoraTrabajada();
                  hora.setIdTarea(rs.getInt("idTarea"));
                  hora.setIdEmpleado(rs.getInt("idEmpleado"));
-                 hora.setFecha(rs.getDate("fecha"));
+                 Timestamp timestamp = rs.getTimestamp("fecha");
+                 if (timestamp != null) {
+                     hora.setFecha(new Date(timestamp.getTime()));
+                 }
                  hora.setCantidad(rs.getInt("cantidad"));
             }
 
@@ -91,7 +95,10 @@ public class HoraTrabajadaDAO {
             	HoraTrabajada hora = new HoraTrabajada();
                 hora.setIdTarea(rs.getInt("idTarea"));
                 hora.setIdEmpleado(rs.getInt("idEmpleado"));
-                hora.setFecha(rs.getDate("fecha"));
+                Timestamp timestamp = rs.getTimestamp("fecha");
+                if (timestamp != null) {
+                    hora.setFecha(new Date(timestamp.getTime()));
+                }
                 hora.setCantidad(rs.getInt("cantidad"));
                 lista.add(hora);
             }

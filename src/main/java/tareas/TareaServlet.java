@@ -2,6 +2,7 @@ package tareas;
 import usuarios.UsuariosDAO;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.sql.Date;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -9,6 +10,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import proyectos.Proyecto;
 import proyectos.ProyectoDAO;
 import usuarios.Usuario;
 
@@ -30,6 +32,7 @@ public class TareaServlet extends HttpServlet {
     private UsuariosDAO udao;
     private CategoriaTareaDAO cdao;
     private EtapaDAO edao;
+    private ProyectoDAO pdao;
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -43,6 +46,7 @@ public class TareaServlet extends HttpServlet {
         udao = new UsuariosDAO();
         tdao=new TareaDAO();
         edao=new EtapaDAO();
+        pdao = new ProyectoDAO();
     }
      List<Tarea> tareas;
      List<Usuario> usuarios;
@@ -133,7 +137,23 @@ public class TareaServlet extends HttpServlet {
             break;
         case "mis-tareas":
             List<Tarea> misTareas = tdao.getByUsuarioId(usuario.getId());
+            List<Proyecto> proyectos = new ArrayList<Proyecto>();
+            for (Tarea tarea2 : misTareas) {
+				Proyecto pro = pdao.getById((edao.getOne(tarea2.getIdEtapa()).getIdProyecto()));
+				proyectos.add(pro);
+				
+				// IMPRIMIR CADA PROYECTO
+		        System.out.println("Tarea: " + tarea2.getNombre() + 
+		                         " | Proyecto ID: " + pro.getId() + 
+		                         " | Nombre proyecto: " + pro.getNombre());
+            }
+		    
+            System.out.println("Total proyectos: " + proyectos.size());
+		    System.out.println("==========================");
+			
             request.setAttribute("tareas", misTareas);
+            request.setAttribute("proyectos", proyectos);
+            request.setAttribute("usuario", usuario);
             request.setAttribute("esEmpleado", true);
             request.getRequestDispatcher("/tareas/mis-tareas.jsp").forward(request, response);
             break;
