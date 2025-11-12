@@ -88,6 +88,12 @@ public class EtapaServlet extends HttpServlet {
             request.setAttribute("error", "Falta el parámetro idProyecto");
         }
 
+        
+        // --- FIJAR DESTINO PARA REDIRECCIONAR O MANTENER LA PAGINA ---
+        String destino = (String) request.getAttribute("destino");
+        System.out.println("destino: "+destino);
+        if (destino == null) destino = "proyectos/unProyecto.jsp";
+        
         // --- CARGAR PROYECTO Y ETAPAS (SIEMPRE) ---
         Proyecto proyecto = null;
         List<Etapa> etapas = new ArrayList<>();
@@ -167,7 +173,7 @@ public class EtapaServlet extends HttpServlet {
         // CARGAR ETAPAS DE NUEVO
         request.setAttribute("etapas", cargarEtapasSeguro(request));
 
-        request.getRequestDispatcher("proyectos/unProyecto.jsp").forward(request, response);
+        request.getRequestDispatcher(destino).forward(request, response);
     }
 
     // DO POST 

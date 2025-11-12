@@ -22,6 +22,11 @@ import etapas.EtapaDAO;
 import exceptions.DAOException;
 import categoriaTarea.CategoriaTarea;
 import categoriaTarea.CategoriaTareaDAO;
+import comentarios.Comentario;
+import comentarios.ComentarioDAO;
+import horastrabajadas.HoraTrabajada;
+import horastrabajadas.HoraTrabajadaDAO;
+
 /**
  * Servlet implementation class TareaServlet
  */
@@ -33,6 +38,8 @@ public class TareaServlet extends HttpServlet {
     private CategoriaTareaDAO cdao;
     private EtapaDAO edao;
     private ProyectoDAO pdao;
+    private ComentarioDAO comdao;
+    private HoraTrabajadaDAO htdao;
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -47,7 +54,10 @@ public class TareaServlet extends HttpServlet {
         tdao=new TareaDAO();
         edao=new EtapaDAO();
         pdao = new ProyectoDAO();
+        comdao = new ComentarioDAO();
+        htdao = new HoraTrabajadaDAO();
     }
+    
      List<Tarea> tareas;
      List<Usuario> usuarios;
      
@@ -75,7 +85,6 @@ public class TareaServlet extends HttpServlet {
 			
 			Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
 			String rol = usuario != null ? usuario.getRol().toLowerCase() : "";
-
 			
         boolean esAdmin = "administrador".equals(rol);
         boolean esEmpleado = "empleado".equals(rol);
@@ -104,6 +113,11 @@ public class TareaServlet extends HttpServlet {
         	idEtapa = Integer.parseInt(request.getParameter("idEtapa"));
             List<Usuario> usuariosDisponibles = udao.getAll();
             List<CategoriaTarea> categorias = cdao.getAll();
+            int idEt=Integer.parseInt(request.getParameter("idEtapa"));
+        	List<Tarea> tar=tdao.getByEtapaId(idEt);
+        	request.setAttribute("tareas", tar);
+        	Etapa et=edao.getOne(idEtapa);
+        	request.setAttribute("etapa", et);
             request.setAttribute("usuarios", usuariosDisponibles);
             request.setAttribute("categorias", categorias);
             request.setAttribute("idEtapa", idEtapa);
@@ -123,14 +137,15 @@ public class TareaServlet extends HttpServlet {
             } else {
                 idEtapa = tarea.getIdEtapa();
             }
+            Etapa eta = edao.getOne(idEtapa);
             usuariosDisponibles = udao.getAll();
             categorias = cdao.getAll();
             List<Usuario> usuariosAsignados = tdao.getUsuariosAsignados(idTarea);
             request.setAttribute("tarea", tarea);
+            request.setAttribute("etapa", eta);          
             request.setAttribute("usuarios", usuariosDisponibles);
             request.setAttribute("usuariosAsignados", usuariosAsignados);
             request.setAttribute("categorias", categorias);
-           
             request.setAttribute("idEtapa", idEtapa);
             request.setAttribute("abrirModal", true);
             request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);
@@ -156,6 +171,28 @@ public class TareaServlet extends HttpServlet {
             request.setAttribute("usuario", usuario);
             request.setAttribute("esEmpleado", true);
             request.getRequestDispatcher("/tareas/mis-tareas.jsp").forward(request, response);
+            break;
+        case "detalle":
+        	int idE=Integer.parseInt(request.getParameter("idEtapa"));
+        	int idT=Integer.parseInt(request.getParameter("idTarea"));
+        	Etapa etapa = edao.getOne(idE);
+        	Tarea tareaDetalle = tdao.getOne(idT);
+        	List<Usuario> asignados = tdao.getUsuariosAsignados(idT);
+        	List<Comentario> comentarios = comdao.getAllByIdTarea(tareaDetalle.getId());
+        	List<HoraTrabajada> horas = htdao.getAllByIdTarea(tareaDetalle.getId());
+        	
+		    System.out.println("==========================");
+            System.out.println("Tarea seleccionada: "+tareaDetalle);
+            System.out.println("Usuarios asignados: "+asignados);
+            System.out.println("==========================");
+            
+        	request.setAttribute("etapa", etapa);
+        	request.setAttribute("tarea", tareaDetalle);
+        	request.setAttribute("empleadosAsignados", asignados);
+        	request.setAttribute("comentarios", comentarios);
+        	request.setAttribute("horas", horas);
+            request.setAttribute("usuario", usuario);
+        	request.getRequestDispatcher("/tareas/unaTarea.jsp").forward(request, response);
             break;
         }
         
@@ -233,6 +270,10 @@ private void insertarTarea(HttpServletRequest request,HttpServletResponse respon
 	tarea.setFechaFin(Date.valueOf(request.getParameter("fechaFin")));
 	tarea.setIdEtapa(Integer.parseInt(request.getParameter("idEtapa")));
 	tarea.setIdCategoria(Integer.parseInt(request.getParameter("idCategoria")));
+	System.out.println("===== DEBUG INSERT TAREA =====");
+	System.out.println("hasta el insertar llegue");
+	
+	
 	String[] usuarios=request.getParameterValues("usuarios");
 	List<Integer> ids=new ArrayList<>();
 	System.out.println("===== DEBUG USUARIOS =====");

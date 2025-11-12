@@ -152,7 +152,7 @@ PreparedStatement psUsuariosAct = con.prepareStatement(sqlUsuariosActuales);
 	 public List<Usuario> getUsuariosAsignados(int idTarea) throws DAOException {
 		    List<Usuario> usuarios = new ArrayList<>();
 
-		    String sql = "SELECT u.id, u.usuario, u.mail FROM usuario u  INNER JOIN tarea_usuario tu ON tu.idEmpleado = u.id WHERE tu.idTarea = ?"; 
+		    String sql = "SELECT u.id, u.nombre, u.apellido, u.mail FROM usuario u  INNER JOIN tarea_usuario tu ON tu.idEmpleado = u.id WHERE tu.idTarea = ?"; 
 		                 
 		                  
 		                 
@@ -167,7 +167,8 @@ PreparedStatement psUsuariosAct = con.prepareStatement(sqlUsuariosActuales);
 		            while (rs.next()) {
 		                Usuario u = new Usuario();
 		                u.setId(rs.getInt("id"));
-		                u.setNombre(rs.getString("usuario"));
+		                u.setNombre(rs.getString("nombre"));
+		                u.setApellido(rs.getString("apellido"));
 		                u.setMail(rs.getString("mail"));
 
 		                usuarios.add(u);

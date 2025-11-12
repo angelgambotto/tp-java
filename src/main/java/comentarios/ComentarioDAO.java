@@ -86,6 +86,35 @@ public class ComentarioDAO {
         return com;
     }
 	
+	public List<Comentario> getAllByIdTarea(int idTarea) throws DAOException {
+        String sql = "SELECT * FROM comentario WHERE idTarea = ?";
+        List<Comentario> lista = new ArrayList<>();
+
+        try (Connection con = ConexionDB.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, idTarea);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+            	Comentario com = new Comentario();
+                com.setIdTarea(rs.getInt("idTarea"));
+                com.setIdEmpleado(rs.getInt("idAutor"));
+                Timestamp timestamp = rs.getTimestamp("fecha");
+                if (timestamp != null) {
+                    com.setFecha(new Date(timestamp.getTime()));
+                }
+                com.setTexto(rs.getString("texto"));
+                lista.add(com);
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException("Error al recuperar los comentarios con idTarea: " + idTarea, e);
+        }
+
+        return lista;
+    }
+	
     public List<Comentario> getAll() throws DAOException {
         String sql = "SELECT * FROM comentario";
         List<Comentario> lista = new ArrayList<>();

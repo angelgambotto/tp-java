@@ -83,6 +83,36 @@ public class HoraTrabajadaDAO {
 
         return hora;
     }
+    
+    public List<HoraTrabajada> getAllByIdTarea(int idTarea) throws DAOException {
+        String sql = "SELECT * FROM hora_trabajada WHERE idTarea = ?";
+        List<HoraTrabajada> lista = new ArrayList<>();
+        try (Connection con = ConexionDB.getConexion();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+
+               ps.setInt(1, idTarea);
+               ResultSet rs = ps.executeQuery();
+               
+               while (rs.next()) {
+               	HoraTrabajada hora = new HoraTrabajada();
+                   hora.setIdTarea(rs.getInt("idTarea"));
+                   hora.setIdEmpleado(rs.getInt("idEmpleado"));
+                   Timestamp timestamp = rs.getTimestamp("fecha");
+                   if (timestamp != null) {
+                       hora.setFecha(new Date(timestamp.getTime()));
+                   }
+                   hora.setCantidad(rs.getInt("cantidad"));
+                   lista.add(hora);
+               }
+
+           } catch (SQLException e) {
+           	throw new DAOException("Error al obtener todas las horas trabajadas", e);
+           }
+
+           return lista;
+       }
+        
+    
     public List<HoraTrabajada> getAll() throws DAOException {
         String sql = "SELECT * FROM hora_trabajada";
         List<HoraTrabajada> lista = new ArrayList<>();

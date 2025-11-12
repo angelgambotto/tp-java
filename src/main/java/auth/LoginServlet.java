@@ -63,7 +63,7 @@ public class LoginServlet extends HttpServlet {
 		    System.out.println(user.getRol().toLowerCase());
 		    switch (user.getRol().toLowerCase()) {
 		        case "administrador":
-		            response.sendRedirect(request.getContextPath() + "/UsuariosServlet");
+		            response.sendRedirect(request.getContextPath() + "/ProyectoServlet");
 		            break;
 		        case "supervisor":
 		        	response.sendRedirect(request.getContextPath() + "/ProyectoServlet");
