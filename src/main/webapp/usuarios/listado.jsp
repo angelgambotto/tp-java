@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="java.util.LinkedList" %>
-<%@page import = "usuarios.Usuario" %>    
+<%@page import = "usuarios.Usuario" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,10 +14,10 @@
             modal.classList.toggle('hidden');
         }
     </script>
-
+ 
 <%LinkedList<Usuario> usuarios=(LinkedList<Usuario>)request.getAttribute("usuarios"); %>
-
-
+ 
+ 
 </head>
 <body>
 <body class="bg-gray-100">
@@ -34,10 +34,10 @@
  <div class="flex items-center justify-between mb-4">
  
     <h2 class="text-2xl font-bold text-black">Listado de usuarios</h2>
-
-     
+ 
+ 
     <div class="relative flex-1 max-w-md">
-        <input type="text" placeholder="Buscar..."
+        <input type="text" id="searchInput" placeholder="Buscar..."
                class="w-full border border-gray-300 rounded px-3 py-2 pr-10 focus:ring-indigo-500 focus:border-indigo-500" />
         <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -45,57 +45,109 @@
             </svg>
         </button>
     </div>
-
-    <a href="UsuariosServlet?action=new" 
+    
+    <div class="relative max-w-md ml-4">
+        <select id="roleFilter" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="">Todos los roles</option>
+            <option value="Administrador">Administrador</option>
+            <option value="Empleado">Empleado</option>
+            <option value="Usuario">Usuario</option>
+        </select>
+    </div>
+ 
+    <a href="UsuariosServlet?action=new"
    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-   Crear usuario
+   Nuevo
 </a>
-
+ 
   </div>
-
-<div class="flex mt-8 bg-white shadow-lg rounded-lg p-6"> 
+ 
+<div class="flex mt-8 bg-white shadow-lg rounded-lg p-6">
     <table class="w-full border-collapse border border-gray-300">
-    	<thead>
+     <thead>
         <tr>
             <th class="border border-gray-300 px-4 py-2">Nombre</th>
             <th class="border border-gray-300 px-4 py-2">Apellido</th>
-             <th class="border border-gray-300 px-4 py-2">Mail</th>
-              <th class="border border-gray-300 px-4 py-2">Usuario</th>
+            <th class="border border-gray-300 px-4 py-2">Mail</th>
+            <th class="border border-gray-300 px-4 py-2">Usuario</th>
             <th class="border border-gray-300 px-4 py-2">Rol</th>
             <th class="border border-gray-300 px-4 py-2">Supervisor</th>
-            <th class="border border-gray-300 px-4 py-2  w-[180px]">Acciones</th>
+            <th class="border border-gray-300 px-4 py-2 w-[180px]">Acciones</th>
         </tr>
         </thead>
-        <tbody>        
+        <tbody>
         <%
-       
+ 
         if(usuarios!=null){
         for(Usuario user :usuarios){ %>
-       
+ 
         <tr class="hover:bg-gray-100">
             <td class="border border-gray-300 px-4 py-2"><%= user.getNombre() %></td>
             <td class="border border-gray-300 px-4 py-2"><%= user.getApellido() %></td>
             <td class="border border-gray-300 px-4 py-2"><%= user.getMail() %></td>
-              <td class="border border-gray-300 px-4 py-2"><%= user.getUsuario() %></td> 
-                         <td class="border border-gray-300 px-4 py-2"><%= user.getRol() %></td>
+            <td class="border border-gray-300 px-4 py-2"><%= user.getUsuario() %></td>
+          	<td class="border border-gray-300 px-4 py-2"><%= user.getRol() %></td>
             <td class="border border-gray-300 px-4 py-2"><%= user.getNombreSupervisor() %></td>
             <td class="border border-gray-300 px-4 py-2">
-             <a href="UsuariosServlet?action=edit&id=<%= user.getId() %>" class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[70px] inline-block text-center"  >Editar</a>
-
-                <a href="UsuariosServlet?action=delete&id=<%= user.getId() %>"
-                   class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-red-700 w-[70px] inline-block text-center">Eliminar</a>
+             <a href="UsuariosServlet?action=edit&id=<%= user.getId() %>" 
+             	class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-blue-700 w-[70px] inline-block text-center" >
+             	Editar
+             </a>
+             <a href="UsuariosServlet?action=delete&id=<%= user.getId() %>"
+    	          class="bg-blue-600 text-white px-2 py-1 rounded text-sm hover:bg-red-700 w-[70px] inline-block text-center">
+    	          Eliminar
+   	          </a>
             </td>
         </tr>
-        <%      }
+        <% }
             }
         %>
         </tbody>
     </table>
 </div>
-
+ 
 <jsp:include page="formulario.jsp" />
 <jsp:include page= "modalEliminar.jsp"/>
-
+ 
 </div>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const roleFilter = document.getElementById('roleFilter');
+    const tableRows = document.querySelectorAll('tbody tr');
+
+    function filterTable() {
+        const searchText = searchInput.value.toLowerCase();
+        const selectedRole = roleFilter.value.toLowerCase();
+
+        tableRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length === 0) return;
+
+            const nombre = cells[0].textContent.toLowerCase();
+            const apellido = cells[1].textContent.toLowerCase();
+            const mail = cells[2].textContent.toLowerCase();
+            const usuario = cells[3].textContent.toLowerCase();
+            const rol = cells[4].textContent.toLowerCase();
+            const supervisor = cells[5].textContent.toLowerCase();
+
+            const matchesSearch = !searchText ||
+                nombre.includes(searchText) ||
+                apellido.includes(searchText) ||
+                mail.includes(searchText) ||
+                usuario.includes(searchText) ||
+                rol.includes(searchText) ||
+                supervisor.includes(searchText);
+
+            const matchesRole = !selectedRole || rol === selectedRole;
+
+            row.style.display = matchesSearch && matchesRole ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    roleFilter.addEventListener('change', filterTable);
+</script>
+
 </body>
 </html>

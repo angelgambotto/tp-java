@@ -54,15 +54,19 @@ public class UsuariosServlet extends HttpServlet {
         if (action != null) {
             switch (action) {
                 case "new":
-                    LinkedList<Usuario> supervisores = new LinkedList<>();
+                    LinkedList<Usuario> empleados = new LinkedList<>();
                     request.setAttribute("user", null);
                     request.setAttribute("abrirModal", true);
                     try {
-                        supervisores = userDAO.getPorRol("Supervisor");
+                    	empleados = userDAO.getPorRol("Empleado");
                     } catch (DAOException e) {
-                        request.setAttribute("error", "No se pudieron cargar los supervisores: " + e.getMessage());
+                        request.setAttribute("error", "No se pudieron cargar los empleados: " + e.getMessage());
                     }
-                    request.setAttribute("supervisores", supervisores);
+                    System.out.println("empleados: ");						
+                    for (Usuario usuario : empleados) {
+                    	System.out.println(usuario.getNombreCompleto());
+					}
+                    request.setAttribute("empleados", empleados);
                     break;
 
                 case "edit":
@@ -73,11 +77,11 @@ public class UsuariosServlet extends HttpServlet {
                         request.setAttribute("abrirModal", true);
                         List<Usuario> supervisoresEdit = new ArrayList<>();
                         for (Usuario s : cargarUsuariosSeguro(request)) {
-                            if ("Supervisor".equalsIgnoreCase(s.getRol())) {
+                            if ("Empleado".equalsIgnoreCase(s.getRol())) {
                                 supervisoresEdit.add(s);
                             }
                         }
-                        request.setAttribute("supervisores", supervisoresEdit);
+                        request.setAttribute("empleados", supervisoresEdit);
                     }
                     break;
 

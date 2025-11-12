@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import usuarios.Usuario;
 
-@WebFilter("/")
+@WebFilter("/*")
 public class SeguridadFilter implements Filter {
 
     @Override
@@ -23,7 +23,7 @@ public class SeguridadFilter implements Filter {
         Usuario usuario = (session != null) ? (Usuario) session.getAttribute("usuario") : null;
 
         // Recursos públicos
-        if (path.contains("login") || path.contains("css") || path.contains("js") || path.contains("images")) {
+        if (path.contains("LoginServlet") || path.contains("login") || path.contains("css") || path.contains("js") || path.contains("images")) {
             chain.doFilter(request, response);
             return;
         }
@@ -43,26 +43,26 @@ public class SeguridadFilter implements Filter {
         }
 
         if (path.contains("/ProyectoServlet") &&
-                !(rol.equals("ADMINISTRADOR") || rol.equals("SUPERVISOR"))) {
+                !(rol.equals("ADMINISTRADOR") || rol.equals("EMPLEADO"))) {
             res.sendRedirect(req.getContextPath() + "/sinPermiso.jsp");
             return;
         }
 
         if (path.contains("/ClienteServlet") &&
-                !(rol.equals("ADMINISTRADOR") || rol.equals("SUPERVISOR"))) {
+                !(rol.equals("ADMINISTRADOR") || rol.equals("EMPLEADO"))) {
             res.sendRedirect(req.getContextPath() + "/sinPermiso.jsp");
             return;
         }
 
         if (path.contains("/CategoriaTareaServlet") &&
-                !(rol.equals("ADMINISTRADOR") || rol.equals("SUPERVISOR"))) {
+                !(rol.equals("ADMINISTRADOR") || rol.equals("EMPLEADO"))) {
             res.sendRedirect(req.getContextPath() + "/sinPermiso.jsp");
             return;
         }
 
         // (opcional) proteger ABMC Tareas / Etapas
         if (path.contains("/TareaServlet") &&
-                !(rol.equals("ADMINISTRADOR") || rol.equals("SUPERVISOR") || rol.equals("EMPLEADO") || rol.equals("USUARIO"))) {
+                !(rol.equals("ADMINISTRADOR") || rol.equals("EMPLEADO") || rol.equals("USUARIO"))) {
             res.sendRedirect(req.getContextPath() + "/sinPermiso.jsp");
             return;
         }

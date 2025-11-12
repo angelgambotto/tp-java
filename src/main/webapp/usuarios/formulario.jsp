@@ -10,7 +10,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 
 <%Usuario user=(Usuario) request.getAttribute("user");
-List<Usuario> supervisores=(List<Usuario>) request.getAttribute("supervisores");
+List<Usuario> empleados=(List<Usuario>) request.getAttribute("empleados");
 %>
 </head>
 <body>
@@ -64,26 +64,24 @@ List<Usuario> supervisores=(List<Usuario>) request.getAttribute("supervisores");
            <select name="rol" required class="w-full border border-gray-300 rounded px-3 py-2">
            
            <option value="">Seleccione un rol</option>
-        <option value="Administrador" <%= (user != null && "Administrador".equals(user.getRol())) ? "selected" : "" %>>
-            Administrador
-        </option>
-       <option value="Empleado" <%= (user != null && "Empleado".equals(user.getRol())) ? "selected" : "" %>>
-		    Empleado
-		</option>
-        <option value="Supervisor" <%= (user != null && "Supervisor".equals(user.getRol())) ? "selected" : "" %>>
-            Supervisor
-        </option>
-        <option value="Usuario" <%= (user != null && "Usuario".equals(user.getRol())) ? "selected" : "" %>>
-            Usuario (sin privilegios)
-        </option></select>
+	        <option value="Administrador" <%= (user != null && "Administrador".equals(user.getRol())) ? "selected" : "" %>>
+	            Administrador
+	        </option>
+	       <option value="Empleado" <%= (user != null && "Empleado".equals(user.getRol())) ? "selected" : "" %>>
+			    Empleado
+			</option>
+	        <option value="Usuario" <%= (user != null && "Usuario".equals(user.getRol())) ? "selected" : "" %>>
+	            Usuario (sin privilegios)
+	        </option>
+	        </select>
            </div>
             <div>
                 <label class="block font-medium">Supervisor:</label>
                 <select name="supervisor"  class="w-full border border-gray-300 rounded px-3 py-2">
                     <option value="">Sin supervisor</option>
                     <%
-                        if (supervisores != null) {
-                            for (Usuario s : supervisores) {  
+                        if (empleados != null) {
+                            for (Usuario s : empleados) {  
                                 String selected = "";
                                 if (request.getAttribute("user") != null) {
                                     Usuario selectedUsuario = (Usuario) request.getAttribute("user");
