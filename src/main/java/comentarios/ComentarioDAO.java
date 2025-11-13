@@ -31,63 +31,57 @@ public class ComentarioDAO {
     }
 	
 	public void update(Comentario com) throws DAOException {
-        String sql = "UPDATE comentario SET fecha = ?, texto = ? WHERE idTarea = ? and idAutor = ?";
+        String sql = "UPDATE comentario SET fecha = ?, texto = ? WHERE id = ?";
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
-        	ps.setInt(1, com.getIdTarea());
-            ps.setInt(2, com.getIdEmpleado());
-            ps.setTimestamp(3, new java.sql.Timestamp(com.getFecha().getTime()));
-            ps.setString(4, com.getTexto());
+        	ps.setInt(3, com.getId());
+            ps.setTimestamp(1, new java.sql.Timestamp(com.getFecha().getTime()));
+            ps.setString(2, com.getTexto());
             ps.executeUpdate();
         } catch (SQLException e) {
-        	throw new DAOException("Error al actualizar comentario en la tarea: "+ com.getIdTarea(), e);
+        	throw new DAOException("Error al actualizar comentario: "+ com.getId(), e);
         }
     }
 	
-	public void delete(int idTarea, int idEmpleado, Date fecha) throws DAOException {
-        String sql = "DELETE FROM comentario WHERE idTarea = ? and idAutor = ? and fecha = ?";
+	public void delete(int id) throws DAOException {
+        String sql = "DELETE FROM comentario WHERE id = ?";
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
-        	ps.setInt(1, idTarea);
-        	ps.setInt(2, idEmpleado);
-        	//ps.setTimestamp(3, new java.sql.Timestamp(fecha));
+        	ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
-        	throw new DAOException("Error al eliminar horas de la tarea con id: " + idTarea, e);
+        	throw new DAOException("Error al eliminar el comentario con id: " + id, e);
         }
     }
 	
-	public Comentario getById(int idTarea, int idEmpleado, Date fecha) throws DAOException {
-        String sql = "SELECT * FROM comentario WHERE idTarea = ? and idEmpleado = ? and fecha = ?";
+	public Comentario getById(int id) throws DAOException {
+        String sql = "SELECT * FROM comentario WHERE id = ?";
         Comentario com = null;
 
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setInt(1, idTarea);
-            ps.setInt(2, idEmpleado);
+            ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
             	 com = new Comentario();
+            	 com.setId(rs.getInt("id"));
                  com.setIdTarea(rs.getInt("idTarea"));
                  com.setIdEmpleado(rs.getInt("idAutor"));
-                 Timestamp timestamp = rs.getTimestamp("fecha");
-                 if (timestamp != null) {
-                     com.setFecha(new Date(timestamp.getTime()));
-                 }
+                 com.setFecha(rs.getTimestamp("fecha"));                 
                  com.setTexto(rs.getString("texto"));
             }
 
         } catch (SQLException e) {
-            throw new DAOException("Error al recuperar el comentario con idTarea: " + idTarea + "y idEmpleado: " + idEmpleado + "para la fecha: "+ fecha, e);
+            throw new DAOException("Error al recuperar el comentario con id: " + id, e);
         }
 
         return com;
     }
 	
 	public List<Comentario> getAllByIdTarea(int idTarea) throws DAOException {
-        String sql = "SELECT * FROM comentario WHERE idTarea = ?";
+        String sql = "SELECT * FROM comentario WHERE idTarea = ? ORDER BY fecha DESC";
         List<Comentario> lista = new ArrayList<>();
 
         try (Connection con = ConexionDB.getConexion();
@@ -98,6 +92,7 @@ public class ComentarioDAO {
 
             while (rs.next()) {
             	Comentario com = new Comentario();
+            	com.setId(rs.getInt("id"));
                 com.setIdTarea(rs.getInt("idTarea"));
                 com.setIdEmpleado(rs.getInt("idAutor"));
                 Timestamp timestamp = rs.getTimestamp("fecha");
@@ -125,6 +120,7 @@ public class ComentarioDAO {
 
             while (rs.next()) {
             	Comentario com = new Comentario();
+            	com.setId(rs.getInt("id"));
                 com.setIdTarea(rs.getInt("idTarea"));
                 com.setIdEmpleado(rs.getInt("idAutor"));
                 Timestamp timestamp = rs.getTimestamp("fecha");

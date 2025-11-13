@@ -173,6 +173,7 @@ public class TareaServlet extends HttpServlet {
             request.getRequestDispatcher("/tareas/mis-tareas.jsp").forward(request, response);
             break;
         case "detalle":
+        	String tab = request.getParameter("tab");
         	int idE=Integer.parseInt(request.getParameter("idEtapa"));
         	int idT=Integer.parseInt(request.getParameter("idTarea"));
         	Etapa etapa = edao.getOne(idE);
@@ -192,6 +193,7 @@ public class TareaServlet extends HttpServlet {
         	request.setAttribute("comentarios", comentarios);
         	request.setAttribute("horas", horas);
             request.setAttribute("usuario", usuario);
+            request.setAttribute("tab",tab);
         	request.getRequestDispatcher("/tareas/unaTarea.jsp").forward(request, response);
             break;
         }

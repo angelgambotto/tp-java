@@ -3,10 +3,19 @@ package comentarios;
 import java.util.Date;
 
 public class Comentario {
+	private int id;
 	private int idTarea;
 	private int idEmpleado;
 	private Date fecha;
 	private String texto;
+	
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
 	
 	public int getIdTarea() {
 		return idTarea;

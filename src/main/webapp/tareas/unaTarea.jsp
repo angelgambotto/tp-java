@@ -20,6 +20,15 @@
     </style>
 </head>
 
+<script>
+window.addEventListener("DOMContentLoaded", function() {
+    const tab = "<%= request.getAttribute("tab") %>";
+    if (tab === "comentarios") {
+        cambiarTab("comentarios");
+    }
+});
+</script>
+
 <body class="bg-gray-100 font-sans">
 
 <jsp:include page="../header.jsp" />
@@ -270,7 +279,7 @@
             <!-- Formulario para nuevo comentario -->
             <div class="bg-gray-50 rounded-lg p-4 mb-6">
                 <form action="ComentarioServlet" method="post">
-                    <input type="hidden" name="action" value="create">
+                    <input type="hidden" name="action" value="new">
                     <input type="hidden" name="idTarea" value="<%= tarea != null ? tarea.getId() : "" %>">
                     <textarea name="texto" rows="3" 
                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
@@ -319,7 +328,7 @@
                                     </div>
                                     <p class="text-sm text-gray-700 break-words"><%= c.getTexto() %></p>
                                     <% if (usuarioActual != null && usuarioActual.getId() == c.getIdEmpleado()) { %>
-                                        <button onclick="eliminarComentario(<%= c.getIdTarea() %>, <%= c.getIdEmpleado() %>, '<%= sdfTime.format(c.getFecha()) %>')" 
+                                        <button onclick="eliminarComentario(<%= c.getId() %>)" 
                                                 class="text-xs text-red-600 hover:text-red-800 mt-2">
                                             Eliminar
                                         </button>
@@ -485,7 +494,7 @@ function eliminarAsignacion(idEmpleado, idTarea) {
     }
 }
 
-function eliminarComentario(idTarea, idEmpleado, fecha) {
+function eliminarComentario(id) {
     if (confirm('¿Desea eliminar este comentario?')) {
         const form = document.createElement('form');
         form.method = 'POST';
@@ -496,25 +505,13 @@ function eliminarComentario(idTarea, idEmpleado, fecha) {
         actionInput.name = 'action';
         actionInput.value = 'delete';
         
-        const tareaInput = document.createElement('input');
-        tareaInput.type = 'hidden';
-        tareaInput.name = 'idTarea';
-        tareaInput.value = idTarea;
-        
-        const empInput = document.createElement('input');
-        empInput.type = 'hidden';
-        empInput.name = 'idEmpleado';
-        empInput.value = idEmpleado;
-        
-        const fechaInput = document.createElement('input');
-        fechaInput.type = 'hidden';
-        fechaInput.name = 'fecha';
-        fechaInput.value = fecha;
+        const comInput = document.createElement('input');
+        comInput.type = 'hidden';
+        comInput.name = 'idComentario';
+        comInput.value = id;
         
         form.appendChild(actionInput);
-        form.appendChild(tareaInput);
-        form.appendChild(empInput);
-        form.appendChild(fechaInput);
+        form.appendChild(comInput);
         document.body.appendChild(form);
         form.submit();
     }
