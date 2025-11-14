@@ -3,6 +3,7 @@
 <%@ page import="proyectos.Proyecto" %>
 <%@ page import="etapas.Etapa" %>
 <%@ page import="tareas.Tarea" %>
+<%@ page import="usuarios.Usuario" %>
 <%@ page import="categoriaTarea.CategoriaTarea" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 
@@ -58,6 +59,8 @@
     List<Etapa> etapas = (List<Etapa>) request.getAttribute("etapas");
     List<CategoriaTarea> categorias = (List<CategoriaTarea>) request.getAttribute("categorias");
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+    List<Usuario> empleadosAsignados = (List<Usuario>) request.getAttribute("usuariosAsignados");
+    List<Usuario> empleadosDisponibles = (List<Usuario>) request.getAttribute("usuarios");
 %>
 
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -80,6 +83,36 @@
 	                + Nueva Etapa
 	            </a>
 	        </div>
+	        <!-- EMPLEADOS ASIGNADOS -->
+            <div class="border-t pt-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                    <h3 class="text-sm font-semibold text-gray-700 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        Personas Asignadas
+                    </h3>
+                    <button onclick="toggleModal('modalAsignarEmpleado')" 
+                            class="text-sm bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-4 rounded-lg transition">
+                        + Asignar Persona
+                    </button>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <% if (empleadosAsignados != null && !empleadosAsignados.isEmpty()) { 
+                        for (Usuario emp : empleadosAsignados) { 
+                            String[] colores = {"bg-purple-400", "bg-blue-400", "bg-indigo-400"};
+                            String color = colores[emp.getId() % colores.length];
+                    %>
+                        <div class="flex items-center gap-2 <%= color %> text-white px-3 py-1.5 rounded-full text-sm font-medium">
+                            <span><%= emp.getNombre() %> <%= emp.getApellido() %></span>
+                        </div>
+                    <% } 
+                    } else { %>
+                        <p class="text-sm text-gray-500 italic">No hay personas asignadas aún</p>
+                    <% } %>
+                </div>
+            </div>
 	    </div>
     <% } else { %>
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 sm:mb-6">
@@ -319,7 +352,8 @@
                 				<%= "To Do".equals(estado) ? "border-yellow-500" :
                                 "In Progress".equals(estado) ? "border-blue-500" :
                                 "Done".equals(estado) ? "border-green-500" :
-                                "border-red-500" %>">
+                                "border-red-500" %>"
+                                onclick="event.stopPropagation(); window.location.href='TareaServlet?action=detalle&idTarea=<%= tarea.getId() %>&idEtapa=<%= etapa.getId() %>'">
                                 
                     <div class="flex justify-between items-start mb-2">
                         <h4 class="font-semibold text-gray-900 text-xs sm:text-sm"><%= tarea.getNombre() %></h4>
@@ -489,6 +523,71 @@
 </div>
 
 
+<!-- MODAL ASIGNAR EMPLEADO -->
+<div id="modalAsignarEmpleado" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-4 sm:p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Asignar Persona</h3>
+                <button onclick="toggleModal('modalAsignarEmpleado')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form action="ProyectoServlet?action=asignar&id=<%= pro.getId() %>" method="post">
+                <input type="hidden" name="id" value="<%= pro != null ? pro.getId() : "" %>">
+                
+                <!-- Barra de búsqueda -->
+                <input 
+                    type="text" 
+                    id="buscadorEmpleado"
+                    placeholder="Buscar empleado..." 
+                    class="w-full mb-3 px-3 py-2 border rounded-lg focus:ring focus:ring-blue-200"
+                    onkeyup="filtrarEmpleados()"
+                />
+
+                <!-- Lista de empleados -->
+                <div id="lista-empleados" class="border rounded-lg px-4 py-3 max-h-40 overflow-y-auto">
+
+                <% if (empleadosDisponibles != null) {
+                       for (Usuario u : empleadosDisponibles) {
+                           boolean seleccionado = empleadosAsignados != null &&
+                                   empleadosAsignados.stream().anyMatch(us -> us.getId() == u.getId());
+                %>
+
+                    <label class="flex items-center space-x-2 mb-2 cursor-pointer empleado-item">
+                        <input type="checkbox"
+                               name="usuarios"
+                               value="<%= u.getId() %>"
+                               <%= seleccionado ? "checked" : "" %>
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <span class="empleado-nombre">
+                            <%= u.getNombre() %> <%= u.getApellido() %>
+                        </span>
+                    </label>
+
+                <% } } %>
+
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-2 justify-end">
+                    <button type="button" onclick="toggleModal('modalAsignarEmpleado')" 
+                            class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
+                        Asignar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
 <script>
 function toggleModal(modalId) {
     const modal = document.getElementById(modalId);
@@ -516,6 +615,26 @@ function cambiarVista(vista) {
         btnKanban.classList.remove('bg-blue-600', 'text-white');
         btnKanban.classList.add('bg-gray-200', 'text-gray-700');
     }
+}
+
+function filtrarEmpleados() {
+    const texto = document.getElementById("buscadorEmpleado").value.toLowerCase();
+    const items = document.querySelectorAll("#lista-empleados .empleado-item");
+
+    items.forEach(item => {
+        const nombre = item.querySelector(".empleado-nombre").innerText.toLowerCase();
+        item.style.display = nombre.includes(texto) ? "flex" : "none";
+    });
+}
+
+//Cerrar modales al hacer clic fuera
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('[id^="modal"]');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
 }
 </script>
 

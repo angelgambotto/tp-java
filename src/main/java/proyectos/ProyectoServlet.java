@@ -44,7 +44,7 @@ public class ProyectoServlet extends HttpServlet {
 	    try {
 	        return usuarioDao.getAll();
 	    } catch (DAOException e) {
-	        request.setAttribute("error", "No se pudieron cargar los clientes: " + e.getMessage());
+	        request.setAttribute("error", "No se pudieron cargar los usuarios: " + e.getMessage());
 	        return new ArrayList<>();
 	    }
 	}
@@ -66,6 +66,15 @@ public class ProyectoServlet extends HttpServlet {
 	        return new Proyecto();
 	    }
 	}	
+	
+	private List<Usuario> cargarAsignadosSeguro(HttpServletRequest request, int id){
+		try {
+			return dao.getUsuariosAsignados(id);
+		} catch (DAOException e) {
+	        request.setAttribute("error", "No se pudieron cargar los usuarios: " + e.getMessage());
+	        return new ArrayList<>();
+	    }
+	}
 
     @Override
     public void init() {
@@ -126,56 +135,109 @@ public class ProyectoServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	System.out.println(">>> Entró a post proyecto <<<");
     	Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
-	    if (usuario == null || !"Administrador".equalsIgnoreCase(usuario.getRol())) {
+    	
+    	int id = request.getParameter("id") == null || request.getParameter("id").isEmpty()
+                ? 0 : Integer.parseInt(request.getParameter("id"));
+    	
+    	List<Usuario> asig = cargarAsignadosSeguro(request, id);
+    	Boolean esta = asig.contains(usuario);
+	    if (esta == false && !"Administrador".equalsIgnoreCase(usuario.getRol())) {
 	        response.sendRedirect("login.jsp");
 	        return; 
 	    }
-    	int id = request.getParameter("id") == null || request.getParameter("id").isEmpty()
-                 ? 0 : Integer.parseInt(request.getParameter("id"));
-        
-        //para hacer el update/insert
-        String nombre = request.getParameter("nombre");
-        String descripcion = request.getParameter("descripcion");
-        String estado = request.getParameter("estado");
-        String fechaStr = request.getParameter("fechaCreacion");
-        
-        int clienteId = Integer.parseInt(request.getParameter("clienteId"));
-        int supervisorId = Integer.parseInt(request.getParameter("supervisorId"));
-
-        Date fechaCreacion = null;
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            fechaCreacion = sdf.parse(fechaStr);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            // Handle error, perhaps redirect with error message
-            response.sendRedirect("ProyectoServlet?error=invalid_date");
-            return;
-        }
-        
-        Cliente cliente = new Cliente();
-        cliente.setId(clienteId);
-
-        Usuario supervisor = new Usuario();
-        supervisor.setId(supervisorId);
-
-        Proyecto pro = new Proyecto(id, nombre, descripcion, estado, cliente, fechaCreacion, supervisor, new LinkedList<>());
-
-        try {        	
-        	if (id > 0) {
-        		dao.update(pro);
-        	} else {
-        		dao.insert(pro);
-        	}
-        	response.sendRedirect("ProyectoServlet");
-        	
-        } catch (DAOException e) {
-        	request.setAttribute("error", e.getMessage());
-	    	request.setAttribute("supervisores", cargarUsuariosSeguro(request));
-	        request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
-        }
+	    
+	    String action=request.getParameter("action");
+	    System.out.println("action: "+ action);
+	    if (action == null) {
+	    	action = "insert-update";
+	    }
+	    
+		switch(action) {
+		case "insert-update":
+			insertarProyecto(request,response, id);
+			break;
+		case "asignar":
+			System.out.println(">>> Entró a asignarUsuarios <<<");
+			asignarUsuarios(request,response, id);
+			break;
+		
+		}
         
     } //cierra el doPost
 
+    private void insertarProyecto(HttpServletRequest request,HttpServletResponse response, int id) throws IOException, ServletException{
+       
+       //para hacer el update/insert
+       String nombre = request.getParameter("nombre");
+       String descripcion = request.getParameter("descripcion");
+       String estado = request.getParameter("estado");
+       String fechaStr = request.getParameter("fechaCreacion");
+       
+       int clienteId = Integer.parseInt(request.getParameter("clienteId"));
+       int supervisorId = Integer.parseInt(request.getParameter("supervisorId"));
+
+       Date fechaCreacion = null;
+       try {
+           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+           fechaCreacion = sdf.parse(fechaStr);
+       } catch (ParseException e) {
+           e.printStackTrace();
+           // Handle error, perhaps redirect with error message
+           response.sendRedirect("ProyectoServlet?error=invalid_date");
+           return;
+       }
+       
+       Cliente cliente = new Cliente();
+       cliente.setId(clienteId);
+
+       Usuario supervisor = new Usuario();
+       supervisor.setId(supervisorId);
+
+       Proyecto pro = new Proyecto(id, nombre, descripcion, estado, cliente, fechaCreacion, supervisor, new LinkedList<>());
+
+       try {        	
+       	if (id > 0) {
+       		dao.update(pro);
+       	} else {
+       		dao.insert(pro);
+       	}
+       	response.sendRedirect("ProyectoServlet");
+       	
+       } catch (DAOException e) {
+       	request.setAttribute("error", e.getMessage());
+	    request.setAttribute("supervisores", cargarUsuariosSeguro(request));
+	    request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
+       }
+    }
+    
+    private void asignarUsuarios(HttpServletRequest request, HttpServletResponse response, int id)
+            throws IOException, ServletException {
+    	System.out.println(">>> Entró estro a asignarUsuarios <<<");
+        try {
+            String[] usuariosForm = request.getParameterValues("usuarios");
+
+            List<Integer> usuariosSeleccionados = new ArrayList<>();
+            if (usuariosForm != null) {
+                for (String idU : usuariosForm) {
+                    usuariosSeleccionados.add(Integer.parseInt(idU));
+                }
+            }
+
+            Proyecto pro = dao.getById(id);
+            if (pro == null) {
+                throw new ServletException("Proyecto no encontrado con ID: " + id);
+            }
+
+            dao.asignarEmpleados(pro.getId(), usuariosSeleccionados);
+
+            response.sendRedirect("EtapaServlet?action=list&idProyecto=" + pro.getId());
+
+        } catch (Exception e) {  // <--- Captura cualquier error
+            throw new ServletException("Error en asignarUsuarios", e);
+        }
+    }
+
+    
 } //cierra el servlet

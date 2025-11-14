@@ -97,10 +97,10 @@ public class TareaServlet extends HttpServlet {
         
         switch(action) {
         case "list":
-        	if (!esAdmin) {
-                response.sendRedirect("TareaServlet?action=mis-tareas");
-                return;
-            }
+        	//if (!esAdmin) {
+            //    response.sendRedirect("TareaServlet?action=mis-tareas");
+            //    return;
+            //}
         	int idEtapa=Integer.parseInt(request.getParameter("idEtapa"));
         	List<Tarea> tareas=tdao.getByEtapaId(idEtapa);
         	request.setAttribute("tareas", tareas);
@@ -111,6 +111,12 @@ public class TareaServlet extends HttpServlet {
         	break;
         case "new":
         	idEtapa = Integer.parseInt(request.getParameter("idEtapa"));
+        	String estadoEtapa=edao.getOne(idEtapa).getEstado();
+
+        	if ("Done".equals(estadoEtapa)) {
+        		request.setAttribute("error", "No se pueden agregar tareas en una etapa finalizada.");
+        		request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);;
+        		}
             List<Usuario> usuariosDisponibles = udao.getAll();
             List<CategoriaTarea> categorias = cdao.getAll();
             int idEt=Integer.parseInt(request.getParameter("idEtapa"));
@@ -118,6 +124,7 @@ public class TareaServlet extends HttpServlet {
         	request.setAttribute("tareas", tar);
         	Etapa et=edao.getOne(idEtapa);
         	request.setAttribute("etapa", et);
+        	request.setAttribute("EtapaFinalizada", estadoEtapa.equals("Done"));
             request.setAttribute("usuarios", usuariosDisponibles);
             request.setAttribute("categorias", categorias);
             request.setAttribute("idEtapa", idEtapa);
@@ -140,9 +147,18 @@ public class TareaServlet extends HttpServlet {
             Etapa eta = edao.getOne(idEtapa);
             usuariosDisponibles = udao.getAll();
             categorias = cdao.getAll();
+            estadoEtapa="";
+            try {
+            	estadoEtapa=edao.getEstadoByTareaId(idTarea);
+            }
+            catch(DAOException ex) {
+            	ex.printStackTrace();
+            	request.setAttribute("error", "error al obtener estado de etapa por tarea con id: "+idTarea);
+            }
             List<Usuario> usuariosAsignados = tdao.getUsuariosAsignados(idTarea);
             request.setAttribute("tarea", tarea);
-            request.setAttribute("etapa", eta);          
+            request.setAttribute("etapa", eta);
+            request.setAttribute("EtapaFinalizada", estadoEtapa.equals("Done"));
             request.setAttribute("usuarios", usuariosDisponibles);
             request.setAttribute("usuariosAsignados", usuariosAsignados);
             request.setAttribute("categorias", categorias);
@@ -179,6 +195,7 @@ public class TareaServlet extends HttpServlet {
         	Etapa etapa = edao.getOne(idE);
         	Tarea tareaDetalle = tdao.getOne(idT);
         	List<Usuario> asignados = tdao.getUsuariosAsignados(idT);
+        	List<Usuario> disponibles = pdao.getUsuariosAsignados(etapa.getIdProyecto());
         	List<Comentario> comentarios = comdao.getAllByIdTarea(tareaDetalle.getId());
         	List<HoraTrabajada> horas = htdao.getAllByIdTarea(tareaDetalle.getId());
         	
@@ -190,6 +207,7 @@ public class TareaServlet extends HttpServlet {
         	request.setAttribute("etapa", etapa);
         	request.setAttribute("tarea", tareaDetalle);
         	request.setAttribute("empleadosAsignados", asignados);
+        	request.setAttribute("empleadosDisponibles", disponibles);
         	request.setAttribute("comentarios", comentarios);
         	request.setAttribute("horas", horas);
             request.setAttribute("usuario", usuario);
@@ -220,6 +238,7 @@ public class TareaServlet extends HttpServlet {
 	        response.sendRedirect("TareaServlet?action=mis-tareas");
 	        return;
 	    }*/
+		
 		String action=request.getParameter("action");
 		switch(action) {
 		case "insert":
@@ -231,6 +250,8 @@ public class TareaServlet extends HttpServlet {
 		case "delete":
 			borrarTarea(request,response);
 		break;
+		case "asignar":
+			asignarUsuarios(request,response);
 		
 		}
 		
@@ -263,51 +284,49 @@ public class TareaServlet extends HttpServlet {
 		response.sendRedirect("EtapaServlet?action=list&idEtapa="+idEtapa+"&idProyecto="+idProyecto);
 		
 	}
-private void insertarTarea(HttpServletRequest request,HttpServletResponse response) throws IOException{
-	try{Tarea tarea=new Tarea();
-	tarea.setNombre(request.getParameter("nombre"));
-	tarea.setDescripcion(request.getParameter("descripcion"));
-	tarea.setEstado(request.getParameter("estado"));
-	tarea.setFechaInicio(Date.valueOf(request.getParameter("fechaInicio")));
-	tarea.setFechaFin(Date.valueOf(request.getParameter("fechaFin")));
-	tarea.setIdEtapa(Integer.parseInt(request.getParameter("idEtapa")));
-	tarea.setIdCategoria(Integer.parseInt(request.getParameter("idCategoria")));
-	System.out.println("===== DEBUG INSERT TAREA =====");
-	System.out.println("hasta el insertar llegue");
 	
-	
-	String[] usuarios=request.getParameterValues("usuarios");
-	List<Integer> ids=new ArrayList<>();
-	System.out.println("===== DEBUG USUARIOS =====");
-    System.out.println("usuarios array es null? " + (usuarios == null));
-    if (usuarios != null) {
-        System.out.println("Cantidad de usuarios recibidos: " + usuarios.length);
-    }
-	
-	if(usuarios!=null) {
-		for (String u:usuarios) {
+	private void insertarTarea(HttpServletRequest request,HttpServletResponse response) throws IOException{
+		try{Tarea tarea=new Tarea();
+		tarea.setNombre(request.getParameter("nombre"));
+		tarea.setDescripcion(request.getParameter("descripcion"));
+		tarea.setEstado(request.getParameter("estado"));
+		tarea.setFechaInicio(Date.valueOf(request.getParameter("fechaInicio")));
+		tarea.setFechaFin(Date.valueOf(request.getParameter("fechaFin")));
+		tarea.setIdEtapa(Integer.parseInt(request.getParameter("idEtapa")));
+		tarea.setIdCategoria(Integer.parseInt(request.getParameter("idCategoria")));
+		System.out.println("===== DEBUG INSERT TAREA =====");
+		System.out.println("hasta el insertar llegue");
 		
-			ids.add(Integer.parseInt(u));
-			System.out.println("usuario: "+u);
 		
+		String[] usuarios=request.getParameterValues("usuarios");
+		List<Integer> ids=new ArrayList<>();
+		System.out.println("===== DEBUG USUARIOS =====");
+	    System.out.println("usuarios array es null? " + (usuarios == null));
+	    if (usuarios != null) {
+	        System.out.println("Cantidad de usuarios recibidos: " + usuarios.length);
+	    }
+		
+		if(usuarios!=null) {
+			for (String u:usuarios) {
 			
+				ids.add(Integer.parseInt(u));
+				System.out.println("usuario: "+u);
+			
+				
+			}
 		}
+		
+			System.out.println(ids);
+			tdao.insert(tarea, ids);
+			response.sendRedirect("TareaServlet?action=list&idEtapa=" + tarea.getIdEtapa());
+		}
+		catch(DAOException e) {
+			request.setAttribute("Error al insertar tarea: ", e);
+		}
+		
 	}
-	
-		System.out.println(ids);
-		tdao.insert(tarea, ids);
-		response.sendRedirect("TareaServlet?action=list&idEtapa=" + tarea.getIdEtapa());
-	}
-	catch(DAOException e) {
-		request.setAttribute("Error al insertar tarea: ", e);
-	}
-	
-}
 
-
-private void actualizarTarea(HttpServletRequest request,HttpServletResponse response) throws IOException,ServletException{
-	
-
+	private void actualizarTarea(HttpServletRequest request,HttpServletResponse response) throws IOException,ServletException{	
 	    try {
 	        Tarea tarea = new Tarea();
 	        tarea.setId(Integer.parseInt(request.getParameter("idTarea")));
@@ -335,7 +354,32 @@ private void actualizarTarea(HttpServletRequest request,HttpServletResponse resp
 
 	    } catch (DAOException e) {
 	        throw new ServletException("Error al actualizar tarea", e);
-	    }}}
+	    }
+    }
+	
+	private void asignarUsuarios(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        try {
+        	int id = request.getParameter("idTarea") == null || request.getParameter("idTarea").isEmpty()
+                    ? 0 : Integer.parseInt(request.getParameter("idTarea"));
+        	Tarea tarea = tdao.getOne(id);
+            String[] usuariosForm = request.getParameterValues("usuarios");
+
+            List<Integer> usuariosSeleccionados = new ArrayList<>();
+            if (usuariosForm != null) {
+                for (String idU : usuariosForm) {
+                    usuariosSeleccionados.add(Integer.parseInt(idU));
+                }
+            }
+
+            tdao.asignarEmpleados(id, usuariosSeleccionados);
+
+            response.sendRedirect("TareaServlet?action=detalle&idEtapa=" + tarea.getIdEtapa() + "&idTarea=" + tarea.getId());
+
+        } catch (Exception e) {  // <--- Captura cualquier error
+            throw new ServletException("Error en asignarUsuarios", e);
+        }
+    }
+}
 	
 
 

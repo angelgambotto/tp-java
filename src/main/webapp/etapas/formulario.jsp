@@ -34,8 +34,8 @@
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
         <h2 class="text-2xl font-bold mb-4">Agregar / Editar Etapa</h2>
         <form action="EtapaServlet" method="post" class="space-y-4">
-            <input type="hidden" name="id" value="${id}" />
-            <input type="hidden" name="idProyecto" value="${idProyecto}" />
+            <input type="hidden" name="id" value="<%= request.getAttribute("id") %>" />
+            <input type="hidden" name="idProyecto" value="<%= request.getAttribute("idProyecto") %>" />
 
             <div>
                 <label class="block font-medium">Nombre:</label>
@@ -54,13 +54,18 @@
             </div>
 
             <div>
+            <% Boolean tp = (Boolean) request.getAttribute("tienePendientes"); 
+            boolean bloqueado = (tp != null && tp);
+%>
                 <label class="block font-medium">Estado:</label>
                 <select name="estado" 
                 value=<%= request.getAttribute("estado") %>
                 required class="w-full border border-gray-300 rounded px-3 py-2">
                     <option value="To Do" <%= "To Do".equals(request.getAttribute("estado")) ? "selected" : "" %>>To Do</option>
                     <option value="In Progress" <%= "In Progress".equals(request.getAttribute("estado")) ? "selected" : "" %>>In Progress</option>
-                    <option value="Done" <%= "Done".equals(request.getAttribute("estado")) ? "selected" : "" %>>Done</option>
+<% if (!bloqueado) { %>
+    <option value="Done" <%= "Done".equals(request.getAttribute("estado")) ? "selected" : "" %>>Done</option>
+<% } %>
                     <option value="Canceled" <%= "Canceled".equals(request.getAttribute("estado")) ? "selected" : "" %>>Canceled</option>
                 </select>
             </div>

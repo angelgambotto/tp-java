@@ -223,6 +223,22 @@ public class EtapaDAO {
 	    }
 	    return etapas;
 	}
+	public String getEstadoByTareaId(int idTarea) throws DAOException {
+		String sql="SELECT e.estado FROM etapa e inner join tarea t on t.idEtapa=e.id where t.id=? ";
+		try {
+			Connection con=ConexionDB.getConexion();
+			PreparedStatement ps=con.prepareStatement(sql);
+			ps.setInt(1, idTarea);
+			ResultSet rs=ps.executeQuery();
+			if(rs.next()) {
+				return rs.getString("estado");
+			}
+			return null;
+		}
+		catch (SQLException e) {
+			throw new DAOException("Error obteniendo estado de etapa por tarea con id: "+idTarea,e);
+		}
+	}
 	
 
 }

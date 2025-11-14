@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,7 +114,7 @@ public class TareaDAO {
 		        ps.setString(6, tarea.getEstado());
 		        ps.setInt(7, tarea.getId());
 		        ps.executeUpdate();
-PreparedStatement psUsuariosAct = con.prepareStatement(sqlUsuariosActuales);
+		        PreparedStatement psUsuariosAct = con.prepareStatement(sqlUsuariosActuales);
 		        psUsuariosAct.setInt(1, tarea.getId());
 		        ResultSet rs = psUsuariosAct.executeQuery();
 		        List<Integer> usuariosActualesBD = new ArrayList<>();
@@ -126,10 +127,7 @@ PreparedStatement psUsuariosAct = con.prepareStatement(sqlUsuariosActuales);
 		        PreparedStatement psInsert = con.prepareStatement(sqlInsertUsuario);
 		        for (Integer u : usuariosSeleccionados) {
 		            if (!usuariosActualesBD.contains(u)) {
-		                
-		            	
-		            	
-		            		psInsert.setInt(1, tarea.getId());
+		                psInsert.setInt(1, tarea.getId());
 		                psInsert.setInt(2, u);
 		                psInsert.executeUpdate();
 		            }
@@ -286,7 +284,22 @@ PreparedStatement psUsuariosAct = con.prepareStatement(sqlUsuariosActuales);
 		    }
 		    return tareas;
 		}
-		
+		public boolean tieneTareasIncompletas  (int idEtapa) throws DAOException {
+			String sql="SELECT COUNT(*) from tarea where idEtapa=? and estado<>'Done'";
+			try {
+				Connection con=ConexionDB.getConexion();
+				PreparedStatement ps=con.prepareStatement(sql);
+				ps.setInt(1, idEtapa);
+				ResultSet rs=ps.executeQuery();
+				if(rs.next()) {
+					return rs.getInt(1)>0;
+				}
+				
+			}catch (SQLException e) {
+				throw new DAOException("Error al obtener tareas incompletas de etapa con id: "+idEtapa,e);
+			}
+	return false;
+		}
 		public List<Tarea> getByUsuarioId(int idEmpleado) throws DAOException {
 		    String sql = "SELECT t.* FROM tarea t INNER JOIN tarea_usuario tu ON t.id = tu.idTarea "
 		    		+ " WHERE idEmpleado = ? ORDER BY fechaInicio ASC"; // Orden lógico por fecha
@@ -318,4 +331,42 @@ PreparedStatement psUsuariosAct = con.prepareStatement(sqlUsuariosActuales);
 		    return tareas;
 		}
 
+		public void asignarEmpleados(int idT, List<Integer> asignados) throws DAOException {
+	    	String sqlActuales = "SELECT * from tarea_usuario where idTarea = ?";
+	    	String sqlAsignar = "INSERT INTO tarea_usuario (idTarea, idEmpleado) VALUES (?,?)";
+	    	String sqlBaja = "DELETE FROM tarea_usuario where idEmpleado = ? and idTarea = ?";
+	    	
+	    	try {
+	    		Connection con=ConexionDB.getConexion();
+	    		PreparedStatement psUsuariosAct = con.prepareStatement(sqlActuales);
+		    	psUsuariosAct.setInt(1, idT);
+		        ResultSet rs = psUsuariosAct.executeQuery();
+		        List<Integer> usuariosActualesBD = new ArrayList<>();
+
+		        while (rs.next()) {
+		            usuariosActualesBD.add(rs.getInt("idEmpleado"));
+		        }
+		        
+		        PreparedStatement psInsert = con.prepareStatement(sqlAsignar);
+		        for (Integer u : asignados) {
+		            if (!usuariosActualesBD.contains(u)) {
+		                psInsert.setInt(1, idT);
+		                psInsert.setInt(2, u);
+		                psInsert.executeUpdate();
+		            }
+		        }
+		       
+		        PreparedStatement psDelete = con.prepareStatement(sqlBaja);
+		        for (Integer u : usuariosActualesBD) {
+		            if (!asignados.contains(u)) {
+		            	psDelete.setInt(1, u);
+		            	psDelete.setInt(2, idT);
+		                psDelete.executeUpdate();
+		            }
+		        }
+
+	    	} catch (SQLException e) {
+		        throw new DAOException("Error actualizando proyecto", e);
+		    }
+	    }
 }

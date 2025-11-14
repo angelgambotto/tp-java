@@ -43,14 +43,20 @@
                 <textarea name="descripcion" rows="3"
                           class="w-full border rounded-lg px-4 py-2"><%= tarea != null ? tarea.getDescripcion() : "" %></textarea>
             </div>
+<%Boolean f=(Boolean)request.getAttribute("EtapaFinalizada"); 
+boolean etapaFinalizada = f != null && f;
 
+%>
             <div class="mb-4">
                 <label class="block text-gray-700 mb-1">Estado</label>
-                <select name="estado" class="w-full border rounded-lg px-4 py-2">
+                <select name="estado" class="w-full border rounded-lg px-4 py-2" <%= etapaFinalizada ? "disabled" : "" %>>
                     <option value="To Do" <%= tarea != null && "To Do".equals(tarea.getEstado()) ? "selected" : "" %>>To Do</option>
                     <option value="In Progress" <%= tarea != null && "In Progress".equals(tarea.getEstado()) ? "selected" : "" %>>In Progress</option>
                     <option value="Done" <%= tarea != null && "Done".equals(tarea.getEstado()) ? "selected" : "" %>>Done</option>
                 </select>
+                <% if (etapaFinalizada) { %>
+    <input type="hidden" name="estado" value="<%= tarea.getEstado() %>">
+<% } %>
             </div>
 
             <div class="grid grid-cols-2 gap-4 mb-6">

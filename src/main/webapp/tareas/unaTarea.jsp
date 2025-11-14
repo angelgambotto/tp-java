@@ -118,12 +118,6 @@ window.addEventListener("DOMContentLoaded", function() {
                     %>
                         <div class="flex items-center gap-2 <%= color %> text-white px-3 py-1.5 rounded-full text-sm font-medium">
                             <span><%= emp.getNombre() %> <%= emp.getApellido() %></span>
-                            <button onclick="eliminarAsignacion(<%= emp.getId() %>, <%= tarea.getId() %>)" 
-                                    class="ml-1 hover:bg-white hover:bg-opacity-20 rounded-full p-0.5 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
                         </div>
                     <% } 
                     } else { %>
@@ -355,24 +349,45 @@ window.addEventListener("DOMContentLoaded", function() {
                     </svg>
                 </button>
             </div>
-            <form action="TareaEmpleadoServlet" method="post">
+
+            <form action="TareaServlet?action=asignar&idTarea=<%= tarea.getId() %>" method="post">
                 <input type="hidden" name="action" value="asignar">
                 <input type="hidden" name="idTarea" value="<%= tarea != null ? tarea.getId() : "" %>">
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Seleccionar Empleado</label>
-                    <select name="idEmpleado" required 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="">-- Seleccione --</option>
-                        <% if (empleadosDisponibles != null) {
-                            for (Usuario emp : empleadosDisponibles) { %>
-                                <option value="<%= emp.getId() %>"><%= emp.getNombre() %> <%= emp.getApellido() %> (<%= emp.getRol() %>)</option>
-                        <%  }
-                        } %>
-                    </select>
+
+                <!-- Barra de búsqueda -->
+                <input 
+                    type="text" 
+                    id="buscadorEmpleado"
+                    placeholder="Buscar empleado..." 
+                    class="w-full mb-3 px-3 py-2 border rounded-lg focus:ring focus:ring-blue-200"
+                    onkeyup="filtrarEmpleados()"
+                />
+
+                <!-- Lista de empleados -->
+                <div id="lista-empleados" class="border rounded-lg px-4 py-3 max-h-40 overflow-y-auto">
+
+                <% if (empleadosDisponibles != null) {
+                       for (Usuario u : empleadosDisponibles) {
+                           boolean seleccionado = empleadosAsignados != null &&
+                                   empleadosAsignados.stream().anyMatch(us -> us.getId() == u.getId());
+                %>
+
+                    <label class="flex items-center space-x-2 mb-2 cursor-pointer empleado-item">
+                        <input type="checkbox"
+                               name="usuarios"
+                               value="<%= u.getId() %>"
+                               <%= seleccionado ? "checked" : "" %>
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <span class="empleado-nombre">
+                            <%= u.getNombre() %> <%= u.getApellido() %>
+                        </span>
+                    </label>
+
+                <% } } %>
+
                 </div>
-                
-                <div class="flex flex-col sm:flex-row gap-2 justify-end">
+
+                <div class="flex flex-col sm:flex-row gap-2 justify-end mt-4">
                     <button type="button" onclick="toggleModal('modalAsignarEmpleado')" 
                             class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition">
                         Cancelar
@@ -380,51 +395,6 @@ window.addEventListener("DOMContentLoaded", function() {
                     <button type="submit" 
                             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
                         Asignar
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL REGISTRAR HORA -->
-<div id="modalRegistrarHora" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
-        <div class="p-4 sm:p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Registrar Horas</h3>
-                <button onclick="toggleModal('modalRegistrarHora')" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            <form action="HoraTrabajadaServlet" method="post">
-                <input type="hidden" name="action" value="new">
-                <input type="hidden" name="idTarea" value="<%= tarea != null ? tarea.getId() : "" %>">
-                <input type="hidden" name="idEmpleado" value="<%= usuario.getId() != 0 ? usuario.getId() : 0 %>" />
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Fecha</label>
-                    <input type="datetime-local" name="fecha" required 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad de Horas</label>
-                    <input type="number" name="cantidad" min="1" step="1" required 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                           placeholder="Ej: 8">
-                </div>
-                
-                <div class="flex flex-col sm:flex-row gap-2 justify-end">
-                    <button type="button" onclick="toggleModal('modalRegistrarHora')" 
-                            class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition">
-                        Cancelar
-                    </button>
-                    <button type="submit" 
-                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
-                        Registrar
                     </button>
                 </div>
             </form>
@@ -515,6 +485,16 @@ function eliminarComentario(id) {
         document.body.appendChild(form);
         form.submit();
     }
+}
+
+function filtrarEmpleados() {
+    const texto = document.getElementById("buscadorEmpleado").value.toLowerCase();
+    const items = document.querySelectorAll("#lista-empleados .empleado-item");
+
+    items.forEach(item => {
+        const nombre = item.querySelector(".empleado-nombre").innerText.toLowerCase();
+        item.style.display = nombre.includes(texto) ? "flex" : "none";
+    });
 }
 
 // Cerrar modales al hacer clic fuera

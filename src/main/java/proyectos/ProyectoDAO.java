@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -132,4 +133,80 @@ public class ProyectoDAO {
         }
         return lista;
     }
+    
+    public void asignarEmpleados(int idPro, List<Integer> asignados) throws DAOException {
+    	String sqlActuales = "SELECT * from proyecto_usuario where idProyecto = ?";
+    	String sqlAsignar = "INSERT INTO proyecto_usuario (idProyecto, idEmpleado, fechaAlta) VALUES (?,?,?)";
+    	String sqlBaja = "UPDATE proyecto_usuario SET fechaBaja = ? where idEmpleado = ? and idProyecto = ? and fechaBaja is null";
+    	
+    	try {
+    		Connection con=ConexionDB.getConexion();
+    		PreparedStatement psUsuariosAct = con.prepareStatement(sqlActuales);
+	    	psUsuariosAct.setInt(1, idPro);
+	        ResultSet rs = psUsuariosAct.executeQuery();
+	        List<Integer> usuariosActualesBD = new ArrayList<>();
+
+	        while (rs.next()) {
+	            usuariosActualesBD.add(rs.getInt("idEmpleado"));
+	        }
+	        
+	        PreparedStatement psInsert = con.prepareStatement(sqlAsignar);
+	        for (Integer u : asignados) {
+	            if (!usuariosActualesBD.contains(u)) {
+	                psInsert.setInt(1, idPro);
+	                psInsert.setInt(2, u);
+	                psInsert.setDate(3, Date.valueOf(LocalDate.now()));
+	                psInsert.executeUpdate();
+	            }
+	        }
+	       
+	        PreparedStatement psDelete = con.prepareStatement(sqlBaja);
+	        for (Integer u : usuariosActualesBD) {
+	            if (!asignados.contains(u)) {
+	            	psDelete.setDate(1, Date.valueOf(LocalDate.now()));
+	            	psDelete.setInt(2, u);
+	            	psDelete.setInt(3, idPro);
+	                psDelete.executeUpdate();
+	            }
+	        }
+
+    	} catch (SQLException e) {
+	        throw new DAOException("Error actualizando proyecto", e);
+	    }
+    }
+    
+	 public List<Usuario> getUsuariosAsignados(int idProyecto) throws DAOException {
+		    List<Usuario> usuarios = new ArrayList<>();
+
+		    String sql = "SELECT u.id, u.nombre, u.apellido, u.mail FROM usuario u  INNER JOIN proyecto_usuario pu ON pu.idEmpleado = u.id WHERE pu.idProyecto = ? and pu.fechaBaja is null";    
+
+		    try (Connection con = ConexionDB.getConexion();
+		         PreparedStatement ps = con.prepareStatement(sql)) {
+		        ps.setInt(1, idProyecto);
+
+		        try (ResultSet rs = ps.executeQuery()) {
+
+		            while (rs.next()) {
+		                Usuario u = new Usuario();
+		                u.setId(rs.getInt("id"));
+		                u.setNombre(rs.getString("nombre"));
+		                u.setApellido(rs.getString("apellido"));
+		                u.setMail(rs.getString("mail"));
+
+		                usuarios.add(u);
+		            }
+		        }
+		    } catch (SQLException e) {
+		        throw new DAOException("Error obteniendo usuarios asignados al proyecto", e);
+		    }
+
+		    return usuarios;
+		}
 }
+
+
+
+
+
+
+
