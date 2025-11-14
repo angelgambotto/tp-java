@@ -75,10 +75,17 @@
 	                    </span>
 	                </p>
 	            </div>
-	            <a href="EtapaServlet?action=new&idProyecto=<%= pro.getId() %>" 
-	                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center whitespace-nowrap">
-	                + Nueva Etapa
-	            </a>
+	            <a 
+    <%= "Done".equals(pro.getEstado()) ? "" : "href=\"EtapaServlet?action=new&idProyecto=" + pro.getId() + "\"" %>
+    class="
+        text-white font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center whitespace-nowrap
+        <%= "Done".equals(pro.getEstado())
+            ? "bg-gray-400 cursor-not-allowed opacity-60 pointer-events-none" 
+            : "bg-blue-600 hover:bg-blue-700" 
+        %>
+    ">
+    + Nueva Etapa
+</a>
 	        </div>
 	    </div>
     <% } else { %>
