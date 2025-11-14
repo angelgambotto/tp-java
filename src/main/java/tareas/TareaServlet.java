@@ -111,6 +111,12 @@ public class TareaServlet extends HttpServlet {
         	break;
         case "new":
         	idEtapa = Integer.parseInt(request.getParameter("idEtapa"));
+        	String estadoEtapa=edao.getOne(idEtapa).getEstado();
+
+        	if ("Done".equals(estadoEtapa)) {
+        		request.setAttribute("error", "No se pueden agregar tareas en una etapa finalizada.");
+        		request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);;
+        		}
             List<Usuario> usuariosDisponibles = udao.getAll();
             List<CategoriaTarea> categorias = cdao.getAll();
             int idEt=Integer.parseInt(request.getParameter("idEtapa"));
@@ -118,6 +124,7 @@ public class TareaServlet extends HttpServlet {
         	request.setAttribute("tareas", tar);
         	Etapa et=edao.getOne(idEtapa);
         	request.setAttribute("etapa", et);
+        	request.setAttribute("EtapaFinalizada", estadoEtapa.equals("Done"));
             request.setAttribute("usuarios", usuariosDisponibles);
             request.setAttribute("categorias", categorias);
             request.setAttribute("idEtapa", idEtapa);
@@ -140,9 +147,18 @@ public class TareaServlet extends HttpServlet {
             Etapa eta = edao.getOne(idEtapa);
             usuariosDisponibles = udao.getAll();
             categorias = cdao.getAll();
+            estadoEtapa="";
+            try {
+            	estadoEtapa=edao.getEstadoByTareaId(idTarea);
+            }
+            catch(DAOException ex) {
+            	ex.printStackTrace();
+            	request.setAttribute("error", "error al obtener estado de etapa por tarea con id: "+idTarea);
+            }
             List<Usuario> usuariosAsignados = tdao.getUsuariosAsignados(idTarea);
             request.setAttribute("tarea", tarea);
-            request.setAttribute("etapa", eta);          
+            request.setAttribute("etapa", eta);
+            request.setAttribute("EtapaFinalizada", estadoEtapa.equals("Done"));
             request.setAttribute("usuarios", usuariosDisponibles);
             request.setAttribute("usuariosAsignados", usuariosAsignados);
             request.setAttribute("categorias", categorias);

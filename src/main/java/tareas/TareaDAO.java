@@ -286,7 +286,22 @@ PreparedStatement psUsuariosAct = con.prepareStatement(sqlUsuariosActuales);
 		    }
 		    return tareas;
 		}
-		
+		public boolean tieneTareasIncompletas  (int idEtapa) throws DAOException {
+			String sql="SELECT COUNT(*) from tarea where idEtapa=? and estado<>'Done'";
+			try {
+				Connection con=ConexionDB.getConexion();
+				PreparedStatement ps=con.prepareStatement(sql);
+				ps.setInt(1, idEtapa);
+				ResultSet rs=ps.executeQuery();
+				if(rs.next()) {
+					return rs.getInt(1)>0;
+				}
+				
+			}catch (SQLException e) {
+				throw new DAOException("Error al obtener tareas incompletas de etapa con id: "+idEtapa,e);
+			}
+	return false;
+		}
 		public List<Tarea> getByUsuarioId(int idEmpleado) throws DAOException {
 		    String sql = "SELECT t.* FROM tarea t INNER JOIN tarea_usuario tu ON t.id = tu.idTarea "
 		    		+ " WHERE idEmpleado = ? ORDER BY fechaInicio ASC"; // Orden lógico por fecha

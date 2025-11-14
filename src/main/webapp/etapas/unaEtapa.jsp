@@ -105,13 +105,20 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-2 flex-shrink-0">
-                    <button onclick="window.location.href='TareaServlet?action=new&idEtapa=<%= etapa.getId() %>'" 
-                            class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center">
-                        <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                        </svg>
-                        Nueva Tarea
-                    </button>
+                    <button 
+    <% if ("Done".equals(etapa.getEstado())) { %> 
+        disabled 
+        class="bg-gray-400 cursor-not-allowed text-white font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center" 
+    <% } else { %>
+        onclick="window.location.href='TareaServlet?action=new&idEtapa=<%= etapa.getId() %>'"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center"
+    <% } %>
+>
+    <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+    </svg>
+    Nueva Tarea
+</button>
                     <button onclick="window.location.href='EtapaServlet?action=edit&id=<%= etapa.getId() %>&idProyecto=<%= etapa.getIdProyecto() %>'" 
                             class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center">
                         <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

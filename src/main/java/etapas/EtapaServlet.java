@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import proyectos.Proyecto;
 import proyectos.ProyectoDAO;
+import tareas.TareaDAO;
 import categoriaTarea.CategoriaTarea;
 import categoriaTarea.CategoriaTareaDAO;
 import usuarios.Usuario;
@@ -23,6 +24,7 @@ public class EtapaServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private EtapaDAO edao;
     private ProyectoDAO pdao;
+    private TareaDAO tdao;
     private CategoriaTareaDAO cdao;
 
     @Override
@@ -30,6 +32,7 @@ public class EtapaServlet extends HttpServlet {
         edao = new EtapaDAO();
         pdao = new ProyectoDAO();
         cdao = new CategoriaTareaDAO();
+        tdao=new TareaDAO();
     }
 
 	private List<CategoriaTarea> cargarCategoriasSeguro(HttpServletRequest request) {
@@ -131,6 +134,7 @@ public class EtapaServlet extends HttpServlet {
         	String currentDate = sdf.format(new Date());
             request.setAttribute("fechaInicio", currentDate);
             request.setAttribute("abrirModal", true);
+            request.setAttribute("tienePendientes", true);
             break;
             
         case "edit":
@@ -143,7 +147,7 @@ public class EtapaServlet extends HttpServlet {
              if (etapa.getFechaInicio() != null) {
                  request.setAttribute("fechaInicio", sdf.format(etapa.getFechaInicio()));
              } else {
-                 request.setAttribute("fechaInicio", ""); // o fecha actual
+                 request.setAttribute("fechaInicio", ""); 
              }
              if (etapa.getFechaTentativa() != null) {
                  request.setAttribute("fechaTentativa", sdf.format(etapa.getFechaTentativa()));
@@ -151,6 +155,14 @@ public class EtapaServlet extends HttpServlet {
              if (etapa.getFechaFin() != null) {
                  request.setAttribute("fechaFin", sdf.format(etapa.getFechaFin()));
              }
+             boolean tienePendientes = false;
+             try {
+                 tienePendientes = tdao.tieneTareasIncompletas(etapa.getId());
+             } catch (DAOException e) {
+            	 e.printStackTrace();
+                request.setAttribute("error", "error al obtener tareas incompletas de la etapa con id:"+etapa.getId());
+             }
+             request.setAttribute("tienePendientes", tienePendientes);
              request.setAttribute("abrirModal", true);
              break;
              
@@ -188,15 +200,15 @@ public class EtapaServlet extends HttpServlet {
 
         int id = request.getParameter("id") == null || request.getParameter("id").isEmpty()
                 ? 0 : Integer.parseInt(request.getParameter("id"));
-
+        boolean tienePendientes;
         String nombre = request.getParameter("nombre");
         String descripcion = request.getParameter("descripcion");
         String estado = request.getParameter("estado");
+        
         String fechaIni = request.getParameter("fechaInicio");
         String fechaTenta = request.getParameter("fechaTentativa");
         String fechaFi = request.getParameter("fechaFin");
-
-        // --- VALIDAR idProyecto ---
+     // --- VALIDAR idProyecto ---
         int idProyecto = 0;
         String idProyectoParam = request.getParameter("idProyecto");
         if (idProyectoParam == null || idProyectoParam.trim().isEmpty()) {
@@ -206,6 +218,19 @@ public class EtapaServlet extends HttpServlet {
             doGet(request, response);
             return;
         }
+        try {	
+            tienePendientes=tdao.tieneTareasIncompletas(id);
+            request.setAttribute("tienePendientes", tienePendientes);}
+           catch(DAOException e) {
+           	request.setAttribute("error", e.getMessage());
+           	doGet(request, response);
+               return;
+           }
+        if(tienePendientes && "Done".equals(estado)) {
+        	request.setAttribute("error", "No puedes marcar como 'Done' una etapa con tareas incompletas... " );
+        	doGet(request, response);
+        }
+        
         try {
             idProyecto = Integer.parseInt(idProyectoParam.trim());
         } catch (NumberFormatException e) {
