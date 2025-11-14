@@ -97,7 +97,23 @@ public class EtapaDAO {
 	        	throw new DAOException("Error al eliminar la etapa con id: "+ id, e);
 	        }
 	}
-	
+	public boolean tieneEtapasIncompletas(int idProyecto) throws DAOException {
+		String sql="SELECT COUNT(*) from etapa where idProyecto=? and estado<>'Done'";
+		try {
+			Connection con=ConexionDB.getConexion();
+			PreparedStatement ps=con.prepareStatement(sql);
+			ps.setInt(1, idProyecto);
+			ResultSet rs=ps.executeQuery();
+			if(rs.next()) {
+				return rs.getInt(1)>0;
+			}
+			
+			}
+		catch(SQLException e) {
+			throw new DAOException("Error al obtener etapas incompletas del proyecto con id: "+idProyecto);
+		}
+		return false;
+	}
 	public Etapa getOne(int id) throws DAOException{
 		String sql = "SELECT etapa.*, tarea.id as tarea_id FROM etapa LEFT JOIN tarea ON etapa.id = tarea.idEtapa WHERE etapa.id = ?";
 		Etapa etapa = null;

@@ -91,6 +91,7 @@ public class EtapaServlet extends HttpServlet {
 
         // --- OBTENER idProyecto CON VALIDACIÓN ---
         int idProyecto = 0;
+        String estadoProyecto="";
         String idProyectoParam = request.getParameter("idProyecto");
         if (idProyectoParam != null && !idProyectoParam.trim().isEmpty()) {
             try {
@@ -147,8 +148,15 @@ public class EtapaServlet extends HttpServlet {
         
         switch(action) {
         case "new":
+        	 estadoProyecto=proyecto.getEstado();
+        	if ("Done".equals(estadoProyecto)) {
+        		request.setAttribute("error", "No se pueden agregar etapas en un proyecto finalizado.");
+        		request.getRequestDispatcher("etapas/listado.jsp").forward(request, response);
+        		return;
+        		}
         	String currentDate = sdf.format(new Date());
             request.setAttribute("fechaInicio", currentDate);
+            request.setAttribute("ProyectoFinalizado", estadoProyecto.equals("Done"));
             request.setAttribute("abrirModal", true);
             request.setAttribute("tienePendientes", true);
             break;
@@ -156,6 +164,7 @@ public class EtapaServlet extends HttpServlet {
         case "edit":
         	 int editId = Integer.parseInt(request.getParameter("id"));
              Etapa etapa = cargarEtaSeguro(request, editId);
+             estadoProyecto=proyecto.getEstado();
              request.setAttribute("id", etapa.getId());
              request.setAttribute("nombre", etapa.getNombre());
              request.setAttribute("descripcion", etapa.getDescripcion());
@@ -171,14 +180,6 @@ public class EtapaServlet extends HttpServlet {
              if (etapa.getFechaFin() != null) {
                  request.setAttribute("fechaFin", sdf.format(etapa.getFechaFin()));
              }
-             boolean tienePendientes = false;
-             try {
-                 tienePendientes = tdao.tieneTareasIncompletas(etapa.getId());
-             } catch (DAOException e) {
-            	 e.printStackTrace();
-                request.setAttribute("error", "error al obtener tareas incompletas de la etapa con id:"+etapa.getId());
-             }
-             request.setAttribute("tienePendientes", tienePendientes);
              request.setAttribute("abrirModal", true);
              break;
              

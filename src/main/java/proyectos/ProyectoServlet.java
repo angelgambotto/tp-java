@@ -17,6 +17,7 @@ import usuarios.Usuario;
 import usuarios.UsuariosDAO;
 import clientes.Cliente;
 import clientes.ClienteDAO;
+import etapas.EtapaDAO;
 import exceptions.DAOException;
 
 /**
@@ -28,6 +29,7 @@ public class ProyectoServlet extends HttpServlet {
     private ProyectoDAO dao;
     private UsuariosDAO usuarioDao;
     private ClienteDAO clienteDAO;
+    private EtapaDAO etapaDAO;
     
 	//metodo para cargar los clientes y no tener problemas con el bloque try catch
 	private List<Cliente> cargarClientesSeguro(HttpServletRequest request) {
@@ -81,6 +83,7 @@ public class ProyectoServlet extends HttpServlet {
         dao = new ProyectoDAO();
         usuarioDao = new UsuariosDAO();
         clienteDAO = new ClienteDAO();
+        etapaDAO=new EtapaDAO();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -95,6 +98,7 @@ public class ProyectoServlet extends HttpServlet {
         	case "new":
                 String currentDate = sdf.format(new Date());
                 request.setAttribute("fechaCreacion", currentDate);
+                request.setAttribute("tieneEtapasPendientes", true);
        		 	request.setAttribute("abrirModal", true);
         		break;
             case "edit":
@@ -107,6 +111,14 @@ public class ProyectoServlet extends HttpServlet {
                 request.setAttribute("cliente", proEdit.getCliente());
                 request.setAttribute("fechaCreacion", sdf.format(proEdit.getFechaCreacion()));
                 request.setAttribute("supervisorId", proEdit.getSupervisor().getId());
+                boolean tienePendientes = false;
+                try {
+                    tienePendientes = etapaDAO.tieneEtapasIncompletas(proEdit.getId());
+                } catch (DAOException e) {
+               	 e.printStackTrace();
+                   request.setAttribute("error", "error al obtener etapas incompletas del proyecto con id:"+proEdit.getId());
+                }
+                request.setAttribute("tieneEtapasPendientes", tienePendientes);
                 request.setAttribute("abrirModal", true);
                 break;
 
