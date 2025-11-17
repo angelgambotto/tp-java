@@ -24,6 +24,7 @@
                             <a href="ProyectoServlet" class="hover:underline transition">Proyectos</a>
                             <a href="ClienteServlet" class="hover:underline transition">Clientes</a>
                             <a href="CategoriaTareaServlet" class="hover:underline transition">Categorías</a>
+                            <a href="HoraTrabajadaServlet?action=reporte" class="hover:underline transition">Reportes</a>
                             <% break;
                         case "supervisor":
                             %>

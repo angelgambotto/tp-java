@@ -26,9 +26,9 @@
 </script>
 
 <% 
-	//Date fechaInicio = (Date) request.getAttribute("fechaInicio");
-    //LinkedList<Usuario> supervisores = (LinkedList<Usuario>) request.getAttribute("supervisores");
-    //List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");  // <-- CAMBIO AQUÍ: List en vez de LinkedList
+	Date fechaInicio = (Date) request.getAttribute("fechaInicio");
+    LinkedList<Usuario> supervisores = (LinkedList<Usuario>) request.getAttribute("supervisores");
+    List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");  // <-- CAMBIO AQUÍ: List en vez de LinkedList
 %>
 <div id="insert-update" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %>">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
@@ -53,6 +53,14 @@
                        class="w-full border border-gray-300 rounded px-3 py-2"/>
             </div>
 
+			<% Boolean tp = (Boolean) request.getAttribute("tienePendientes"); 
+	            boolean bloqueado = (tp != null && tp);
+	            
+	            Boolean f=(Boolean)request.getAttribute("ProyectoFinalizado"); 
+	            boolean proyectoFinalizado = f != null && f;
+	            System.out.println(proyectoFinalizado); 
+			%>
+
             <div>
                 <label class="block font-medium">Estado:</label>
                 <select name="estado" 
@@ -61,14 +69,14 @@
                 >
                     <option value="To Do" <%= "To Do".equals(request.getAttribute("estado")) ? "selected" : "" %>>To Do</option>
                     <option value="In Progress" <%= "In Progress".equals(request.getAttribute("estado")) ? "selected" : "" %>>In Progress</option>
-<% if (!bloqueado) { %>
-    <option value="Done" <%= "Done".equals(request.getAttribute("estado")) ? "selected" : "" %>>Done</option>
-<% } %>
+					<% if (!bloqueado) { %>
+					    <option value="Done" <%= "Done".equals(request.getAttribute("estado")) ? "selected" : "" %>>Done</option>
+					<% } %>
                     <option value="Canceled" <%= "Canceled".equals(request.getAttribute("estado")) ? "selected" : "" %>>Canceled</option>
                 </select>
                  <% if (proyectoFinalizado) { %>
-    <input type="hidden" name="estado" value="<%= request.getAttribute("estado") %>">
-<% } %>
+				    <input type="hidden" name="estado" value="<%= request.getAttribute("estado") %>">
+				<% } %>
                 
             </div>
 

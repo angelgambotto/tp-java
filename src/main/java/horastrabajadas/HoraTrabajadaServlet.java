@@ -10,6 +10,9 @@ import proyectos.ProyectoDAO;
 import tareas.Tarea;
 import tareas.TareaDAO;
 import usuarios.Usuario;
+import usuarios.UsuariosDAO;
+import horasReporte.HorasReporte;
+import horasReporte.HorasReporteDAO;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -32,6 +35,9 @@ public class HoraTrabajadaServlet extends HttpServlet {
 	private TareaDAO tdao;
 	private ProyectoDAO pdao;
 	private EtapaDAO edao;
+	private UsuariosDAO udao;
+	private HorasReporteDAO rdao;
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
        
 	
 	public void init() {
@@ -39,7 +45,8 @@ public class HoraTrabajadaServlet extends HttpServlet {
 		pdao = new ProyectoDAO();
 		edao = new EtapaDAO();
 		hdao = new HoraTrabajadaDAO();
-		
+		udao = new UsuariosDAO();
+		rdao = new HorasReporteDAO();
 	}
 
 	/**
@@ -72,9 +79,10 @@ public class HoraTrabajadaServlet extends HttpServlet {
         }
     }
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("ACTION = " + request.getParameter("action")+" en GET");
 		//Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
 		//String rol = usuario != null ? usuario.getRol().toLowerCase() : "";
-		String action = (request.getParameter("action")) == null ? "list" : request.getParameter("action") ;
+		String action = (request.getParameter("action")) == null ? "misHoras" : request.getParameter("action") ;
 		
 		switch(action) {
 		
@@ -102,17 +110,76 @@ public class HoraTrabajadaServlet extends HttpServlet {
 	        }
 			break;
 		
-		case "list":
+		case "misHoras":
 			System.out.println(action);
 			// OBTENER DATOS DE NUEVO (tareas, proyectos, usuario)
             // (puedes tener un método que cargue todo)
             cargarDatosMisTareas(request, response);
-
+            response.sendRedirect("TareaServlet?action=mis-tareas");
 			break;
-		}
+			
+		case "reporte":
+			
+			System.out.println("====================");
+			System.out.println("DEBUG REPORTES");
+			
+			Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
+
+	        if (usuario == null || !"administrador".equalsIgnoreCase(usuario.getRol())) {
+	            request.getRequestDispatcher("login.jsp").forward(request, response);
+	            return;
+	        }
+
+	        String lista = request.getParameter("lista");
+	        System.out.println("Lista: "+lista);
+	        if ("null".equals(lista) || lista == null) {
+	        	lista = "usuarios";
+	        }
+	        String desdeStr = request.getParameter("desde");
+	        String hastaStr = request.getParameter("hasta");
+
+	        Date desde = null, hasta = null;
+	        
+	        try {
+	            if (desdeStr != null && !desdeStr.isEmpty()) desde = sdf.parse(desdeStr);
+	            if (hastaStr != null && !hastaStr.isEmpty()) hasta = sdf.parse(hastaStr);
+	        } catch (ParseException e) {}
+
+	        try {
+	            switch (lista) {
+
+	                case "usuarios":
+	                    request.setAttribute("data", rdao.horasPorUsuario(desde, hasta));
+	                    request.setAttribute("tipo", "usuarios");
+	                    System.out.println("Entro a usuarios");
+	                    break;
+
+	                case "usuariosProyecto":
+	                    request.setAttribute("data", rdao.horasPorUsuarioProyecto(desde, hasta));
+	                    request.setAttribute("tipo", "usuariosProyecto");
+	                    System.out.println("Entro a usuariosProyectos");
+	                    break;
+
+	                case "usuariosProyectoEtapa":
+	                    request.setAttribute("data", rdao.horasPorUsuarioProyectoEtapa(desde, hasta));
+	                    request.setAttribute("tipo", "usuariosProyectoEtapa");
+	                    break;
+
+	                case "usuariosProyectoEtapaTarea":
+	                    request.setAttribute("data", rdao.horasPorUsuarioProyectoEtapaTarea(desde, hasta));
+	                    request.setAttribute("tipo", "usuariosProyectoEtapaTarea");
+	                    break;
+	            }
+	        } catch (DAOException e) {
+	                request.setAttribute("error", e.getMessage());
+	                System.out.println("error de dao");
+	        }
+	        System.out.println("====================");
+            request.getRequestDispatcher("/horasTrabajadas/reporte.jsp").forward(request, response);    
+	        
+		    break;
 		
-		// Si no es "new", redirigir o mostrar lista
-	    response.sendRedirect("TareaServlet?action=mis-tareas");
+		}
 		
 		
 	}
@@ -122,7 +189,8 @@ public class HoraTrabajadaServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		
+		System.out.println("ACTION = " + request.getParameter("action")+" en POST");
+
 		Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
 	    if (usuario == null || !"Empleado".equalsIgnoreCase(usuario.getRol())) {
 	        response.sendRedirect("login.jsp");
