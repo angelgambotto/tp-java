@@ -43,7 +43,7 @@ El sistema también contempla una estructura de roles y permisos para definir qu
 |                         |              | ABMC - Comentario                                                          |
 | **CU "Complejo"**       | 2            | CU - Gestionar proyecto: desde la creación hasta la finalización, pasando por la definición y seguimiento de etapas. |
 |                         |              | CU - Gestionar tarea: desde la creación hasta la finalización, pasando por asignación de empleado, carga de comentarios y horas trabajadas. |
-| **Listado complejo**    | 1            | Listado - Tarea: Filtrado por categoría, usuario, estado.                   |
+| **Listado complejo**    | 1            | Listado - Horas Trabajadas: Filtrado por fecha, proyectos, etapas y tareas  |
 |                         |              | Listado - Usuario: Filtrado por rol y/o búsqueda por nombre y apellido.     |
 | **Nivel de acceso**     | 2            | Administrador                                                              |
 |                         |              | Usuario avanzado (empleados)                                               |
