@@ -202,8 +202,50 @@ public class ProyectoDAO {
 
 		    return usuarios;
 		}
-}
+	 
+    public List<Proyecto> getByIdEmpleado(int idEmpleado) throws DAOException {
+        String sql = """
+        				SELECT p.* 
+        				FROM proyecto_usuario pu
+        				inner join proyecto p
+        		 			on pu.idProyecto = p.id 
+        				WHERE pu.IdEmpleado = ?
+        				""";
+        List<Proyecto> lista = new ArrayList<>();
+        try (Connection con = ConexionDB.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idEmpleado);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+            	Proyecto pro = new Proyecto();
+                pro = new Proyecto();
+                pro.setId(rs.getInt("id"));
+                pro.setNombre(rs.getString("nombre"));
+                pro.setDescripcion(rs.getString("descripcion"));
+                pro.setEstado(rs.getString("estado"));
+                pro.setFechaCreacion(rs.getDate("fechaCreacion"));
 
+                ClienteDAO clienteDAO = new ClienteDAO();
+                Cliente cli = clienteDAO.getOne(rs.getInt("idCliente"));
+                pro.setCliente(cli);
+
+                UsuariosDAO usuarioDAO = new UsuariosDAO();
+                Usuario sup = usuarioDAO.getOne(rs.getInt("idSupervisor"));
+                pro.setSupervisor(sup);
+
+                pro.setUsuarios(new LinkedList<>()); // Si lo cargas lazy, aquí vacío
+
+                /*	EtapaDAO etapaDAO = new EtapaDAO();
+	                pro.setEtapas(etapaDAO.getByProyectoIdConTareas(id));*/
+                lista.add(pro);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Error al obtener los proyectos del empleado: " + idEmpleado, e);
+        }
+        return lista;
+    }
+
+}
 
 
 

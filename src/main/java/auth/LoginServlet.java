@@ -66,10 +66,10 @@ public class LoginServlet extends HttpServlet {
 		            response.sendRedirect(request.getContextPath() + "/ProyectoServlet");
 		            break;
 		        case "empleado":
-		        	response.sendRedirect(request.getContextPath() + "/ProyectoServlet");
+		        	response.sendRedirect(request.getContextPath() + "/ProyectoServlet?action=mis-proyectos");
 		            break;
 		        case "usuario":
-		        	response.sendRedirect(request.getContextPath() + "/TareaServlet?action=mis-tareas");
+		        	response.sendRedirect(request.getContextPath() + "/ProyectoServlet?action=mis-proyectos");
 		            break;
 		        default:
 		            response.sendRedirect("login.jsp");

@@ -232,10 +232,19 @@ public class HoraTrabajadaServlet extends HttpServlet {
     		
     	}
     	
+    	String returnUrl = request.getParameter("returnUrl");
+        if (returnUrl != null && !returnUrl.isEmpty() && returnUrl.contains("TareaServlet")) {
+            response.sendRedirect(returnUrl);
+        } else {
+            // fallback por si acaso
+            response.sendRedirect("TareaServlet?action=mis-tareas");
+        }
     	// OBTENER DATOS DE NUEVO (tareas, proyectos, usuario)
         // (puedes tener un método que cargue todo)
-        cargarDatosMisTareas(request, response);
-        request.getRequestDispatcher("/tareas/mis-tareas.jsp").forward(request, response);
+        //cargarDatosMisTareas(request, response);
+        //response.sendRedirect("TareaServlet?action=detalle&idTarea=" + idTarea);
+        //request.getRequestDispatcher("/tareas/mis-tareas.jsp").forward(request, response);
+        return;
 	}
 
 }

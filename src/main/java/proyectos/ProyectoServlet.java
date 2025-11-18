@@ -55,10 +55,22 @@ public class ProyectoServlet extends HttpServlet {
 	    try {
 	        return dao.getAll();
 	    } catch (DAOException e) {
-	        request.setAttribute("error", "No se pudieron cargar los clientes: " + e.getMessage());
+	        request.setAttribute("error", "No se pudieron cargar los proyectos: " + e.getMessage());
 	        return new ArrayList<>();
 	    }
 	}
+
+	private List<Proyecto> cargarMisProyectos(HttpServletRequest request) {
+	    try {
+	    	Usuario usu = (Usuario) request.getAttribute("usuario");
+	        return dao.getByIdEmpleado(usu.getId());
+	    } catch (DAOException e) {
+	        request.setAttribute("error", "No se pudieron cargar los proyectos del empleado: " + e.getMessage());
+	        return new ArrayList<>();
+	    }
+	}
+	
+	
 	//metodo para cargar un proyecto y no tener problemas con el bloque try catch
 	private Proyecto cargarProSeguro(HttpServletRequest request, int id) {
 	    try {
@@ -88,10 +100,23 @@ public class ProyectoServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	
-	    
+    	Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
+		String rol = usuario != null ? usuario.getRol().toLowerCase() : "";
+		
+		request.setAttribute("usuario", usuario);
+		
+	   // boolean esAdmin = "administrador".equals(rol);
+	   boolean esEmpleado = "empleado".equals(rol);
+    	
     	String action = request.getParameter("action");
 
-        if (action == null) action = "list";
+        if (action == null) {
+        	if (esEmpleado) {
+        		action = "mis-proyectos";
+        	} else {
+        		action = "list";        		
+        	}
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         switch (action) {
@@ -138,12 +163,23 @@ public class ProyectoServlet extends HttpServlet {
                 }
                 
                 break;
+            case "mis-proyectos":
+            	request.setAttribute("proyectos", cargarMisProyectos(request));
+            	//request.setAttribute("clientes", cargarClientesSeguro(request));
+                //request.setAttribute("supervisores", cargarUsuariosSeguro(request));
+            	request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
+            	break; 
         }
+        
+        switch (usuario.getRol().toLowerCase()) {
+        	case "administrador":
+	        	request.setAttribute("proyectos", cargarProyectosSeguro(request));
+	        	request.setAttribute("clientes", cargarClientesSeguro(request));
+	        	request.setAttribute("supervisores", cargarUsuariosSeguro(request));
+	        	request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
+        	break;
 
-        request.setAttribute("proyectos", cargarProyectosSeguro(request));
-        request.setAttribute("clientes", cargarClientesSeguro(request));
-        request.setAttribute("supervisores", cargarUsuariosSeguro(request));
-        request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
+        }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -155,7 +191,7 @@ public class ProyectoServlet extends HttpServlet {
     	
     	List<Usuario> asig = cargarAsignadosSeguro(request, id);
     	Boolean esta = asig.contains(usuario);
-	    if (esta == false && !"Administrador".equalsIgnoreCase(usuario.getRol())) {
+	    if (esta == false && !("Administrador".equalsIgnoreCase(usuario.getRol()) || "Empleado".equalsIgnoreCase(usuario.getRol()))) {
 	        response.sendRedirect("login.jsp");
 	        return; 
 	    }

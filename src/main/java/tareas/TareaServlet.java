@@ -85,6 +85,7 @@ public class TareaServlet extends HttpServlet {
 			
 			Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
 			String rol = usuario != null ? usuario.getRol().toLowerCase() : "";
+			request.setAttribute("usuario", usuario);
 			
         boolean esAdmin = "administrador".equals(rol);
         boolean esEmpleado = "empleado".equals(rol);

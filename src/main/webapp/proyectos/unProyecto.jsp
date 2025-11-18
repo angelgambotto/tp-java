@@ -61,6 +61,8 @@
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     List<Usuario> empleadosAsignados = (List<Usuario>) request.getAttribute("usuariosAsignados");
     List<Usuario> empleadosDisponibles = (List<Usuario>) request.getAttribute("usuarios");
+    Usuario usu = (Usuario) request.getAttribute("usuario");
+    String rol = usu.getRol();
 %>
 
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -78,6 +80,7 @@
 	                    </span>
 	                </p>
 	            </div>
+	            <% if (rol.equalsIgnoreCase("administrador")) { %>
 	            <a 
     <%= "Done".equals(pro.getEstado()) ? "" : "href=\"EtapaServlet?action=new&idProyecto=" + pro.getId() + "\"" %>
     class="
@@ -88,7 +91,7 @@
         %>
     ">
     + Nueva Etapa
-</a>
+</a> <%} %>
 	        </div>
 	        <!-- EMPLEADOS ASIGNADOS -->
             <div class="border-t pt-4">
@@ -99,10 +102,13 @@
                         </svg>
                         Personas Asignadas
                     </h3>
+                      <% if (rol.equalsIgnoreCase("administrador")) { %>
+	          
                     <button onclick="toggleModal('modalAsignarEmpleado')" 
                             class="text-sm bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-4 rounded-lg transition">
                         + Asignar Persona
                     </button>
+                    <% } %>
                 </div>
 
                 <div class="flex flex-wrap gap-2">
@@ -334,10 +340,13 @@
 	                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
 	                </svg>
 	                <p class="text-sm">Sin tareas</p>
+	                
+	               <% if (rol.equalsIgnoreCase("administrador")) { %>          
 	                <a href="TareaServlet?action=new&idEtapa=<%= etapa.getId() %>" 
 	                   class="text-blue-600 hover:text-blue-700 text-xs font-medium mt-2 inline-block">
 	                    + Agregar tarea
 	                </a>
+	               <% }%>
 	            </div>
 	        <% } else { 
 	            for (Tarea tarea : tareasEtapa) { 
@@ -510,6 +519,8 @@
 	                        <div><strong>Fin:</strong> <%= e.getFechaFin() != null ? sdf.format(e.getFechaFin()) : "—"%></div>
 	                    </td>
 	                    <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm font-medium">
+	                     <% if (rol.equalsIgnoreCase("administrador")) { %>
+	          
 	                        <a href="EtapaServlet?action=edit&id=<%= e.getId() %>&idProyecto=<%= pro.getId() %>"
 	                           class="text-indigo-600 hover:text-indigo-900 mr-3 lg:mr-4"
 	                           onclick="event.stopPropagation()">
@@ -520,6 +531,7 @@
 	                           onclick="event.stopPropagation(); return confirm('¿Eliminar etapa <%= e.getNombre() %>?')">
 	                            Eliminar
 	                        </a>
+	                        <% } %>
 	                    </td>
 	                </tr>
 	            <% } %>

@@ -79,12 +79,14 @@ public class EtapaServlet extends HttpServlet {
             throws ServletException, IOException {
 
         Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
-        if (usuario == null || !"Administrador".equalsIgnoreCase(usuario.getRol())) {
+        if (usuario == null || !("Administrador".equalsIgnoreCase(usuario.getRol()) || "Empleado".equalsIgnoreCase(usuario.getRol()))) {
             response.sendRedirect("login.jsp");
             return;
         }
         //limpiar errores
         request.setAttribute("error", null);
+        
+        request.setAttribute("usuario", usuario);
         
         String action = (request.getParameter("action") == null ? "view" : request.getParameter("action"));
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

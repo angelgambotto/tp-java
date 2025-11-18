@@ -25,7 +25,7 @@ int idEmpleado = (idEmpleadoObj != null) ? idEmpleadoObj : 0;
             <input type="hidden" name="idTarea" value="<%= idTarea != 0 ? idTarea : 0 %>" />
             <input type="hidden" name="idEmpleado" value="<%= idEmpleado != 0 ? idEmpleado : 0 %>" />
             <input type="hidden" name="action" value="new"/>
-
+			<input type="hidden" name="returnUrl" value="<%= request.getHeader("Referer") %>">
              <div>
                 <label class="block font-medium">Fecha:</label>
                 <input type="datetime-local" 

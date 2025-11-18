@@ -41,7 +41,10 @@
             });
         });
     </script>
-    <% LinkedList<Usuario> supervisores = (LinkedList<Usuario>) request.getAttribute("supervisores"); %>
+    <% LinkedList<Usuario> supervisores = (LinkedList<Usuario>) request.getAttribute("supervisores");
+	   Usuario usuarioActual = (Usuario) session.getAttribute("usuario");
+	   String rol = usuarioActual.getRol();
+    %>
 </head>
 <body class="bg-gray-100">
 <jsp:include page="../header.jsp" />
@@ -60,12 +63,14 @@
                 </svg>
             </button>
         </div>
+        <% if(rol.equalsIgnoreCase("administrador")) {%>
         <!-- Botón -->
         <a href="ProyectoServlet?action=new">
             <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                 Nuevo
             </button>
         </a>
+        <%} %>
     </div>
 
     <%

@@ -1,3 +1,4 @@
+<%@page import="usuarios.Usuario"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="tareas.Tarea" %>
@@ -48,6 +49,8 @@
     
     int totalTareas = tareas != null ? tareas.size() : 0;
     int progreso = totalTareas > 0 ? (tareasDone * 100 / totalTareas) : 0;
+    Usuario usuarioActual = (Usuario) session.getAttribute("usuario");
+    String rol = usuarioActual.getRol();
 %>
 
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -105,6 +108,9 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-2 flex-shrink-0">
+                   
+                    <% if (rol.equalsIgnoreCase("administrador")) { %>
+	          
                     <button 
     <% if ("Done".equals(etapa.getEstado())) { %> 
         disabled 
@@ -126,6 +132,7 @@
                         </svg>
                         Editar Etapa
                     </button>
+                    <% } %>
                 </div>
             </div>
 
@@ -360,6 +367,8 @@
                             </td>
 
                             <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                 <% if (rol.equalsIgnoreCase("administrador")) { %>
+	          
                                 <a href="TareaServlet?action=edit&idTarea=<%= t.getId() %>&idEtapa=<%= etapa.getId() %>"
                                    class="text-indigo-600 hover:text-indigo-900 mr-3"
                                    onclick="event.stopPropagation()">
@@ -374,6 +383,8 @@
                                     <button type="submit" onclick="event.stopPropagation();" class="text-red-600 hover:text-red-900 bg-transparent border-0 p-0 cursor-pointer">
                                         Eliminar
                                     </button>
+                                    
+                                    <% } %>
                                 </form>
                             </td>
                         </tr>

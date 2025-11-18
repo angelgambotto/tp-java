@@ -43,6 +43,7 @@ window.addEventListener("DOMContentLoaded", function() {
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     SimpleDateFormat sdfTime = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     Usuario usuarioActual = (Usuario) session.getAttribute("usuario");
+    String rol = usuarioActual.getRol();
 %>
 
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -85,6 +86,8 @@ window.addEventListener("DOMContentLoaded", function() {
 
                 <!-- Botón de editar -->
                 <div class="flex-shrink-0">
+                  <% if (rol.equalsIgnoreCase("administrador")) { %>
+	          
                     <a href="TareaServlet?action=edit&idTarea=<%= tarea.getId() %>" 
                        class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center">
                         <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,6 +95,7 @@ window.addEventListener("DOMContentLoaded", function() {
                         </svg>
                         Editar Tarea
                     </a>
+                    <% } %>
                 </div>
             </div>
 
@@ -104,10 +108,13 @@ window.addEventListener("DOMContentLoaded", function() {
                         </svg>
                         Personas Asignadas
                     </h3>
+                     <% if (rol.equalsIgnoreCase("administrador")) { %>
+	          
                     <button onclick="toggleModal('modalAsignarEmpleado')" 
                             class="text-sm bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-4 rounded-lg transition">
                         + Asignar Persona
                     </button>
+                    <% } %>
                 </div>
 
                 <div class="flex flex-wrap gap-2">
@@ -132,6 +139,26 @@ window.addEventListener("DOMContentLoaded", function() {
         </div>
     <% } %>
 
+<% 
+    // Variable que indica si el usuario puede ver el contenido sensible
+    boolean puedeVerContenido = false;
+
+    // 1. Es administrador?
+    if ("administrador".equalsIgnoreCase(rol)) {
+        puedeVerContenido = true;
+    }
+    // 2. Si no es admin, revisamos si está asignado a la tarea
+    else if (empleadosAsignados != null && usuarioActual != null) {
+        for (Usuario emp : empleadosAsignados) {
+            if (emp.getId() == usuarioActual.getId()) {
+                puedeVerContenido = true;
+                break;
+            }
+        }
+    }
+%>
+
+<% if (puedeVerContenido) { %>
     <!-- TABS -->
     <div class="bg-white rounded-lg shadow mb-6">
         <div class="border-b overflow-x-auto">
@@ -153,14 +180,18 @@ window.addEventListener("DOMContentLoaded", function() {
             </nav>
         </div>
 
+
         <!-- CONTENIDO DE HORAS TRABAJADAS -->
         <div id="contentHoras" class="p-4 sm:p-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <h2 class="text-lg font-semibold text-gray-800">Registro de Horas</h2>
+                 <% if (rol.equalsIgnoreCase("empleado")) { %>
+	          
                 <a href="HoraTrabajadaServlet?action=new&idTarea=<%= tarea.getId() %>&idEmpleado=<%= usuario.getId() %>" 
                         class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition text-sm">
                     + Registrar Horas
                 </a>
+                <% } %>
             </div>
 
             <% if (horas == null || horas.isEmpty()) { %>
@@ -242,10 +273,13 @@ window.addEventListener("DOMContentLoaded", function() {
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-sm">
+                                     <% if (rol.equalsIgnoreCase("empleado")) { %>
+	          
                                         <button onclick="eliminarHora(<%= h.getIdTarea() %>, <%= h.getIdEmpleado() %>, '<%= sdf.format(h.getFecha()) %>')" 
                                                 class="text-red-600 hover:text-red-900">
                                             Eliminar
                                         </button>
+                                        <%} %>
                                     </td>
                                 </tr>
                             <% } %>
@@ -335,6 +369,17 @@ window.addEventListener("DOMContentLoaded", function() {
             </div>
         </div>
     </div>
+    <% } else { %>
+    <!-- Mensaje para quien no tiene permiso -->
+    <div class="bg-white rounded-lg shadow p-8 text-center">
+        <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Acceso restringido</h3>
+        <p class="text-gray-600">Solo los administradores y las personas asignadas a esta tarea pueden ver esta información.</p>
+    </div>
+<% } %>
+    
 </div>
 
 <!-- MODAL ASIGNAR EMPLEADO -->

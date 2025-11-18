@@ -29,12 +29,11 @@
                         case "supervisor":
                             %>
                             <a href="ProyectoServlet" class="hover:underline transition">Proyectos</a>
-                            <a href="TareaServlet" class="hover:underline transition">Mis tareas</a>
                             <%
                             break;
                         case "empleado":
                             %>
-                            <a href="TareaServlet" class="hover:underline transition">Mis tareas</a>
+                            <a href="ProyectoServlet" class="hover:underline transition">Mis proyectos</a>
                             <%
                             break;
                         case "usuario":

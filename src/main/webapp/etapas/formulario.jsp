@@ -26,9 +26,9 @@
 </script>
 
 <% 
-	Date fechaInicio = (Date) request.getAttribute("fechaInicio");
-    LinkedList<Usuario> supervisores = (LinkedList<Usuario>) request.getAttribute("supervisores");
-    List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");  // <-- CAMBIO AQUÍ: List en vez de LinkedList
+	//Date fechaInicio = (Date) request.getAttribute("fechaInicio");
+    //LinkedList<Usuario> supervisores = (LinkedList<Usuario>) request.getAttribute("supervisores");
+    //List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");  // <-- CAMBIO AQUÍ: List en vez de LinkedList
 %>
 <div id="insert-update" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %>">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
