@@ -174,6 +174,7 @@ public class EtapaServlet extends HttpServlet {
             	 }
              Etapa etapa = cargarEtaSeguro(request, editId);
              estadoProyecto=proyecto.getEstado();
+             request.setAttribute("ProyectoFinalizado", estadoProyecto.equals("Done"));
              request.setAttribute("id", etapa.getId());
              request.setAttribute("nombre", etapa.getNombre());
              request.setAttribute("descripcion", etapa.getDescripcion());
