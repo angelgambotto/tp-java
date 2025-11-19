@@ -165,6 +165,13 @@ public class EtapaServlet extends HttpServlet {
             
         case "edit":
         	 int editId = Integer.parseInt(request.getParameter("id"));
+        	 try{
+            	 boolean tienePendientes=tdao.tieneTareasIncompletas(editId);
+            	 request.setAttribute("tienePendientes",tienePendientes);
+            	 }
+            	 catch(DAOException e) {
+            		 request.setAttribute("error",e.getMessage());
+            	 }
              Etapa etapa = cargarEtaSeguro(request, editId);
              estadoProyecto=proyecto.getEstado();
              request.setAttribute("id", etapa.getId());
