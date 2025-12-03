@@ -305,7 +305,7 @@ window.addEventListener("DOMContentLoaded", function() {
             </div>
 
             <!-- Formulario para nuevo comentario -->
-            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+        <!--      <div class="bg-gray-50 rounded-lg p-4 mb-6">
                 <form action="ComentarioServlet" method="post">
                     <input type="hidden" name="action" value="new">
                     <input type="hidden" name="idTarea" value="<%= tarea != null ? tarea.getId() : "" %>">
@@ -319,7 +319,39 @@ window.addEventListener("DOMContentLoaded", function() {
                         </button>
                     </div>
                 </form>
-            </div>
+            </div> -->
+            
+            <!-- Formulario para nuevo comentario + archivos adjuntos -->
+<div class="bg-gray-50 rounded-lg p-4 mb-6">
+    <form action="ComentarioServlet" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="new">
+        <input type="hidden" name="idTarea" value="<%= tarea != null ? tarea.getId() : "" %>">
+
+        <textarea name="texto" rows="3"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Escribe un comentario... (opcional si adjuntas archivos)" required></textarea>
+
+        <!-- Input para adjuntar archivos (múltiples) -->
+        <div class="mt-3">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Adjuntar archivos (imágenes, PDFs, documentos...)
+            </label>
+            <input type="file" 
+                   name="archivos" 
+                   multiple 
+                   accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt"
+                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+            <p class="text-xs text-gray-500 mt-1">Puedes seleccionar varios archivos (máx 10 MB total recomendado)</p>
+        </div>
+
+        <div class="mt-4 flex justify-end">
+            <button type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition text-sm">
+                Publicar Comentario
+            </button>
+        </div>
+    </form>
+</div>
 
             <!-- Lista de comentarios -->
             <div class="space-y-4">

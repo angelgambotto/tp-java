@@ -1,22 +1,31 @@
 package comentarios;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 import tareas.TareaDAO;
 import tareas.Tarea;
 import comentarios.Comentario;
 import comentarios.ComentarioDAO;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import adjuntosComentario.AdjuntosComentario;
+import adjuntosComentario.AdjuntosComentarioDAO;
 import usuarios.Usuario;
 import exceptions.DAOException;
 
@@ -24,6 +33,11 @@ import exceptions.DAOException;
  * Servlet implementation class ComentarioServlet
  */
 @WebServlet("/ComentarioServlet")
+@MultipartConfig(                                     
+	    fileSizeThreshold = 1024 * 1024 * 2,   // 2 MB en memoria
+	    maxFileSize = 1024 * 1024 * 15,        // 15 MB por archivo
+	    maxRequestSize = 1024 * 1024 * 60      // 60 MB total (varios archivos)
+	)
 public class ComentarioServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ComentarioDAO cdao;
@@ -40,21 +54,26 @@ public class ComentarioServlet extends HttpServlet {
 	}
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
+		request.setCharacterEncoding("UTF-8"); // importante para tildes
 		
+		//chequeo de rol
+		Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
 		if (usuario == null) {
 			response.sendRedirect("LoginServlet");
 		}
 		
+		//obtencion id y accion
 		String rol = usuario != null ? usuario.getRol().toLowerCase() : "";
 		int idTarea = request.getParameter("idTarea") == null || request.getParameter("idTarea").isEmpty()
                 ? 0 : Integer.parseInt(request.getParameter("idTarea"));
 		String action = request.getParameter("action");
 		
+		
 		switch(action) {
 		
 		case "new":
 			try {
+				System.out.println("entro al crear comentario");
 	            Tarea tarea = tdao.getOne(idTarea);
 	            List<Usuario> asignados = tdao.getUsuariosAsignados(tarea.getId());
 	            String texto = request.getParameter("texto");
@@ -73,14 +92,59 @@ public class ComentarioServlet extends HttpServlet {
 	            }
 	            
 	            
-	            // Inserto el comentario
+	            // 1. Inserto el comentario
 	            Date hoy = new Date();
 	            Comentario comentario = new Comentario();
 	            comentario.setIdTarea(tarea.getId());
 	            comentario.setIdEmpleado(usuario.getId());
 	            comentario.setTexto(texto);
 	            comentario.setFecha(hoy);
-	            cdao.insert(comentario);
+	            //recupero el id para los adjuntos
+	            int idComentario = cdao.insert(comentario);
+	            System.out.println("idComentario insertado" + idComentario);
+	            // 2. SUBIR ARCHIVOS (si los hay)
+	            String uploadPath = getServletContext().getRealPath("") 
+                        + File.separator + "uploads" 
+                        + File.separator + "comentarios";
+	            File uploadDir = new File(uploadPath);
+	            if (!uploadDir.exists()) uploadDir.mkdirs();
+		
+		      // AQUÍ ESTÁ EL TRUCO: solo recorremos UNA VEZ los parts
+	            for (Part part : request.getParts()) {
+		          String fieldName = part.getName();
+		          
+		          // Ignoramos los campos de texto (texto, idTarea, action)
+		          if ("archivos".equals(fieldName)) {
+		              String fileName = getFileName(part);
+		              
+		              if (fileName != null && !fileName.isEmpty()) {
+		                  System.out.println("Subiendo archivo: " + fileName + " (" + part.getSize() + " bytes)");
+		
+		                  String extension = fileName.contains(".") 
+		                      ? fileName.substring(fileName.lastIndexOf(".")) : "";
+		                  String nombreGuardado = idComentario + "_" + System.currentTimeMillis() + extension;
+		
+		                  File archivoDestino = new File(uploadDir, nombreGuardado);
+		                  
+		                  // ¡ESTE ES EL QUE FUNCIONA!
+		                  part.write(archivoDestino.getAbsolutePath());  // ← MÉTODO MÁGICO DE Part
+		                  System.out.println("Archivo físicamente guardado en: " + archivoDestino.getAbsolutePath());     
+		                  // Guardar en base de datos
+	                        AdjuntosComentario adjunto = new AdjuntosComentario();
+	                        adjunto.setIdComentario(idComentario);
+	                        adjunto.setNombreOriginal(fileName);
+	                        adjunto.setNombreGuardado(nombreGuardado);
+	                        adjunto.setRuta("/uploads/comentarios/" + nombreGuardado);
+	                        adjunto.setTamanoKb((int) (part.getSize() / 1024));
+	                        adjunto.setTipoMime(part.getContentType());
+	                        
+	                        System.out.println("ENTRO AL DAO ADJUNTOS");
+	                        AdjuntosComentarioDAO.insertar(adjunto);
+	                        System.out.println("SALIO DEL DAO ADJUNTOS");
+	                        
+		                    }
+		                }
+		      }
 	            
 	            // FORWARD A LA MISMA PÁGINA
 	            response.sendRedirect("TareaServlet?action=detalle&idTarea=" + tarea.getId() + "&idEtapa=" + tarea.getIdEtapa()+ "&tab=comentarios");
@@ -108,6 +172,7 @@ public class ComentarioServlet extends HttpServlet {
 				}
 				
 				cdao.delete(c.getId());
+				
 				// FORWARD A LA MISMA PÁGINA
 	            response.sendRedirect("TareaServlet?action=detalle&idTarea=" + tarea.getId() + "&idEtapa=" + tarea.getIdEtapa() + "&tab=comentarios");
 	            return;
@@ -117,8 +182,22 @@ public class ComentarioServlet extends HttpServlet {
 	            // fallback
 	        }
 		}
+	} //do post
+	
+	// Método auxiliar para sacar el nombre original del archivo
+	private String getFileName(Part part) {
+		String contentDisposition = part.getHeader("content-disposition");
+		if (contentDisposition != null) {
+			for (String cd : contentDisposition.split(";")) {
+				if (cd.trim().startsWith("filename")) {
+					String fileName = cd.substring(cd.indexOf('=') + 1).trim().replace("\"", "");
+					return fileName.isEmpty() ? null : fileName;
+				}
+			}
+		}
+		return null;
 	}
-}
+} //servlet
 
 
 

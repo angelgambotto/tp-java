@@ -13,21 +13,28 @@ import exceptions.DAOException;
 import utils.ConexionDB;
 
 public class ComentarioDAO {
-	public void insert(Comentario com) throws DAOException {
+	public int insert(Comentario com) throws DAOException {
         String sql = "INSERT INTO comentario (idTarea, idAutor, fecha, texto) VALUES (?, ?, ?, ?)";
 
         try (Connection con = ConexionDB.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, com.getIdTarea());
             ps.setInt(2, com.getIdEmpleado());
             ps.setTimestamp(3, new java.sql.Timestamp(com.getFecha().getTime()));
             ps.setString(4, com.getTexto());
             ps.executeUpdate();
+            
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
 
         } catch (SQLException e) {
         	throw new DAOException("Error al insertar comentario en la tarea: "+ com.getIdTarea(), e);
         }
+        return -1;
     }
 	
 	public void update(Comentario com) throws DAOException {
