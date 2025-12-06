@@ -22,15 +22,15 @@
 <body>
 <body class="bg-gray-100">
 <jsp:include page="../header.jsp" />
-<!-- Mostrar errores -->
+
 <div class="p-8">
+	<!-- Mostrar errores -->
+
     <% if (request.getAttribute("error") != null) { %>
         <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
             <%= request.getAttribute("error") %>
         </div>
     <% } %>
-</div>
-<div class="p-8">
  <div class="flex items-center justify-between mb-4">
  
     <h2 class="text-2xl font-bold text-black">Listado de usuarios</h2>
