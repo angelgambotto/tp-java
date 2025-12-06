@@ -183,6 +183,49 @@
 </div>
 
 <jsp:include page="formulario.jsp" />
+```html
+<!-- MENSAJE FLOTANTE (éxito/error) -->
+<div id="mensaje" class="hidden fixed top-4 right-4 z-50 max-w-md">
+    <div id="mensajeContenido" class="px-6 py-4 rounded-lg shadow-lg text-white flex items-center justify-between">
+        <span id="mensajeTexto"></span>
+        <button onclick="document.getElementById('mensaje').classList.add('hidden')" 
+                class="ml-4 text-2xl font-bold hover:opacity-70">×</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    <%
+    String exito = (String) session.getAttribute("mensajeExito");
+    String error = (String) session.getAttribute("mensajeError");
+    if (exito != null) {
+        session.removeAttribute("mensajeExito");
+    %>
+        mostrarMensaje("<%= exito %>", "verde");
+    <%
+    } else if (error != null) {
+        session.removeAttribute("mensajeError");
+    %>
+        mostrarMensaje("<%= error %>", "rojo");
+    <%
+    }
+    %>
+});
+
+function mostrarMensaje(texto, color) {
+    const div = document.getElementById('mensaje');
+    const contenido = document.getElementById('mensajeContenido');
+    const textoSpan = document.getElementById('mensajeTexto');
+    
+    textoSpan.textContent = texto;
+    contenido.className = color === "verde"
+        ? "px-6 py-4 rounded-lg shadow-lg text-white flex items-center justify-between bg-green-600"
+        : "px-6 py-4 rounded-lg shadow-lg text-white flex items-center justify-between bg-red-600";
+    
+    div.classList.remove('hidden');
+    setTimeout(() => div.classList.add('hidden'), 6000);
+}
+</script>
 
 </body>
 </html>

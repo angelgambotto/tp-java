@@ -101,9 +101,11 @@ public class ClienteServlet extends HttpServlet {
     	try {
     		if("confirmDelete".equals(action)) {
     			int deleteId = Integer.parseInt(request.getParameter("id"));
-                if (id > 0 && dao.getOne(deleteId) != null) {
-                	dao.delete(deleteId);              
-                } else {
+                try {
+                	dao.delete(deleteId);        
+                	request.getSession().setAttribute("mensajeExito", "Cliente eliminado con éxito");
+                } catch (DAOException e) {
+                	request.getSession().setAttribute("mensajeError", e.getMessage());
                     request.setAttribute("clientes", cargarClientesSeguro(request));
                     request.getRequestDispatcher("clientes/listado.jsp").forward(request, response);
                     return;
