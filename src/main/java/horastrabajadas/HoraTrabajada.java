@@ -7,6 +7,7 @@ public class HoraTrabajada {
 	private int idEmpleado;
 	private Date fecha;
 	private int cantidad;
+	private String detalle;
 	
 	public int getIdTarea() {
 		return idTarea;
@@ -31,6 +32,12 @@ public class HoraTrabajada {
 	}
 	public void setCantidad(int cantidad) {
 		this.cantidad = cantidad;
+	}
+	public String getDetalle() {
+		return detalle;
+	}
+	public void setDetalle(String detalle) {
+		this.detalle = detalle;
 	}
 	
 	public HoraTrabajada() {

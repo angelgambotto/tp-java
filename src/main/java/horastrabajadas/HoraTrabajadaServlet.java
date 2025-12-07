@@ -102,6 +102,8 @@ public class HoraTrabajadaServlet extends HttpServlet {
 
 	            // FORWARD A LA MISMA PÁGINA
 	            request.getRequestDispatcher("/tareas/mis-tareas.jsp").forward(request, response);
+	         // VOLVEMOS A LA PÁGINA ANTERIOR (la que el usuario tenía abierta)
+	            //response.sendRedirect(request.getHeader("Referer")); NO FUNCIONA ME INHABILITA LA CARGA
 	            return;
 
 	        } catch (NumberFormatException e) {
@@ -192,17 +194,20 @@ public class HoraTrabajadaServlet extends HttpServlet {
 		System.out.println("ACTION = " + request.getParameter("action")+" en POST");
 
 		Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
-	    if (usuario == null || !"Empleado".equalsIgnoreCase(usuario.getRol())) {
+		
+	    if (usuario == null) {
 	        response.sendRedirect("login.jsp");
 	        return; 
 	    }
+		
 	    
     	int idTarea = request.getParameter("idTarea") == null || request.getParameter("idTarea").isEmpty()
                 ? 0 : Integer.parseInt(request.getParameter("idTarea"));
     	int idEmpleado = request.getParameter("idEmpleado") == null || request.getParameter("idEmpleado").isEmpty()
                 ? 0 : Integer.parseInt(request.getParameter("idEmpleado"));
     	int cantidad = Integer.parseInt(request.getParameter("cantidad"));
-    	 String fechaStr = request.getParameter("fecha");
+    	String detalle = request.getParameter("detalle");
+    	String fechaStr = request.getParameter("fecha");
     	 
          Date fecha = null;
          try {
@@ -224,6 +229,7 @@ public class HoraTrabajadaServlet extends HttpServlet {
     		hora.setIdEmpleado(idEmpleado);
     		hora.setCantidad(cantidad);
     		hora.setFecha(fecha);
+    		hora.setDetalle(detalle);
     		try {
 				hdao.insert(hora);
 			} catch (DAOException e) {
