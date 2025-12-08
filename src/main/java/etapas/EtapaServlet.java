@@ -79,7 +79,7 @@ public class EtapaServlet extends HttpServlet {
             throws ServletException, IOException {
 
         Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
-        if (usuario == null || !("Administrador".equalsIgnoreCase(usuario.getRol()) || "Empleado".equalsIgnoreCase(usuario.getRol()))) {
+        if (usuario == null || !("Administrador".equalsIgnoreCase(usuario.getRol()) || "Empleado".equalsIgnoreCase(usuario.getRol()) || "Cliente".equalsIgnoreCase(usuario.getRol()) )) {
             response.sendRedirect("login.jsp");
             return;
         }
@@ -110,7 +110,8 @@ public class EtapaServlet extends HttpServlet {
         // --- FIJAR DESTINO PARA REDIRECCIONAR O MANTENER LA PAGINA ---
         String destino = (String) request.getAttribute("destino");
         System.out.println("destino: "+destino);
-        if (destino == null) destino = "proyectos/unProyecto.jsp";
+        if (destino == null) {destino = request.getParameter("destino"); System.out.println("destino: "+destino);}
+        else destino = "proyectos/unProyecto.jsp";
         
         // --- CARGAR PROYECTO Y ETAPAS (SIEMPRE) ---
         Proyecto proyecto = null;
@@ -207,6 +208,8 @@ public class EtapaServlet extends HttpServlet {
                  return;
              }
              break;
+        case "view":
+        	System.out.println("llego hasta el servlet etapa");
         }
 
         // CARGAR ETAPAS DE NUEVO
