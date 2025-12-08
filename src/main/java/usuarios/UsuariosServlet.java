@@ -175,15 +175,29 @@ public class UsuariosServlet extends HttpServlet {
                 return;
             }
 
-            // ==== ADMIN: ELIMINAR ====
+         // ==== ADMIN: ELIMINAR ====
             if (esAdmin && "confirmDelete".equalsIgnoreCase(action)) {
-                if (id > 0 && cargarUsuSeguro(request, id) != null) {
+                try {
+                    if (id <= 0) {
+                        throw new DAOException("ID de usuario inválido");
+                    }
+                    
+                    Usuario usuarioAEliminar = userDAO.getOne(id);
+                    if (usuarioAEliminar == null) {
+                        throw new DAOException("El usuario no existe");
+                    }
+
                     userDAO.delete(id);
-                } else {
-                    request.setAttribute("error", "ID de usuario inválido");
-                    request.setAttribute("usuarios", cargarUsuariosSeguro(request));
-                    request.getRequestDispatcher("usuarios/listado.jsp").forward(request, response);
+                    
+                    // Si llega aquí → se borró bien
+                    request.getSession().setAttribute("mensajeExito", "Usuario '" + usuarioAEliminar.getUsuario() + "' eliminado correctamente");
+
+                } catch (DAOException e) {
+                    // Aquí capturamos el error del DAO (el que dice que tiene tareas, comentarios, etc.)
+                    request.getSession().setAttribute("mensajeError", e.getMessage());
                 }
+
+                // SIEMPRE redirigimos, pase lo que pase
                 response.sendRedirect("UsuariosServlet");
                 return;
             }

@@ -1,3 +1,5 @@
+<%@page import="adjuntosComentario.AdjuntosComentarioDAO"%>
+<%@page import="adjuntosComentario.AdjuntosComentario"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="tareas.Tarea" %>
@@ -185,7 +187,7 @@ window.addEventListener("DOMContentLoaded", function() {
         <div id="contentHoras" class="p-4 sm:p-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <h2 class="text-lg font-semibold text-gray-800">Registro de Horas</h2>
-                 <% if (rol.equalsIgnoreCase("empleado")) { %>
+                 <% if (rol.equalsIgnoreCase("empleado") || rol.equalsIgnoreCase("administrador")) { %>
 	          
                 <a href="HoraTrabajadaServlet?action=new&idTarea=<%= tarea.getId() %>&idEmpleado=<%= usuario.getId() %>" 
                         class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition text-sm">
@@ -303,55 +305,38 @@ window.addEventListener("DOMContentLoaded", function() {
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                 <h2 class="text-lg font-semibold text-gray-800">Comentarios</h2>
             </div>
-
-            <!-- Formulario para nuevo comentario -->
-        <!--      <div class="bg-gray-50 rounded-lg p-4 mb-6">
-                <form action="ComentarioServlet" method="post">
-                    <input type="hidden" name="action" value="new">
-                    <input type="hidden" name="idTarea" value="<%= tarea != null ? tarea.getId() : "" %>">
-                    <textarea name="texto" rows="3" 
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                              placeholder="Escribe un comentario..." required></textarea>
-                    <div class="mt-2 flex justify-end">
-                        <button type="submit" 
-                                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition text-sm">
-                            Publicar Comentario
-                        </button>
-                    </div>
-                </form>
-            </div> -->
-            
+                        
             <!-- Formulario para nuevo comentario + archivos adjuntos -->
-<div class="bg-gray-50 rounded-lg p-4 mb-6">
-    <form action="ComentarioServlet" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="action" value="new">
-        <input type="hidden" name="idTarea" value="<%= tarea != null ? tarea.getId() : "" %>">
-
-        <textarea name="texto" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  placeholder="Escribe un comentario... (opcional si adjuntas archivos)" required></textarea>
-
-        <!-- Input para adjuntar archivos (múltiples) -->
-        <div class="mt-3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-                Adjuntar archivos (imágenes, PDFs, documentos...)
-            </label>
-            <input type="file" 
-                   name="archivos" 
-                   multiple 
-                   accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt"
-                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-            <p class="text-xs text-gray-500 mt-1">Puedes seleccionar varios archivos (máx 10 MB total recomendado)</p>
-        </div>
-
-        <div class="mt-4 flex justify-end">
-            <button type="submit"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition text-sm">
-                Publicar Comentario
-            </button>
-        </div>
-    </form>
-</div>
+			<div class="bg-gray-50 rounded-lg p-4 mb-6">
+			    <form action="ComentarioServlet" method="post" enctype="multipart/form-data">
+			        <input type="hidden" name="action" value="new">
+			        <input type="hidden" name="idTarea" value="<%= tarea != null ? tarea.getId() : "" %>">
+			
+			        <textarea name="texto" rows="3"
+			                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+			                  placeholder="Escribe un comentario... (opcional si adjuntas archivos)" required></textarea>
+		
+			        <!-- Input para adjuntar archivos (múltiples) -->
+			        <div class="mt-3">
+			            <label class="block text-sm font-medium text-gray-700 mb-1">
+			                Adjuntar archivos (imágenes, PDFs, documentos...)
+			            </label>
+			            <input type="file" 
+			                   name="archivos" 
+			                   multiple 
+			                   accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt"
+			                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+			            <p class="text-xs text-gray-500 mt-1">Puedes seleccionar varios archivos (máx 10 MB total recomendado)</p>
+			        </div>
+			
+			        <div class="mt-4 flex justify-end">
+			            <button type="submit"
+			                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition text-sm">
+			                Publicar Comentario
+			            </button>
+			        </div>
+   			 </form>
+			</div>
 
             <!-- Lista de comentarios -->
             <div class="space-y-4">
@@ -387,6 +372,42 @@ window.addEventListener("DOMContentLoaded", function() {
                                         <p class="text-xs text-gray-500"><%= c.getFecha() != null ? sdfTime.format(c.getFecha()) : "—" %></p>
                                     </div>
                                     <p class="text-sm text-gray-700 break-words"><%= c.getTexto() %></p>
+                                    <!-- Archivos adjuntos -->
+									<% 
+									List<AdjuntosComentario> adjuntos = AdjuntosComentarioDAO.obtenerPorComentario(c.getId());
+									if (adjuntos != null && !adjuntos.isEmpty()) { %>
+									    <div class="mt-3 flex flex-wrap gap-2">
+									        <% for (AdjuntosComentario a : adjuntos) { %>
+									            <!-- <a href="<%= request.getContextPath() %><%= a.getRuta() %>"  target="_blank" 
+									               class="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-xs font-medium text-gray-700">
+									                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.586-6.586"></path>
+									                </svg>
+									                <%= a.getNombreOriginal().length() > 30 ? a.getNombreOriginal().substring(0,27)+"..." : a.getNombreOriginal() %>
+									            </a> -->
+									            <% 
+String rutaCompleta = request.getContextPath() + a.getRuta();
+String tipo = a.getTipoMime() != null ? a.getTipoMime() : "";
+boolean esImagen = tipo.startsWith("image/");
+%>
+
+<% if (esImagen) { %>
+    <a href="<%= rutaCompleta %>" target="_blank">
+        <img src="<%= rutaCompleta %>" alt="<%= a.getNombreOriginal() %>" 
+             class="h-32 rounded border object-cover hover:opacity-80 transition">
+    </a>
+<% } else { %>
+    <a href="<%= rutaCompleta %>" target="_blank"
+       class="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-xs font-medium text-gray-700">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.586-6.586"></path>
+        </svg>
+        <%= a.getNombreOriginal().length() > 30 ? a.getNombreOriginal().substring(0,27)+"..." : a.getNombreOriginal() %>
+    </a>
+<% } %>
+									        <% } %>
+									    </div>
+									<% } %>
                                     <% if (usuarioActual != null && usuarioActual.getId() == c.getIdEmpleado()) { %>
                                         <button onclick="eliminarComentario(<%= c.getId() %>)" 
                                                 class="text-xs text-red-600 hover:text-red-800 mt-2">

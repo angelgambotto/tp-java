@@ -101,23 +101,23 @@ public class CategoriaTareaServlet extends HttpServlet {
         //trae la accion para eliminar
         String action = request.getParameter("action");
 
+        
         //bloque try general
-       try {
+        try {
     	   
-    	   if ("confirmDelete".equals(action)) {
-                id = Integer.parseInt(request.getParameter("id"));
-                if (id > 0 && dao.getById(id) != null) {
-                    dao.delete(id);
-                } else {
-                    request.setAttribute("error", "No se pudo eliminar la categoría: ID inválido.");
-                    request.setAttribute("categorias", cargarCategoriasSeguro(request));
-                    request.getRequestDispatcher("categorias/listado.jsp").forward(request, response);
-                    return;
-                }
-                response.sendRedirect("CategoriaTareaServlet");
-                return;
-    	   }
-    	   
+        	if ("confirmDelete".equals(action)) {
+        	    id = Integer.parseInt(request.getParameter("id"));
+        	    try {
+        	        dao.delete(id);
+        	        request.getSession().setAttribute("mensajeExito", "Categoría eliminada con éxito");
+        	    } catch (DAOException e) {
+
+        	        request.getSession().setAttribute("mensajeError", e.getMessage());
+        	    }
+        	    response.sendRedirect("CategoriaTareaServlet");
+        	    return;
+        	}
+    
     	   CategoriaTarea cat = new CategoriaTarea();
     	   cat.setId(id);
     	   cat.setNombre(nombre);
@@ -142,9 +142,8 @@ public class CategoriaTareaServlet extends HttpServlet {
 	        request.getRequestDispatcher("categorias/listado.jsp").forward(request, response);
 	        return;
        }
-        	
-    }
-        
-    }
+    }// cierra dopost	
+ } //cierra servlet 
+
     
     

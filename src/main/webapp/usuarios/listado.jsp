@@ -22,15 +22,15 @@
 <body>
 <body class="bg-gray-100">
 <jsp:include page="../header.jsp" />
-<!-- Mostrar errores -->
+
 <div class="p-8">
+	<!-- Mostrar errores -->
+
     <% if (request.getAttribute("error") != null) { %>
         <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
             <%= request.getAttribute("error") %>
         </div>
     <% } %>
-</div>
-<div class="p-8">
  <div class="flex items-center justify-between mb-4">
  
     <h2 class="text-2xl font-bold text-black">Listado de usuarios</h2>
@@ -147,6 +147,54 @@
 
     searchInput.addEventListener('input', filterTable);
     roleFilter.addEventListener('change', filterTable);
+</script>
+
+<!-- MENSAJE FLOTANTE -->
+<div id="mensaje" class="hidden fixed top-4 right-4 z-50 max-w-md">
+    <div id="mensajeContenido" class="px-6 py-4 py-3 rounded-lg shadow-lg text-white flex items-center justify-between">
+        <span id="mensajeTexto"></span>
+        <button onclick="document.getElementById('mensaje').classList.add('hidden')" 
+                class="ml-4 text-2xl font-bold hover:opacity-70">×</button>
+    </div>
+</div>
+
+<script>
+// Mostrar mensaje de éxito o error que venga de la sesión
+document.addEventListener("DOMContentLoaded", function() {
+    <%
+    String exito = (String) session.getAttribute("mensajeExito");
+    String error = (String) session.getAttribute("mensajeError");
+    if (exito != null) {
+        session.removeAttribute("mensajeExito");
+    %>
+        mostrarMensaje("<%= exito %>", "verde");
+    <%
+    } else if (error != null) {
+        session.removeAttribute("mensajeError");
+    %>
+        mostrarMensaje("<%= error %>", "rojo");
+    <%
+    }
+    %>
+});
+
+function mostrarMensaje(texto, color) {
+    const div = document.getElementById('mensaje');
+    const contenido = document.getElementById('mensajeContenido');
+    const textoSpan = document.getElementById('mensajeTexto');
+    
+    textoSpan.textContent = texto;
+    contenido.className = color === "verde" 
+        ? "px-6 py-4 rounded-lg shadow-lg text-white flex items-center justify-between bg-green-600"
+        : "px-6 py-4 rounded-lg shadow-lg text-white flex items-center justify-between bg-red-600";
+    
+    div.classList.remove('hidden');
+
+    // Se cierra solo en 10 segundos
+    setTimeout(() => {
+        div.classList.add('hidden');
+    }, 10000);
+}
 </script>
 
 </body>

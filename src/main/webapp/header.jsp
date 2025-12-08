@@ -30,10 +30,17 @@
                             %>
                             <a href="ProyectoServlet" class="hover:underline transition">Mis proyectos</a>
                             <%
+                            %>
+                            <a href="TareaServlet" class="hover:underline transition">Mis tareas</a>
+                            <%
                             break;
                         case "cliente":
                             %>
+<<<<<<< HEAD
                             <a href="ProyectoServlet" class="hover:underline transition">Mis proyectos</a>
+=======
+                            <a href="TareaServlet?action=mis-tareas" class="hover:underline transition">Mis tareas</a>
+>>>>>>> dev
                             <%
                             break;
                         default:

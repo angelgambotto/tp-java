@@ -56,7 +56,7 @@ public class ClienteDAO {
 	            ps.executeUpdate();
 
 	        } catch (SQLException e) {
-	            throw new DAOException("Error al eliminar al cliente con id: " + id, e);
+	            throw new DAOException("El cliente no puede eliminarse, posiblemente esté asignado a algun proyecto", e);
 	        }
 	    }
 

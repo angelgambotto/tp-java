@@ -51,7 +51,7 @@ public class CategoriaTareaDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-        	throw new DAOException("Error al eliminar la categoría con id: "+ id, e);
+        	throw new DAOException("La categoria no puede eliminarse, posiblemente haya tareas con esta categoria", e);
         }
     }
 

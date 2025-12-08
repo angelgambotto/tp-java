@@ -213,7 +213,7 @@ public class UsuariosDAO {
 			conn.close();
 		}
 		catch(SQLException e) {
-			throw new DAOException("Error al eliminar al usuario con id: " + idABorrar, e);
+			throw new DAOException("El usuario no puede eliminarse, posiblemente hay proyectos donde está asignado", e);
 		}
 	}
 }

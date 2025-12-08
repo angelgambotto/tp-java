@@ -173,20 +173,29 @@ public class ProyectoServlet extends HttpServlet {
 
             case "delete":
                 int deleteId = Integer.parseInt(request.getParameter("id"));
-                Proyecto pro = cargarProSeguro(request, deleteId);
-                request.setAttribute("proyecto", pro);
-                //request.setAttribute("abrirModalEliminar", true);
-             
-                
-                try {                	
-                	dao.delete(deleteId);
+
+                try {
+                    Proyecto pro = dao.getById(deleteId);
+                    if (pro == null) {
+                        throw new DAOException("El proyecto no existe");
+                    }
+
+                    dao.delete(deleteId);
+
+                    // ÉXITO: se borró bien
+                    request.getSession().setAttribute("mensajeExito", 
+                        "Proyecto '" + pro.getNombre() + "' eliminado correctamente");
+
                 } catch (DAOException e) {
-                	request.setAttribute("error", e.getMessage());
-        	    	request.setAttribute("supervisores", cargarUsuariosSeguro(request));
-        	        request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
+                    // ERROR: tiene etapas, tareas, etc.
+                    request.getSession().setAttribute("mensajeError", 
+                        "No se puede eliminar el proyecto porque tiene etapas o tareas asociadas");
                 }
+
+                // SIEMPRE redirigimos al listado (con mensaje)
+                response.sendRedirect("ProyectoServlet");
+                return;
                 
-                break;
             case "mis-proyectos":
             	request.setAttribute("proyectos", cargarMisProyectos(request));
             	//request.setAttribute("clientes", cargarClientesSeguro(request));

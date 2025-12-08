@@ -89,7 +89,7 @@ System.out.println("etapaFinalizada:"+ etapaFinalizada);
                     <% }} %>
                 </select>
             </div>
-
+<!-- LO COMENTO ASI SOLO SE PUEDEN CARGAR EMPLEADOS CON EL OTRO BOTON 
             <div class="mb-6">
     <label class="block text-gray-700 mb-1">Asignar usuarios</label>
 
@@ -112,8 +112,7 @@ System.out.println("etapaFinalizada:"+ etapaFinalizada);
 
         <% } } %>
     </div>
-</div>
-
+</div> -->
             <div class="flex justify-end space-x-4">
                 <button type="button"
                         onclick="cerrarModalYVolver(<%= idEtapa %>)"

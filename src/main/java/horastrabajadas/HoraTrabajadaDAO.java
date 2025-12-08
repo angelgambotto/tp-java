@@ -14,7 +14,7 @@ import utils.ConexionDB;
 
 public class HoraTrabajadaDAO {
 	public void insert(HoraTrabajada hora) throws DAOException {
-        String sql = "INSERT INTO hora_trabajada (idTarea, idEmpleado, fecha, cantidad) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO hora_trabajada (idTarea, idEmpleado, fecha, cantidad, detalle) VALUES (?, ?, ?, ?,?)";
 
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -23,6 +23,7 @@ public class HoraTrabajadaDAO {
             ps.setInt(2, hora.getIdEmpleado());
             ps.setTimestamp(3, new java.sql.Timestamp(hora.getFecha().getTime()));
             ps.setInt(4, hora.getCantidad());
+            ps.setString(5, hora.getDetalle());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -30,13 +31,14 @@ public class HoraTrabajadaDAO {
         }
     }
 	public void update(HoraTrabajada hora) throws DAOException {
-        String sql = "UPDATE hora_trabajada SET fecha = ?, cantidad = ? WHERE idTarea = ? and idEmpleado = ?";
+        String sql = "UPDATE hora_trabajada SET fecha = ?, cantidad = ?, detalle=? WHERE idTarea = ? and idEmpleado = ?";
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
         	ps.setInt(1, hora.getIdTarea());
             ps.setInt(2, hora.getIdEmpleado());
             ps.setTimestamp(3, new java.sql.Timestamp(hora.getFecha().getTime()));
             ps.setInt(4, hora.getCantidad());
+            ps.setString(5, hora.getDetalle());
             ps.executeUpdate();
         } catch (SQLException e) {
         	throw new DAOException("Error al actualizar horas en la tarea: "+ hora.getIdTarea(), e);
@@ -75,6 +77,7 @@ public class HoraTrabajadaDAO {
                      hora.setFecha(new Date(timestamp.getTime()));
                  }
                  hora.setCantidad(rs.getInt("cantidad"));
+                 hora.setDetalle(rs.getString("detalle"));
             }
 
         } catch (SQLException e) {
@@ -102,6 +105,7 @@ public class HoraTrabajadaDAO {
                        hora.setFecha(new Date(timestamp.getTime()));
                    }
                    hora.setCantidad(rs.getInt("cantidad"));
+                   hora.setDetalle(rs.getString("detalle"));
                    lista.add(hora);
                }
 
@@ -130,6 +134,7 @@ public class HoraTrabajadaDAO {
                     hora.setFecha(new Date(timestamp.getTime()));
                 }
                 hora.setCantidad(rs.getInt("cantidad"));
+                hora.setDetalle(rs.getString("detalle"));
                 lista.add(hora);
             }
 
