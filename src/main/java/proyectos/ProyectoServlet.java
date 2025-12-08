@@ -41,6 +41,16 @@ public class ProyectoServlet extends HttpServlet {
 	    }
 	}
 	
+	private Cliente cargarClienteSeguro(HttpServletRequest request) {
+	    try {
+	    	Usuario usu = (Usuario) request.getAttribute("usuario");
+	        return clienteDAO.getOne(usu.getIdCliente());
+	    } catch (DAOException e) {
+	        request.setAttribute("error", "No se pudieron cargar los clientes: " + e.getMessage());
+	        return new Cliente();
+	    }
+	}
+	
 	//metodo para cargar los usuarios y no tener problemas con el bloque try catch
 	private List<Usuario> cargarUsuariosSeguro(HttpServletRequest request) {
 	    try {
@@ -69,6 +79,17 @@ public class ProyectoServlet extends HttpServlet {
 	        return new ArrayList<>();
 	    }
 	}
+	
+	private List<Proyecto> cargarMisProyectosCliente(HttpServletRequest request) {
+	    try {
+	    	Usuario usu = (Usuario) request.getAttribute("usuario");
+	        return dao.getByIdCliente(usu.getIdCliente());
+	    } catch (DAOException e) {
+	        request.setAttribute("error", "No se pudieron cargar los proyectos del cliente: " + e.getMessage());
+	        return new ArrayList<>();
+	    }
+	}
+	
 	
 	
 	//metodo para cargar un proyecto y no tener problemas con el bloque try catch
@@ -106,13 +127,16 @@ public class ProyectoServlet extends HttpServlet {
 		request.setAttribute("usuario", usuario);
 		
 	   // boolean esAdmin = "administrador".equals(rol);
-	   boolean esEmpleado = "empleado".equals(rol);
+	   boolean esEmpleado = "Empleado".equals(rol);
+	   boolean esCliente = "Cliente".equals(rol);
     	
     	String action = request.getParameter("action");
 
         if (action == null) {
         	if (esEmpleado) {
         		action = "mis-proyectos";
+        	} else if (esCliente){
+        		action = "cliente";
         	} else {
         		action = "list";        		
         	}
@@ -169,6 +193,13 @@ public class ProyectoServlet extends HttpServlet {
                 //request.setAttribute("supervisores", cargarUsuariosSeguro(request));
             	request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
             	break; 
+            case "cliente":
+            	request.setAttribute("proyectos", cargarMisProyectosCliente(request));
+            	System.out.println(cargarMisProyectosCliente(request));
+            	request.setAttribute("cliente", cargarClienteSeguro(request));
+                //request.setAttribute("supervisores", cargarUsuariosSeguro(request));
+            	request.getRequestDispatcher("proyectos/proyectosCliente.jsp").forward(request, response);
+            	break;
         }
         
         switch (usuario.getRol().toLowerCase()) {

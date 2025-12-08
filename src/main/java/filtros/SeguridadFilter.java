@@ -43,7 +43,7 @@ public class SeguridadFilter implements Filter {
         }
 
         if (path.contains("/ProyectoServlet") &&
-                !(rol.equals("ADMINISTRADOR") || rol.equals("EMPLEADO"))) {
+                !(rol.equals("ADMINISTRADOR") || rol.equals("EMPLEADO")|| rol.equals("CLIENTE"))) {
             res.sendRedirect(req.getContextPath() + "/sinPermiso.jsp");
             return;
         }

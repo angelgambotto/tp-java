@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     <%@page import = "usuarios.Usuario" %>  
+    <%@page import = "clientes.Cliente" %>  
     <%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html>
@@ -11,6 +12,7 @@
 
 <%Usuario user=(Usuario) request.getAttribute("user");
 List<Usuario> empleados=(List<Usuario>) request.getAttribute("empleados");
+List<Cliente> clientes=(List<Cliente>) request.getAttribute("clientes");
 %>
 </head>
 <body>
@@ -70,8 +72,8 @@ List<Usuario> empleados=(List<Usuario>) request.getAttribute("empleados");
 	       <option value="Empleado" <%= (user != null && "Empleado".equals(user.getRol())) ? "selected" : "" %>>
 			    Empleado
 			</option>
-	        <option value="Usuario" <%= (user != null && "Usuario".equals(user.getRol())) ? "selected" : "" %>>
-	            Usuario (sin privilegios)
+	        <option value="Cliente" <%= (user != null && "Cliente".equals(user.getRol())) ? "selected" : "" %>>
+	            Usuario Cliente
 	        </option>
 	        </select>
            </div>
@@ -91,6 +93,28 @@ List<Usuario> empleados=(List<Usuario>) request.getAttribute("empleados");
                                 }
                     %>
                                 <option value="<%= s.getId() %>" <%= selected %>><%= s.getNombreCompleto() %></option>
+                    <%
+                            }
+                        }
+                    %>
+                </select>
+            </div>
+            <div>
+                <label class="block font-medium">Cliente:</label>
+                <select name="cliente"  class="w-full border border-gray-300 rounded px-3 py-2">
+                    <option value="">Sin cliente</option>
+                    <%
+                        if (clientes != null) {
+                            for (Cliente c : clientes) {  
+                            	String selected = "";
+                            	if (request.getAttribute("user") != null) {
+                                    Usuario selectedUsuario = (Usuario) request.getAttribute("user");
+                                    if (selectedUsuario.getSupervisor()!=null && (c.getId() == selectedUsuario.getIdCliente())) {
+                                        selected = "selected";
+                                    }
+                                }
+                    %>
+                                <option value="<%= c.getId() %>" <%= selected %>><%= c.getRazonSocial() %></option>
                     <%
                             }
                         }

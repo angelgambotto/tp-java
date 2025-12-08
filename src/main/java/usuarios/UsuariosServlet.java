@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import clientes.Cliente;
+import clientes.ClienteDAO;
+
 import exceptions.DAOException;
 
 /**
@@ -19,16 +22,27 @@ import exceptions.DAOException;
 public class UsuariosServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private UsuariosDAO userDAO;
+    private ClienteDAO cDAO;
 
     @Override
     public void init() {
         userDAO = new UsuariosDAO();
+        cDAO = new ClienteDAO();
     }
 
     // ===== Métodos auxiliares =====
     private List<Usuario> cargarUsuariosSeguro(HttpServletRequest request) {
         try {
             return userDAO.getAll();
+        } catch (DAOException e) {
+            request.setAttribute("error", "No se pudieron cargar los usuarios: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+    
+    private List<Cliente> cargarClientesSeguro(HttpServletRequest request) {
+        try {
+            return cDAO.getAll();
         } catch (DAOException e) {
             request.setAttribute("error", "No se pudieron cargar los usuarios: " + e.getMessage());
             return new ArrayList<>();
@@ -55,6 +69,7 @@ public class UsuariosServlet extends HttpServlet {
             switch (action) {
                 case "new":
                     LinkedList<Usuario> empleados = new LinkedList<>();
+                    List<Cliente> clientes = cargarClientesSeguro(request);
                     request.setAttribute("user", null);
                     request.setAttribute("abrirModal", true);
                     try {
@@ -62,16 +77,14 @@ public class UsuariosServlet extends HttpServlet {
                     } catch (DAOException e) {
                         request.setAttribute("error", "No se pudieron cargar los empleados: " + e.getMessage());
                     }
-                    System.out.println("empleados: ");						
-                    for (Usuario usuario : empleados) {
-                    	System.out.println(usuario.getNombreCompleto());
-					}
                     request.setAttribute("empleados", empleados);
+                    request.setAttribute("clientes", clientes);
                     break;
 
                 case "edit":
                     idUsuario = Integer.parseInt(request.getParameter("id"));
                     Usuario u = cargarUsuSeguro(request, idUsuario);
+                    List<Cliente> cli = cargarClientesSeguro(request);
                     if (u != null) {
                         request.setAttribute("user", u);
                         request.setAttribute("abrirModal", true);
@@ -83,6 +96,7 @@ public class UsuariosServlet extends HttpServlet {
                         }
                         request.setAttribute("empleados", supervisoresEdit);
                     }
+                    request.setAttribute("clientes", cli);
                     break;
 
                 case "delete":
@@ -152,7 +166,7 @@ public class UsuariosServlet extends HttpServlet {
                 String mail = request.getParameter("mail");
                 String clave = request.getParameter("clave");
 
-                Usuario nuevo = new Usuario(0, nombre, apellido, mail, clave, user, "Usuario", null);
+                Usuario nuevo = new Usuario(0, nombre, apellido, mail, clave, user, "Usuario", null, null);
                 userDAO.add(nuevo); // se aplica hash + salt en el DAO
 
                 System.out.printf("[INFO] Nuevo usuario registrado: %s (%s)%n", user, mail);
@@ -183,6 +197,8 @@ public class UsuariosServlet extends HttpServlet {
             String usuarioUsuario = request.getParameter("usuario");
             String s = request.getParameter("supervisor");
             Integer supervisor = (s != null && !s.isEmpty()) ? Integer.parseInt(s) : null;
+            String c = request.getParameter("cliente");
+            Integer cliente = (c != null && !c.isEmpty()) ? Integer.parseInt(c) : null;
 
             if (id != 0) {
                 Usuario existente = userDAO.getOne(id);
@@ -193,7 +209,7 @@ public class UsuariosServlet extends HttpServlet {
             }
 
             Usuario user = new Usuario(id, nombreUsuario, apellidoUsuario, mailUsuario,
-                    claveUsuario, usuarioUsuario, rolUsuario, supervisor);
+                    claveUsuario, usuarioUsuario, rolUsuario, supervisor, cliente);
 
             if (id == 0) {
                 userDAO.add(user); // genera nuevo salt

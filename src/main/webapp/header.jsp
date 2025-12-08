@@ -26,19 +26,14 @@
                             <a href="CategoriaTareaServlet" class="hover:underline transition">Categorías</a>
                             <a href="HoraTrabajadaServlet?action=reporte" class="hover:underline transition">Reportes</a>
                             <% break;
-                        case "supervisor":
-                            %>
-                            <a href="ProyectoServlet" class="hover:underline transition">Proyectos</a>
-                            <%
-                            break;
                         case "empleado":
                             %>
                             <a href="ProyectoServlet" class="hover:underline transition">Mis proyectos</a>
                             <%
                             break;
-                        case "usuario":
+                        case "cliente":
                             %>
-                            <a href="TareaServlet" class="hover:underline transition">Mis tareas</a>
+                            <a href="ProyectoServlet" class="hover:underline transition">Mis proyectos</a>
                             <%
                             break;
                         default:
