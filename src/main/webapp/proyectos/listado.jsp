@@ -183,7 +183,6 @@
 </div>
 
 <jsp:include page="formulario.jsp" />
-```html
 <!-- MENSAJE FLOTANTE (éxito/error) -->
 <div id="mensaje" class="hidden fixed top-4 right-4 z-50 max-w-md">
     <div id="mensajeContenido" class="px-6 py-4 rounded-lg shadow-lg text-white flex items-center justify-between">

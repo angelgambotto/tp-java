@@ -3,8 +3,6 @@
 <%@ page import="proyectos.Proyecto" %>
 <%@ page import="etapas.Etapa" %>
 <%@ page import="usuarios.Usuario" %>
-<%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.nio.charset.StandardCharsets" %>
 
 <!DOCTYPE html>
 <html>
@@ -97,12 +95,7 @@
             
             <!-- TARJETA DE PROYECTO -->
             <div class="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow cursor-pointer overflow-hidden"
-				onclick="
-    var idProyecto = '<%= proyecto.getId() %>';
-    var destino = 'proyectos/detalleProyectoCliente.jsp';
-    var url = 'EtapaServlet?idProyecto=' + idProyecto + '&destino=' + encodeURIComponent(destino);
-    window.location.href = url;
-">
+				onclick="window.location.href='EtapaServlet?idProyecto=<%= proyecto.getId() %>&action=detalleCliente'">
                 
                 <!-- Header del proyecto -->
                 <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 sm:p-5">

@@ -110,8 +110,7 @@ public class EtapaServlet extends HttpServlet {
         // --- FIJAR DESTINO PARA REDIRECCIONAR O MANTENER LA PAGINA ---
         String destino = (String) request.getAttribute("destino");
         System.out.println("destino: "+destino);
-        if (destino == null) {destino = request.getParameter("destino"); System.out.println("destino: "+destino);}
-        else destino = "proyectos/unProyecto.jsp";
+        if (destino == null) destino = "proyectos/unProyecto.jsp";
         
         // --- CARGAR PROYECTO Y ETAPAS (SIEMPRE) ---
         Proyecto proyecto = null;
@@ -208,8 +207,8 @@ public class EtapaServlet extends HttpServlet {
                  return;
              }
              break;
-        case "view":
-        	System.out.println("llego hasta el servlet etapa");
+        case "detalleCliente":
+        	destino="proyectos/detalleProyectoCliente.jsp";
         }
 
         // CARGAR ETAPAS DE NUEVO
