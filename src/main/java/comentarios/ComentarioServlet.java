@@ -27,6 +27,7 @@ import java.util.List;
 import adjuntosComentario.AdjuntosComentario;
 import adjuntosComentario.AdjuntosComentarioDAO;
 import usuarios.Usuario;
+import utils.mail.EmailService;
 import exceptions.DAOException;
 
 /**
@@ -42,11 +43,14 @@ public class ComentarioServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ComentarioDAO cdao;
 	private TareaDAO tdao;
-	
+    private EmailService emailService;
+
 	
 	public void init() {
 		tdao = new TareaDAO();
 		cdao = new ComentarioDAO();
+		
+		this.emailService = (EmailService) getServletContext().getAttribute("emailService");
 	}
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -145,6 +149,44 @@ public class ComentarioServlet extends HttpServlet {
 		                    }
 		                }
 		      }
+	            
+	            
+	            // ENVÍO DE MAIL AL CREAR UN COMENTARIO
+	            
+	            for (Usuario u : asignados) {
+
+	                // Evitar enviar al autor
+	                if (u.getId() == usuario.getId()) 
+	                    continue;
+
+	                String asunto = "Nuevo comentario en la tarea: " + tarea.getNombre();
+
+	                String cuerpo =
+	                	    "<div style='font-family: Arial, sans-serif; background:#f4f4f4; padding:20px;'>"
+	                	  + "  <div style='max-width:600px; margin:auto; background:#ffffff; padding:20px; border-radius:8px;'>"
+	                	  + "    <h2 style='color:#1a73e8;'>Nuevo comentario en una tarea</h2>"
+	                	  + "    <p>Hola <strong>" + u.getNombreCompleto() + "</strong>,</p>"
+	                	  + "    <p>Se agregó un nuevo comentario en la tarea <strong>" + tarea.getNombre() + "</strong>.</p>"
+
+	                	  + "    <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;'>"
+
+	                	  + "    <h3 style='color:#444;'>Comentario</h3>"
+	                	  + "    <p style='white-space:pre-line; background:#f7f7f7; padding:12px; border-radius:6px;'>" 
+	                	  +          texto + "</p>"
+
+	                	  + "    <p><strong>Autor:</strong> " + usuario.getNombreCompleto() + "</p>"
+
+	                	  + "    <p>Podés ver el detalle completo ingresando al sistema.</p>"
+	                	  + "  </div>"
+	                	  + "</div>";
+
+	                try {
+	                    emailService.enviar(u.getMail(), asunto, cuerpo);
+	                } catch (Exception exMail) {
+	                    System.out.println("[ERROR] No se pudo enviar mail a " + u.getMail());
+	                    exMail.printStackTrace();
+	                }
+	            }
 	            
 	            // FORWARD A LA MISMA PÁGINA
 	            response.sendRedirect("TareaServlet?action=detalle&idTarea=" + tarea.getId() + "&idEtapa=" + tarea.getIdEtapa()+ "&tab=comentarios");
