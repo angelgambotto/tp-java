@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import usuarios.Usuario;
 import usuarios.UsuariosDAO;
+import utils.mail.EmailFactory;
+import utils.mail.EmailService;
 import exceptions.DAOException;
 
 import java.io.IOException;
@@ -30,6 +32,10 @@ public class LoginServlet extends HttpServlet {
     @Override
     public void init() {
     	userDAO=new UsuariosDAO();
+    	EmailService emailService =
+                EmailFactory.crearEmailService(true); // cambiar a true cuando actives SMTP
+
+        getServletContext().setAttribute("emailService", emailService);
   
     }
     private Usuario buscarParaLoginSeguro(HttpServletRequest request,String usuario,String clave) {
