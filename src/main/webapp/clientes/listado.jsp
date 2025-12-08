@@ -22,7 +22,7 @@
 
      <!-- Buscador con ícono de lupa -->
     <div class="relative flex-1 max-w-md">
-        <input type="text" placeholder="Buscar..."
+        <input type="text" id="searchInput" placeholder="Buscar..."
                class="w-full border border-gray-300 rounded px-3 py-2 pr-10 focus:ring-indigo-500 focus:border-indigo-500" />
         <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -83,6 +83,36 @@
 <jsp:include page="modalEliminar.jsp" />
 
 </div>
+
+<script>
+const searchInput=document.getElementById("searchInput");
+const tableRows = document.querySelectorAll('tbody tr');
+function filterTable(){
+	const searchText=searchInput.value.toLowerCase();
+	tableRows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+   
+        if (cells.length === 0) return;
+
+        const cuil = cells[0].textContent.toLowerCase();
+        const razon = cells[1].textContent.toLowerCase();
+       	const mail=cells[2].textContent.toLowerCase()
+
+        const matchesSearch = !searchText ||
+            cuil.includes(searchText) ||
+            razon.includes(searchText)||
+            mail.includes(searchText);
+
+  
+
+        row.style.display = matchesSearch  ? '' : 'none';
+    });
+		
+}
+searchInput.addEventListener('input', filterTable);
+
+</script>
+
 <!-- MENSAJE FLOTANTE -->
 <div id="mensaje" class="hidden fixed top-4 right-4 z-50 max-w-md">
     <div id="mensajeContenido" class="px-6 py-4 py-3 rounded-lg shadow-lg text-white flex items-center justify-between">

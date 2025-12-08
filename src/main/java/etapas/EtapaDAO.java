@@ -18,7 +18,8 @@ import utils.ConexionDB;
 
 public class EtapaDAO {
 	
-	public void insert(Etapa etapa) throws DAOException {
+	public int  insert(Etapa etapa) throws DAOException {
+		int id=0;
 		String sql = "INSERT INTO etapa "
 				+ "(nombre, descripcion, estado, fechaInicio, fechaFin, fechaTentativa, idProyecto) VALUES (?, ?, ?, ?, ?, ?, ?)";
 		
@@ -49,8 +50,12 @@ public class EtapaDAO {
 	            // Para ver si se insertó de verdad
 	            ResultSet rs = ps.getGeneratedKeys();
 	            if (rs.next()) {
-	                System.out.println("ID NUEVO: " + rs.getInt(1));  // ← ¿Aparece?
+	                 id=rs.getInt(1);
+	            	System.out.println("ID NUEVO: " + id);
+	            	// ← ¿Aparece?
+	                
 	            }
+	            return id;
 
 	        } catch (SQLException e) {
 	        	throw new DAOException("Error al insertar la etapa: "+ etapa.getNombre(), e);

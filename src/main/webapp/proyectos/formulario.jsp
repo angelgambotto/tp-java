@@ -13,11 +13,11 @@
 
 <% 
     LinkedList<Usuario> supervisores = (LinkedList<Usuario>) request.getAttribute("supervisores");
-    List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");  // <-- CAMBIO AQUÍ: List en vez de LinkedList
+    List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes"); // <-- CAMBIO AQUÍ: List en vez de LinkedList
 %>
 <div id="modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %>">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
-        <h2 class="text-2xl font-bold mb-4">Agregar / Editar Proyecto</h2>
+        <h2 class="text-2xl font-bold mb-4">${id != null ? "Editar proyecto" : "Crear proyecto"} </h2>
         <form action="ProyectoServlet" method="post" class="space-y-4">
             <input type="hidden" name="id" value="${id}" />
 

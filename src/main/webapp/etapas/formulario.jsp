@@ -29,10 +29,13 @@
 	//Date fechaInicio = (Date) request.getAttribute("fechaInicio");
     //LinkedList<Usuario> supervisores = (LinkedList<Usuario>) request.getAttribute("supervisores");
     //List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");  // <-- CAMBIO AQUÍ: List en vez de LinkedList
+	Integer idEtapa=(Integer) request.getAttribute("id");
 %>
 <div id="insert-update" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %>">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
-        <h2 class="text-2xl font-bold mb-4">Agregar / Editar Etapa</h2>
+        <h2 class="text-2xl font-bold mb-4">
+      <%= (idEtapa == null || idEtapa == 0) ? "Agregar Etapa" : "Editar Etapa" %>
+        </h2>
         <form action="EtapaServlet" method="post" class="space-y-4">
             <input type="hidden" name="id" value="${id}" />
             <input type="hidden" name="idProyecto" value="${idProyecto}" />

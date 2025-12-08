@@ -6,6 +6,7 @@
 
 <%
     Tarea tarea = (Tarea) request.getAttribute("tarea");
+	int  idTarea = (tarea != null) ? tarea.getId() : 0;
     List<Usuario> usuarios = (List<Usuario>) request.getAttribute("usuarios");
     List<Usuario> usuariosAsignados = (List<Usuario>) request.getAttribute("usuariosAsignados");
     List<CategoriaTarea> categorias = (List<CategoriaTarea>) request.getAttribute("categorias");
@@ -46,7 +47,9 @@
 <%Boolean f=(Boolean)request.getAttribute("EtapaFinalizada"); 
 boolean etapaFinalizada = (f != null && f);
 System.out.println("etapaFinalizada:"+ etapaFinalizada);
-
+if (tarea != null) {
+    System.out.println("tareaID: " + tarea.getId());  
+}
 %>
             <div class="mb-4">
                 <label class="block text-gray-700 mb-1">Estado</label>
@@ -89,11 +92,8 @@ System.out.println("etapaFinalizada:"+ etapaFinalizada);
                     <% }} %>
                 </select>
             </div>
-<!-- LO COMENTO ASI SOLO SE PUEDEN CARGAR EMPLEADOS CON EL OTRO BOTON 
-            <div class="mb-6">
-    <label class="block text-gray-700 mb-1">Asignar usuarios</label>
 
-    <div class="border rounded-lg px-4 py-3 max-h-40 overflow-y-auto">
+        
 
         <% if (usuarios != null) {
             for (Usuario u : usuarios) {
@@ -101,24 +101,25 @@ System.out.println("etapaFinalizada:"+ etapaFinalizada);
                         usuariosAsignados.stream().anyMatch(us -> us.getId() == u.getId());
         %>
 
-            <label class="flex items-center space-x-2 mb-2 cursor-pointer">
-                <input type="checkbox"
+            
+                <input type="hidden"
                        name="usuarios"
                        value="<%= u.getId() %>"
                        <%= seleccionado ? "checked" : "" %>
                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                <span><%= u.getNombre() %> <%= u.getApellido() %></span>
-            </label>
+                
 
         <% } } %>
-    </div>
-</div> -->
+    
             <div class="flex justify-end space-x-4">
                 <button type="button"
-                        onclick="cerrarModalYVolver(<%= idEtapa %>)"
-                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-lg">
-                    Cancelar
-                </button>
+        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-lg"
+        data-id-etapa="<%= idEtapa %>"
+        data-id-tarea="<%= (tarea!=null)?tarea.getId():"" %>"
+        id="btnCancelarModal">
+    Cancelar
+</button>
+
                 <button type="submit"
                         class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg">
                     Guardar
@@ -129,8 +130,15 @@ System.out.println("etapaFinalizada:"+ etapaFinalizada);
     </div>
 </div>
  <script>
-function cerrarModalYVolver(idEtapa) {
-    document.getElementById("modalFormTarea").classList.add("hidden");
-    window.location.href = `TareaServlet?action=list&idEtapa=${idEtapa}`;
-}
+ console.log("Script cargado correctamente");
+ document.getElementById("btnCancelarModal").addEventListener("click", function() {
+	    const idEtapa = this.dataset.idEtapa;
+	    const idTarea = this.dataset.idTarea;
+	    console.log("idEtapa:", idEtapa, "idTarea:", idTarea);
+	    document.getElementById("modalFormTarea").classList.add("hidden");
+	    window.location.href = `TareaServlet?action=list&idEtapa=${idEtapa}`;
+	    
+
+	});
+
 </script>

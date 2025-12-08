@@ -55,7 +55,7 @@
 
         <!-- Buscador con ícono de lupa -->
         <div class="relative flex-1 max-w-md">
-            <input type="text" placeholder="Buscar..."
+            <input type="text" id="searchInput" placeholder="Buscar..."
                    class="w-full border border-gray-300 rounded px-3 py-2 pr-10 focus:ring-indigo-500 focus:border-indigo-500" />
             <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -122,9 +122,9 @@
                                 }
                                 int usuariosCount = (pro.getUsuarios() != null) ? pro.getUsuarios().size() : 0;
                         %>
-                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 relative">
+                                <!--  <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 relative"> -->
                                 <!-- Descomentar para activar redireccion a EtapaServletal ahcer click sobre una card-->
-                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 relative cursor-pointer" onclick="window.location.href='EtapaServlet?action=list&idProyecto=<%= pro.getId() %>';" >
+                                <div class=" proyecto_card bg-gray-50 p-4 rounded-lg border border-gray-200 relative cursor-pointer" onclick="window.location.href='EtapaServlet?action=list&idProyecto=<%= pro.getId() %>';" >
                                 
                                     <!-- Menú de tres puntos arriba derecha -->
                                     <div class="absolute top-2 right-2">
@@ -170,7 +170,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                </div>
+                              
                         <%
                             }
                         %>
@@ -183,7 +183,7 @@
 </div>
 
 <jsp:include page="formulario.jsp" />
-```html
+
 <!-- MENSAJE FLOTANTE (éxito/error) -->
 <div id="mensaje" class="hidden fixed top-4 right-4 z-50 max-w-md">
     <div id="mensajeContenido" class="px-6 py-4 rounded-lg shadow-lg text-white flex items-center justify-between">
@@ -225,6 +225,38 @@ function mostrarMensaje(texto, color) {
     div.classList.remove('hidden');
     setTimeout(() => div.classList.add('hidden'), 6000);
 }
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("searchInput");
+    const cards = document.querySelectorAll(".proyecto_card");
+    console.log("Tarjetas encontradas:", cards.length);
+    function filtrarProyectos() {
+        const searchText = searchInput.value.toLowerCase();
+        
+        cards.forEach(card => {
+            
+            const nombre = card.querySelector('h4')?.textContent.toLowerCase() || '';
+            const descripcion = card.querySelector('p')?.textContent.toLowerCase() || '';
+           
+            
+            // Verificar si coincide con la búsqueda
+            const matches = !searchText ||
+                nombre.includes(searchText) ||
+                descripcion.includes(searchText) 
+                
+            
+            // Mostrar u ocultar
+            if (matches) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        
+    }
+    searchInput.addEventListener('input', filtrarProyectos);});
 </script>
 
 </body>

@@ -128,7 +128,9 @@ public class EtapaServlet extends HttpServlet {
         }
 
         // --- PASAR DATOS COMUNES ---
-        request.setAttribute("categorias", cargarCategoriasSeguro(request));
+        List<CategoriaTarea> categorias=cargarCategoriasSeguro(request);
+        System.out.println("categoria tarea en servlet:"+ categorias);
+        request.setAttribute("categorias", categorias);
         request.setAttribute("proyecto", proyecto);
         request.setAttribute("etapas", etapas);
         request.setAttribute("idProyecto", idProyecto);
@@ -191,6 +193,7 @@ public class EtapaServlet extends HttpServlet {
                  request.setAttribute("fechaFin", sdf.format(etapa.getFechaFin()));
              }
              request.setAttribute("abrirModal", true);
+             
              break;
              
         case "delete":
@@ -210,8 +213,8 @@ public class EtapaServlet extends HttpServlet {
         }
 
         // CARGAR ETAPAS DE NUEVO
+        
         request.setAttribute("etapas", cargarEtapasSeguro(request));
-
         request.getRequestDispatcher(destino).forward(request, response);
     }
 
@@ -331,7 +334,7 @@ public class EtapaServlet extends HttpServlet {
             if (id > 0) {
                 edao.update(eta);
             } else {
-                edao.insert(eta);
+                id=edao.insert(eta);
             }
 	         // ÉXITO: LIMPIAR ERROR
 	            request.getSession().setAttribute("error", null); // o request
@@ -339,7 +342,7 @@ public class EtapaServlet extends HttpServlet {
 
             // Opcional: mensaje de éxito
             request.getSession().setAttribute("success", "Etapa guardada correctamente");
-            response.sendRedirect("EtapaServlet?action=view&idProyecto=" + idProyecto);
+            response.sendRedirect("TareaServlet?action=list&idEtapa=" + id);
 
         } catch (DAOException e) {
             request.setAttribute("error", e.getMessage());

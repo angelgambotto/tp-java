@@ -60,6 +60,7 @@ public class TareaServlet extends HttpServlet {
     
      List<Tarea> tareas;
      List<Usuario> usuarios;
+     List<CategoriaTarea> categorias;
      
      /*private List<Tarea> cargarTareasSeguro(HttpServletRequest request) {
          try {
@@ -104,9 +105,14 @@ public class TareaServlet extends HttpServlet {
             //}
         	int idEtapa=Integer.parseInt(request.getParameter("idEtapa"));
         	List<Tarea> tareas=tdao.getByEtapaId(idEtapa);
-        	request.setAttribute("tareas", tareas);
+       
+        	categorias=cdao.getAll();
+        	System.out.println("categorias"+categorias);
+        	
         	Etapa e=edao.getOne(idEtapa);
+        	request.setAttribute("categorias", categorias);
         	request.setAttribute("etapa", e);
+        	request.setAttribute("tareas", tareas);
         	request.setAttribute("esAdmin", true);
         	request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);
         	break;
@@ -114,24 +120,23 @@ public class TareaServlet extends HttpServlet {
         	idEtapa = Integer.parseInt(request.getParameter("idEtapa"));
         	String estadoEtapa=edao.getOne(idEtapa).getEstado();
 
-        	if ("Done".equals(estadoEtapa)) {
-        		request.setAttribute("error", "No se pueden agregar tareas en una etapa finalizada.");
-        		request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);;
-        		}
+        	
             List<Usuario> usuariosDisponibles = udao.getAll();
             List<CategoriaTarea> categorias = cdao.getAll();
             int idEt=Integer.parseInt(request.getParameter("idEtapa"));
         	List<Tarea> tar=tdao.getByEtapaId(idEt);
         	request.setAttribute("tareas", tar);
         	Etapa et=edao.getOne(idEtapa);
+        	if ("Done".equals(estadoEtapa)) {
+        		request.setAttribute("error", "No se pueden agregar tareas en una etapa finalizada.");
+        		request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);;
+        		}
         	request.setAttribute("etapa", et);
         	request.setAttribute("EtapaFinalizada", estadoEtapa.equals("Done"));
             request.setAttribute("usuarios", usuariosDisponibles);
             request.setAttribute("categorias", categorias);
             request.setAttribute("idEtapa", idEtapa);
             request.setAttribute("abrirModal", true);
-           
-
             request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);
             break;
         case "edit":
@@ -156,15 +161,15 @@ public class TareaServlet extends HttpServlet {
             	ex.printStackTrace();
             	request.setAttribute("error", "error al obtener estado de etapa por tarea con id: "+idTarea);
             }
-            List<Usuario> usuariosAsignados = tdao.getUsuariosAsignados(idTarea);
+            
             request.setAttribute("tarea", tarea);
             request.setAttribute("etapa", eta);
             request.setAttribute("EtapaFinalizada", estadoEtapa.equals("Done"));
             request.setAttribute("usuarios", usuariosDisponibles);
-            request.setAttribute("usuariosAsignados", usuariosAsignados);
-            request.setAttribute("categorias", categorias);
+          
+            request.setAttribute("categorias", categorias); 
             request.setAttribute("idEtapa", idEtapa);
-            request.setAttribute("abrirModal", true);
+            request.setAttribute("abrirModal", true); 
             request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);
             break;
         case "mis-tareas":
@@ -193,6 +198,7 @@ public class TareaServlet extends HttpServlet {
         	String tab = request.getParameter("tab");
         	int idE=Integer.parseInt(request.getParameter("idEtapa"));
         	int idT=Integer.parseInt(request.getParameter("idTarea"));
+        	
         	Etapa etapa = edao.getOne(idE);
         	Tarea tareaDetalle = tdao.getOne(idT);
         	List<Usuario> asignados = tdao.getUsuariosAsignados(idT);
@@ -282,7 +288,7 @@ public class TareaServlet extends HttpServlet {
 		
 		}
 	
-		response.sendRedirect("EtapaServlet?action=list&idEtapa="+idEtapa+"&idProyecto="+idProyecto);
+		response.sendRedirect("TareaServlet?action=list&idEtapa="+idEtapa);
 		
 	}
 	
@@ -318,8 +324,8 @@ public class TareaServlet extends HttpServlet {
 		}
 		
 			System.out.println(ids);
-			tdao.insert(tarea, ids);
-			response.sendRedirect("TareaServlet?action=list&idEtapa=" + tarea.getIdEtapa());
+			Integer idTarea=tdao.insert(tarea, ids);
+			response.sendRedirect("TareaServlet?action=detalle&idTarea="+idTarea+"&idEtapa=" + tarea.getIdEtapa());
 		}
 		catch(DAOException e) {
 			request.setAttribute("Error al insertar tarea: ", e);
@@ -351,7 +357,7 @@ public class TareaServlet extends HttpServlet {
 	        tdao.update(tarea, usuariosSeleccionados);
 
 	       
-	        response.sendRedirect("TareaServlet?action=list&idEtapa=" + tarea.getIdEtapa());
+	        response.sendRedirect("TareaServlet?action=detalle&idTarea="+tarea.getId()+"&idEtapa=" + tarea.getIdEtapa());
 
 	    } catch (DAOException e) {
 	        throw new ServletException("Error al actualizar tarea", e);

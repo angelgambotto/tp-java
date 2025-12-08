@@ -20,7 +20,7 @@ import utils.ConexionDB;
 
 public class TareaDAO {
 
-	public void insert(Tarea tarea, List<Integer> usuarios) throws DAOException {
+	public Integer insert(Tarea tarea, List<Integer> usuarios) throws DAOException {
 	    String sql = "INSERT INTO tarea (nombre, descripcion, estado, fechaInicio, fechaFin, idEtapa, idCategoria) VALUES (?,?,?,?,?,?,?)";
 	    String sql2 = "INSERT INTO tarea_usuario (idTarea, idEmpleado) VALUES (?,?)";
 	    
@@ -28,7 +28,7 @@ public class TareaDAO {
 	    PreparedStatement ps = null;
 	    PreparedStatement ps2 = null;
 	    ResultSet rs = null;
-	    
+	    Integer id=null;
 	    try {
 	        con = ConexionDB.getConexion();
 	        con.setAutoCommit(false);
@@ -51,7 +51,8 @@ public class TareaDAO {
 	        rs = ps.getGeneratedKeys();
 	        if (rs.next()) {
 	            System.out.println("El id de la tarea es: " + rs.getInt(1));
-	            tarea.setId(rs.getInt(1));
+	            id=rs.getInt(1);
+	            tarea.setId(id);
 	        }
 	        
 	 
@@ -66,8 +67,9 @@ public class TareaDAO {
 	        
 	        
 	        con.commit();
+	       
 	        System.out.println("transacción completada ");
-	        
+	        return id;
 	    } catch (SQLException e) {
 	       
 	        if (con != null) {

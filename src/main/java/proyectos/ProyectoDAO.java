@@ -141,6 +141,7 @@ public class ProyectoDAO {
     	
     	try {
     		Connection con=ConexionDB.getConexion();
+    		con.setAutoCommit(false);
     		PreparedStatement psUsuariosAct = con.prepareStatement(sqlActuales);
 	    	psUsuariosAct.setInt(1, idPro);
 	        ResultSet rs = psUsuariosAct.executeQuery();
@@ -149,7 +150,8 @@ public class ProyectoDAO {
 	        while (rs.next()) {
 	            usuariosActualesBD.add(rs.getInt("idEmpleado"));
 	        }
-	        
+	        rs.close();
+	        psUsuariosAct.close();
 	        PreparedStatement psInsert = con.prepareStatement(sqlAsignar);
 	        for (Integer u : asignados) {
 	            if (!usuariosActualesBD.contains(u)) {
@@ -159,7 +161,7 @@ public class ProyectoDAO {
 	                psInsert.executeUpdate();
 	            }
 	        }
-	       
+	        psInsert.close();
 	        PreparedStatement psDelete = con.prepareStatement(sqlBaja);
 	        for (Integer u : usuariosActualesBD) {
 	            if (!asignados.contains(u)) {
@@ -169,8 +171,10 @@ public class ProyectoDAO {
 	                psDelete.executeUpdate();
 	            }
 	        }
-
+	        psDelete.close();
+	        con.commit();
     	} catch (SQLException e) {
+    		
 	        throw new DAOException("Error actualizando proyecto", e);
 	    }
     }

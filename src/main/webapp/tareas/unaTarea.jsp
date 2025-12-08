@@ -501,7 +501,7 @@ boolean esImagen = tipo.startsWith("image/");
 </div>
 
 <jsp:include page="../horasTrabajadas/formulario.jsp" />
-
+<jsp:include page="../tareas/formulario.jsp" />
 <script>
 function toggleModal(modalId) {
     const modal = document.getElementById(modalId);
@@ -604,6 +604,9 @@ window.onclick = function(event) {
         }
     });
 }
+<% if (request.getAttribute("abrirModalTarea") != null) { %>
+window.onload = () => toggleModal("modalFormTarea");
+<% } %>
 </script>
 
 </body>

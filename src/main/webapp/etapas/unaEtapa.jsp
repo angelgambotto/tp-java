@@ -276,6 +276,7 @@
             <div class="block lg:hidden divide-y divide-gray-200">
                 <% for (Tarea t : tareas) { 
                     String nombreCat = "Sin categoría";
+                    System.out.println("categorias"+ categorias);
                     if (categorias != null && t.getIdCategoria() > 0) {
                         for (CategoriaTarea c : categorias) {
                             if (c.getId() == t.getIdCategoria()) {
