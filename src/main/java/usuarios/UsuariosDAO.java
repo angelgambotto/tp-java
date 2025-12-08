@@ -27,7 +27,8 @@ public class UsuariosDAO {
 	                    hashedPassword,
 	                    rs.getString("usuario"),
 	                    rs.getString("rol"),
-	                    rs.getInt("supervisor")
+	                    rs.getInt("supervisor"),
+	                    rs.getInt("cliente")
 	                );
 	            }
 	        }
@@ -56,7 +57,8 @@ public class UsuariosDAO {
 					String rolUsuario=rs.getString("rol");
 					String mailUsuario=rs.getString("mail");
 					Integer supervisorUsuario=rs.getInt("supervisor");
-					Usuario user=new Usuario(idUsuario,nombreUsuario,apellidoUsuario,mailUsuario,"",usuarioUsuario,rolUsuario,supervisorUsuario);
+					Integer clienteUsuario = rs.getInt("cliente");
+					Usuario user=new Usuario(idUsuario,nombreUsuario,apellidoUsuario,mailUsuario,"",usuarioUsuario,rolUsuario,supervisorUsuario,clienteUsuario);
 					usuarios.add(user);
 				}
 			}
@@ -90,7 +92,8 @@ public class UsuariosDAO {
 				String rolUsuario=rs.getString("rol");
 				String mailUsuario=rs.getString("mail");
 				Integer supervisorUsuario=rs.getInt("supervisor");
-				Usuario user=new Usuario(idUsuario,nombreUsuario,apellidoUsuario,mailUsuario,"",usuarioUsuario,rolUsuario,supervisorUsuario);
+				Integer clienteUsuario = rs.getInt("cliente");
+				Usuario user=new Usuario(idUsuario,nombreUsuario,apellidoUsuario,mailUsuario,"",usuarioUsuario,rolUsuario,supervisorUsuario,clienteUsuario);
 				usuarios.add(user);
 			}}
 			if(rs!=null) {rs.close();
@@ -120,7 +123,8 @@ public class UsuariosDAO {
 				Integer supervisorUsuario=rs.getInt("supervisor");
 				String rolUsuario=rs.getString("rol");
 				String mailUsuario=rs.getString("mail");
-				user=new Usuario(idUsuario,nombreUsuario,apellidoUsuario,mailUsuario,"",usuarioUsuario,rolUsuario,supervisorUsuario);
+				Integer clienteUsuario = rs.getInt("cliente");
+				user=new Usuario(idUsuario,nombreUsuario,apellidoUsuario,mailUsuario,"",usuarioUsuario,rolUsuario,supervisorUsuario,clienteUsuario);
 	
 			}
 			if(rs!=null) {
@@ -144,7 +148,7 @@ public class UsuariosDAO {
 	        String hashed = PasswordUtils.hashPassword(user.getClave(), salt);
 
 	        PreparedStatement stmt = conn.prepareStatement(
-	            "INSERT INTO usuario (nombre, apellido, rol, usuario, mail, clave, salt, supervisor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+	            "INSERT INTO usuario (nombre, apellido, rol, usuario, mail, clave, salt, supervisor, cliente) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
 	            PreparedStatement.RETURN_GENERATED_KEYS
 	        );
 
@@ -157,7 +161,8 @@ public class UsuariosDAO {
 	        stmt.setString(7, salt);
 	        if (user.getSupervisor() != null) stmt.setInt(8, user.getSupervisor());
 	        else stmt.setNull(8, java.sql.Types.INTEGER);
-
+	        if (user.getIdCliente() != null) stmt.setInt(8, user.getIdCliente());
+	        else stmt.setNull(9, java.sql.Types.INTEGER);
 	        stmt.executeUpdate();
 	        ResultSet rs = stmt.getGeneratedKeys();
 	        if (rs != null && rs.next()) user.setId(rs.getInt(1));
@@ -175,7 +180,7 @@ public class UsuariosDAO {
 	        String hashed = PasswordUtils.hashPassword(user.getClave(), salt);
 
 	        PreparedStatement stmt = conn.prepareStatement(
-	            "UPDATE usuario SET nombre=?, apellido=?, clave=?, salt=?, usuario=?, rol=?, mail=?, supervisor=? WHERE id=?"
+	            "UPDATE usuario SET nombre=?, apellido=?, clave=?, salt=?, usuario=?, rol=?, mail=?, supervisor=?, cliente=? WHERE id=?"
 	        );
 
 	        stmt.setString(1, user.getNombre());
@@ -187,7 +192,9 @@ public class UsuariosDAO {
 	        stmt.setString(7, user.getMail());
 	        if (user.getSupervisor() != null) stmt.setInt(8, user.getSupervisor());
 	        else stmt.setNull(8, java.sql.Types.INTEGER);
-	        stmt.setInt(9, user.getId());
+	        if (user.getIdCliente() != null) stmt.setInt(8, user.getIdCliente());
+	        else stmt.setNull(9, java.sql.Types.INTEGER);
+	        stmt.setInt(10, user.getId());
 
 	        stmt.executeUpdate();
 	        stmt.close();

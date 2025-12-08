@@ -1,7 +1,5 @@
 package usuarios;
 
-import exceptions.DAOException;
-
 public class Usuario {
 	private int id;
 	private String nombre;
@@ -11,6 +9,15 @@ public class Usuario {
 	private String usuario;
 	private String rol;
 	private Integer supervisor;
+	private Integer idCliente;
+	
+	public Integer getIdCliente() {
+		return idCliente;
+	}
+	public void setIdCliente(Integer idCliente) {
+		this.idCliente = idCliente;
+	}
+
 	private String nombreSupervisor;
 	
 	public int getId() {
@@ -70,7 +77,7 @@ public class Usuario {
 	public Usuario() {
 		super();
 	}
-	public Usuario(int id, String nombre, String apellido, String mail, String clave, String usuario, String rol, Integer supervisor) {
+	public Usuario(int id, String nombre, String apellido, String mail, String clave, String usuario, String rol, Integer supervisor, Integer cliente) {
 		super();
 		this.id = id;
 		this.nombre = nombre;
@@ -80,6 +87,7 @@ public class Usuario {
 		this.usuario = usuario;
 		this.rol = rol;
 		this.supervisor=supervisor;
+		this.idCliente=cliente;
 	}
 	
 	public String getNombreCompleto() {

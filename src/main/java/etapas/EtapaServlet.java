@@ -19,6 +19,7 @@ import categoriaTarea.CategoriaTarea;
 import categoriaTarea.CategoriaTareaDAO;
 import usuarios.Usuario;
 import usuarios.UsuariosDAO;
+import utils.mail.EmailService;
 
 @WebServlet("/EtapaServlet")
 public class EtapaServlet extends HttpServlet {
@@ -28,6 +29,8 @@ public class EtapaServlet extends HttpServlet {
     private TareaDAO tdao;
     private CategoriaTareaDAO cdao;
     private UsuariosDAO udao;
+    private EmailService emailService;
+
 
     @Override
     public void init() {
@@ -36,6 +39,8 @@ public class EtapaServlet extends HttpServlet {
         cdao = new CategoriaTareaDAO();
         tdao=new TareaDAO();
         udao= new UsuariosDAO();
+        
+        this.emailService = (EmailService) getServletContext().getAttribute("emailService");
     }
 
 	private List<CategoriaTarea> cargarCategoriasSeguro(HttpServletRequest request) {
@@ -79,7 +84,7 @@ public class EtapaServlet extends HttpServlet {
             throws ServletException, IOException {
 
         Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
-        if (usuario == null || !("Administrador".equalsIgnoreCase(usuario.getRol()) || "Empleado".equalsIgnoreCase(usuario.getRol()))) {
+        if (usuario == null || !("Administrador".equalsIgnoreCase(usuario.getRol()) || "Empleado".equalsIgnoreCase(usuario.getRol()) || "Cliente".equalsIgnoreCase(usuario.getRol()) )) {
             response.sendRedirect("login.jsp");
             return;
         }
@@ -210,6 +215,8 @@ public class EtapaServlet extends HttpServlet {
                  return;
              }
              break;
+        case "detalleCliente":
+        	destino="proyectos/detalleProyectoCliente.jsp";
         }
 
         // CARGAR ETAPAS DE NUEVO
@@ -331,11 +338,65 @@ public class EtapaServlet extends HttpServlet {
 
         // INSERT O UPDATE
         try {
+        	// DETECTAR SI CAMBIÓ EL ESTADO
+        	String estadoAnterior = null;
+
+        	if (id > 0) {
+        	    try {
+        	        Etapa etapaOriginal = edao.getOne(id);
+        	        estadoAnterior = etapaOriginal.getEstado();
+        	    } catch (DAOException ex) {
+        	        System.out.println("[ERROR] No se pudo obtener etapa original para comparar estado");
+        	    }
+        	}
+
             if (id > 0) {
                 edao.update(eta);
             } else {
                 id=edao.insert(eta);
             }
+            
+            // ENVIO DE MAIL
+            if (id > 0 && estadoAnterior != null && !estadoAnterior.equals(estado)) {
+
+                Proyecto proyectoMail = pdao.getById(idProyecto);
+
+                if (proyectoMail != null && proyectoMail.getCliente() != null) {
+
+                    String mailCliente = proyectoMail.getCliente().getMail();
+                    String nombreCliente = proyectoMail.getCliente().getRazonSocial();
+
+                    String asunto = "Actualización en la etapa del proyecto: " + proyectoMail.getNombre();
+
+                    String cuerpo =
+                    	    "<div style='font-family: Arial, sans-serif; background:#f4f4f4; padding:20px;'>"
+                    	  + "  <div style='max-width:600px; margin:auto; background:#ffffff; padding:20px; border-radius:8px;'>"
+                    	  + "    <h2 style='color:#1a73e8; margin-top:0;'>Actualización en una etapa del proyecto</h2>"
+                    	  + "    <p>Hola <strong>" + nombreCliente + "</strong>,</p>"
+                    	  + "    <p>Queremos informarte que una etapa del proyecto ha sido actualizada.</p>"
+
+                    	  + "    <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;'>"
+
+                    	  + "    <h3 style='color:#444;'>Detalles del proyecto</h3>"
+                    	  + "    <p><strong>Proyecto:</strong> " + proyectoMail.getNombre() + "<br>"
+                    	  + "       <strong>Etapa:</strong> " + eta.getNombre() + "</p>"
+
+                    	  + "    <h3 style='color:#444;'>Cambio de estado</h3>"
+                    	  + "    <p><strong>Estado anterior:</strong> " + estadoAnterior + "<br>"
+                    	  + "       <strong>Nuevo estado:</strong> " + estado + "</p>"
+
+                    	  + "    <p>Podés ver más información ingresando al sistema.</p>"
+                    	  + "  </div>"
+                    	  + "</div>";
+                    try {
+                    	emailService.enviar(mailCliente, asunto, cuerpo);
+			        } catch (Exception ex) {
+			            ex.printStackTrace();
+			            System.out.println("[ERROR] No se pudo enviar mail a " + mailCliente);
+			        }
+                }
+        	}
+            
 	         // ÉXITO: LIMPIAR ERROR
 	            request.getSession().setAttribute("error", null); // o request
 	            request.setAttribute("error", null); // mejor: limpiar del request

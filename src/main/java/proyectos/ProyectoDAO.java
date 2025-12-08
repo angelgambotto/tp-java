@@ -248,6 +248,44 @@ public class ProyectoDAO {
         }
         return lista;
     }
+    
+    public List<Proyecto> getByIdCliente(int idCliente) throws DAOException {
+        String sql = """
+        				SELECT p.* 
+        				FROM proyecto p
+        				WHERE p.idCliente = ?
+        				""";
+        List<Proyecto> lista = new ArrayList<>();
+        try (Connection con = ConexionDB.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idCliente);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+            	Proyecto pro = new Proyecto();
+                pro = new Proyecto();
+                
+                int id = rs.getInt("id");
+                pro.setId(id);
+                pro.setNombre(rs.getString("nombre"));
+                pro.setDescripcion(rs.getString("descripcion"));
+                pro.setEstado(rs.getString("estado"));
+                pro.setFechaCreacion(rs.getDate("fechaCreacion"));
+
+                UsuariosDAO usuarioDAO = new UsuariosDAO();
+                Usuario sup = usuarioDAO.getOne(rs.getInt("idSupervisor"));
+                pro.setSupervisor(sup);
+
+                pro.setUsuarios(new LinkedList<>()); // Si lo cargas lazy, aquí vacío
+
+                EtapaDAO etapaDAO = new EtapaDAO();
+                pro.setEtapas(etapaDAO.getByProyectoIdConTareas(id));
+                lista.add(pro);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Error al obtener los proyectos del empleado: " + idCliente, e);
+        }
+        return lista;
+    }
 
 }
 

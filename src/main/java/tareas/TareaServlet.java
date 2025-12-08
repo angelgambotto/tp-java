@@ -1,5 +1,6 @@
 package tareas;
 import usuarios.UsuariosDAO;
+import utils.mail.EmailService;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,6 +41,8 @@ public class TareaServlet extends HttpServlet {
     private ProyectoDAO pdao;
     private ComentarioDAO comdao;
     private HoraTrabajadaDAO htdao;
+    private EmailService emailService;
+
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -56,6 +59,8 @@ public class TareaServlet extends HttpServlet {
         pdao = new ProyectoDAO();
         comdao = new ComentarioDAO();
         htdao = new HoraTrabajadaDAO();
+        
+        this.emailService = (EmailService) getServletContext().getAttribute("emailService");
     }
     
      List<Tarea> tareas;
@@ -161,7 +166,7 @@ public class TareaServlet extends HttpServlet {
             	ex.printStackTrace();
             	request.setAttribute("error", "error al obtener estado de etapa por tarea con id: "+idTarea);
             }
-            
+            List<Usuario> usuariosAsignados = tdao.getUsuariosAsignados(idTarea);
             request.setAttribute("tarea", tarea);
             request.setAttribute("etapa", eta);
             request.setAttribute("EtapaFinalizada", estadoEtapa.equals("Done"));
@@ -356,6 +361,41 @@ public class TareaServlet extends HttpServlet {
 	        
 	        tdao.update(tarea, usuariosSeleccionados);
 
+	        for (Integer idUser : usuariosSeleccionados) {
+                Usuario u = udao.getOne(idUser);
+
+                if (u != null) {
+                	String asunto = "Actualización en la tarea: " + tarea.getNombre();
+
+                	String cuerpo =
+                		    "<div style='font-family: Arial, sans-serif; background:#f4f4f4; padding:20px;'>"
+                		  + "  <div style='max-width:600px; margin:auto; background:#ffffff; padding:20px; border-radius:8px;'>"
+                		  + "    <h2 style='color:#1a73e8;'>Actualización en una tarea</h2>"
+                		  + "    <p>Hola <strong>" + u.getNombreCompleto() + "</strong>,</p>"
+                		  + "    <p>Una tarea en la que estás asignado ha sido modificada.</p>"
+
+                		  + "    <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;'>"
+
+                		  + "    <h3 style='color:#444;'>Detalles actualizados</h3>"
+                		  + "    <p><strong>Nombre:</strong> " + tarea.getNombre() + "<br>"
+                		  + "       <strong>Descripción:</strong> " + tarea.getDescripcion() + "<br>"
+                		  + "       <strong>Estado:</strong> " + tarea.getEstado() + "<br>"
+                		  + "       <strong>Inicio:</strong> " + tarea.getFechaInicio() + "<br>"
+                		  + "       <strong>Fin:</strong> " + tarea.getFechaFin() + "</p>"
+
+                		  + "    <p>Ingresá al sistema para revisar los cambios.</p>"
+                		  + "  </div>"
+                		  + "</div>";
+
+                    try {
+                        emailService.enviar(u.getMail(), asunto, cuerpo);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        System.out.println("[ERROR] No se envió mail a " + u.getMail());
+                    }
+                }
+            }
+
 	       
 	        response.sendRedirect("TareaServlet?action=detalle&idTarea="+tarea.getId()+"&idEtapa=" + tarea.getIdEtapa());
 
@@ -379,6 +419,43 @@ public class TareaServlet extends HttpServlet {
             }
 
             tdao.asignarEmpleados(id, usuariosSeleccionados);
+            
+         // =============== ENVÍO DE MAIL ===============
+
+            for (Integer idUser : usuariosSeleccionados) {
+                Usuario u = udao.getOne(idUser);
+
+                if (u != null) {
+                	String asunto = "Nueva tarea asignada: " + tarea.getNombre();
+
+                	String cuerpo =
+                		    "<div style='font-family: Arial, sans-serif; background:#f4f4f4; padding:20px;'>"
+                		  + "  <div style='max-width:600px; margin:auto; background:#ffffff; padding:20px; border-radius:8px;'>"
+                		  + "    <h2 style='color:#1a73e8;'>Nueva tarea asignada</h2>"
+                		  + "    <p>Hola <strong>" + u.getNombreCompleto() + "</strong>,</p>"
+                		  + "    <p>Se te ha asignado una nueva tarea.</p>"
+
+                		  + "    <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;'>"
+
+                		  + "    <h3 style='color:#444;'>Detalles de la tarea</h3>"
+                		  + "    <p><strong>Tarea:</strong> " + tarea.getNombre() + "<br>"
+                		  + "       <strong>Descripción:</strong> " + tarea.getDescripcion() + "<br>"
+                		  + "       <strong>Fecha inicio:</strong> " + tarea.getFechaInicio() + "<br>"
+                		  + "       <strong>Fecha fin:</strong> " + tarea.getFechaFin() + "</p>"
+
+                		  + "    <p>Ingresá al sistema para revisarla.</p>"
+                		  + "  </div>"
+                		  + "</div>";
+
+                    try {
+                        emailService.enviar(u.getMail(), asunto, cuerpo);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        System.out.println("[ERROR] No se envió mail a " + u.getMail());
+                    }
+                }
+            }
+
 
             response.sendRedirect("TareaServlet?action=detalle&idEtapa=" + tarea.getIdEtapa() + "&idTarea=" + tarea.getId());
 
