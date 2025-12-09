@@ -60,10 +60,16 @@ public class ProyectoServlet extends HttpServlet {
 	        return new ArrayList<>();
 	    }
 	}
+	
 	//metodo para cargar los proyectos y no tener problemas con el bloque try catch
 	private List<Proyecto> cargarProyectosSeguro(HttpServletRequest request) {
 	    try {
-	        return dao.getAll();
+	    	List<Proyecto> p = dao.getAll();
+	    	for (Proyecto pro: p) {
+	    		List<Usuario> u = dao.getUsuariosAsignados(pro.getId());
+	    		pro.setUsuarios(u);
+	    	}
+	    	return p;
 	    } catch (DAOException e) {
 	        request.setAttribute("error", "No se pudieron cargar los proyectos: " + e.getMessage());
 	        return new ArrayList<>();

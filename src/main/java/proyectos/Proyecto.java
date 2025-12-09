@@ -16,7 +16,7 @@ public class Proyecto {
 	private Cliente cliente;
 	private Date fechaCreacion;
 	private Usuario supervisor;
-	private LinkedList<Usuario> usuarios;
+	private List<Usuario> usuarios;
 	private List<Etapa> etapas;
 	
 	
@@ -62,10 +62,10 @@ public class Proyecto {
 	public void setSupervisor(Usuario supervisor) {
 		this.supervisor = supervisor;
 	}
-	public LinkedList<Usuario> getUsuarios() {
+	public List<Usuario> getUsuarios() {
 		return usuarios;
 	}
-	public void setUsuarios(LinkedList<Usuario> usuarios) {
+	public void setUsuarios(List<Usuario> usuarios) {
 		this.usuarios = usuarios;
 	}
 	public Proyecto() {
