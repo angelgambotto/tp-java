@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import proyectos.Proyecto;
 import proyectos.ProyectoDAO;
+import tareas.Tarea;
 import tareas.TareaDAO;
 import categoriaTarea.CategoriaTarea;
 import categoriaTarea.CategoriaTareaDAO;
@@ -180,39 +181,50 @@ public class EtapaServlet extends HttpServlet {
             		 request.setAttribute("error",e.getMessage());
             	 }
              Etapa etapa = cargarEtaSeguro(request, editId);
-             estadoProyecto=proyecto.getEstado();
-             request.setAttribute("ProyectoFinalizado", estadoProyecto.equals("Done"));
+             List<Tarea> tareas=new ArrayList<>();
+             List<CategoriaTarea> cat=new ArrayList<>();
+             int idP=etapa.getIdProyecto();
+             Proyecto p=new Proyecto();
+             try {
+             tareas=tdao.getByEtapaId(etapa.getId());
+             cat=cdao.getAll();
+             p=pdao.getById(idP);
+             }
+             catch(DAOException e) {
+            	 request.setAttribute("error", e.getMessage());
+             }
+             request.setAttribute("ProyectoFinalizado", p.getEstado().equals("Done"));
              request.setAttribute("id", etapa.getId());
+             request.setAttribute("etapa", etapa);
+             request.setAttribute("idProyecto",p.getId());
              request.setAttribute("nombre", etapa.getNombre());
+             request.setAttribute("fechaInicio", etapa.getFechaInicio());
+             request.setAttribute("fechaTentativa", etapa.getFechaTentativa());
+             request.setAttribute("fechaFin", etapa.getFechaFin());
              request.setAttribute("descripcion", etapa.getDescripcion());
-             request.setAttribute("estado", etapa.getEstado());
-             if (etapa.getFechaInicio() != null) {
-                 request.setAttribute("fechaInicio", sdf.format(etapa.getFechaInicio()));
-             } else {
-                 request.setAttribute("fechaInicio", ""); 
-             }
-             if (etapa.getFechaTentativa() != null) {
-                 request.setAttribute("fechaTentativa", sdf.format(etapa.getFechaTentativa()));
-             }
-             if (etapa.getFechaFin() != null) {
-                 request.setAttribute("fechaFin", sdf.format(etapa.getFechaFin()));
-             }
+             request.setAttribute("estado",etapa.getEstado());
+             request.setAttribute("tareas", tareas);
+             request.setAttribute("categorias", cat);
              request.setAttribute("abrirModal", true);
-             
+             destino="etapas/unaEtapa.jsp";
              break;
              
         case "delete":
+        
         	 int deleteId = Integer.parseInt(request.getParameter("id"));
+        		System.out.println("el id a eliminar es :"+deleteId);
              Etapa eta = cargarEtaSeguro(request, deleteId);
              request.setAttribute("etapa", eta);
              
              // ESTO HABRIA QUE PASARLO AL DOPOST SI QUEREMOS CONFIRMACION
              try {
                  edao.delete(deleteId);
+                 
              } catch (DAOException e) {
                  request.setAttribute("error", e.getMessage());
-                 request.getRequestDispatcher("etapas/listado.jsp").forward(request, response);
-                 return;
+                 System.out.println("no me puedo borrar por"+ e.getMessage());
+                 
+                 
              }
              break;
         case "detalleCliente":
@@ -220,15 +232,15 @@ public class EtapaServlet extends HttpServlet {
         }
 
         // CARGAR ETAPAS DE NUEVO
-        
-        request.setAttribute("etapas", cargarEtapasSeguro(request));
+        System.out.println("las etapas son: "+etapas);
+        //request.setAttribute("etapas", cargarEtapasSeguro(request));
         request.getRequestDispatcher(destino).forward(request, response);
     }
 
     // DO POST 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-
+    	System.out.println("pase por el doPost");
         Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
         if (usuario == null || !"Administrador".equalsIgnoreCase(usuario.getRol())) {
             response.sendRedirect("login.jsp");
@@ -236,8 +248,9 @@ public class EtapaServlet extends HttpServlet {
         }
 
         String idStr = request.getParameter("id");
-
+        System.out.println("idString "+idStr);
         int id = (idStr == null || idStr.isEmpty() || idStr.equals("null")) ? 0 : Integer.parseInt(idStr);
+        List<Tarea> tareas=new ArrayList<>();
         
         boolean tienePendientes;
         
@@ -251,6 +264,7 @@ public class EtapaServlet extends HttpServlet {
      // --- VALIDAR idProyecto ---
         int idProyecto = 0;
         String idProyectoParam = request.getParameter("idProyecto");
+        System.out.println("idProyectoparam"+idProyectoParam);
         if (idProyectoParam == null || idProyectoParam.trim().isEmpty()) {
             request.setAttribute("error", "Falta idProyecto");
             request.setAttribute("idProyecto", 0);
@@ -409,6 +423,17 @@ public class EtapaServlet extends HttpServlet {
             request.setAttribute("error", e.getMessage());
             request.setAttribute("idProyecto", idProyecto);
             request.setAttribute("action", "view");
+            request.setAttribute("etapa", eta);
+            request.setAttribute("id", eta.getId());
+            try {
+                tareas=tdao.getByEtapaId(id);
+                System.out.println("las tareas son (en el try):"+tareas);}
+                catch(DAOException ex) {
+                	request.setAttribute("error", ex.getMessage());
+                };
+            request.setAttribute("tareas", tareas);
+            request.setAttribute("destino", "etapas/unaEtapa.jsp");
+            System.out.println("pase por aca");
             doGet(request, response); 
             return;
         }

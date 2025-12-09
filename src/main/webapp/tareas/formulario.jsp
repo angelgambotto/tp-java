@@ -14,7 +14,7 @@
 %>
 
 <div id="modalFormTarea"
-     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 <%= (request.getAttribute("abrirModalTarea") != null) ? "" : "hidden" %>">
 
     <div class="bg-white rounded-lg shadow-lg  w-full max-w-2xl max-h-[90vh] flex flex-col p-6	">
 
@@ -95,28 +95,14 @@ if (tarea != null) {
 
         
 
-        <% if (usuarios != null) {
-            for (Usuario u : usuarios) {
-                boolean seleccionado = usuariosAsignados != null &&
-                        usuariosAsignados.stream().anyMatch(us -> us.getId() == u.getId());
-        %>
-
-            
-                <input type="hidden"
-                       name="usuarios"
-                       value="<%= u.getId() %>"
-                       <%= seleccionado ? "checked" : "" %>
-                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                
-
-        <% } } %>
+        
     
             <div class="flex justify-end space-x-4">
                 <button type="button"
         class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-lg"
         data-id-etapa="<%= idEtapa %>"
         data-id-tarea="<%= (tarea!=null)?tarea.getId():"" %>"
-        id="btnCancelarModal">
+        onclick="toggleModal('modalFormTarea')">
     Cancelar
 </button>
 
@@ -129,16 +115,3 @@ if (tarea != null) {
         </form>
     </div>
 </div>
- <script>
- console.log("Script cargado correctamente");
- document.getElementById("btnCancelarModal").addEventListener("click", function() {
-	    const idEtapa = this.dataset.idEtapa;
-	    const idTarea = this.dataset.idTarea;
-	    console.log("idEtapa:", idEtapa, "idTarea:", idTarea);
-	    document.getElementById("modalFormTarea").classList.add("hidden");
-	    window.location.href = `TareaServlet?action=list&idEtapa=${idEtapa}`;
-	    
-
-	});
-
-</script>
