@@ -51,7 +51,8 @@
             <div>
                 <label class="block font-medium">Descripción:</label>
                 <input type="text" name="descripcion" 
-                value=<%= request.getAttribute("descripcion") %>
+                value="<%= request.getAttribute("descripcion") != null ? request.getAttribute("descripcion") : "" %>
+                "
                        required
                        class="w-full border border-gray-300 rounded px-3 py-2"/>
             </div>

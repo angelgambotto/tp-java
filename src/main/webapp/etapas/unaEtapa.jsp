@@ -489,7 +489,12 @@ function toggleModal(modalId) {
     const modal = document.getElementById(modalId);
     modal.classList.toggle("hidden");
 }
+<% if (request.getAttribute("abrirModal") != null) { %>
+document.addEventListener("DOMContentLoaded", function() {
 
+    document.getElementById("modalFormTarea").classList.remove("hidden");
+});
+<% } %>
 function cambiarVista(vista) {
     const vistaTabla = document.getElementById('vistaTabla');
     const vistaKanban = document.getElementById('vistaKanban');
@@ -543,9 +548,7 @@ function filtrarTareas() {
     }
 }
 
-<% if (request.getAttribute("abrirModal") != null) { %>
-    window.onload = () => toggleModal("modalFormTarea");
-<% } %>
+
 </script>
 
 </body>

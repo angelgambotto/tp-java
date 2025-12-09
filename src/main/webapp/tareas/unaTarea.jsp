@@ -604,7 +604,7 @@ window.onclick = function(event) {
         }
     });
 }
-<% if (request.getAttribute("abrirModalTarea") != null) { %>
+<% if (request.getAttribute("abrirModal") != null) { %>
 window.onload = () => toggleModal("modalFormTarea");
 <% } %>
 </script>

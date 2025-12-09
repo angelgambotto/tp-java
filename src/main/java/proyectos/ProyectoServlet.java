@@ -1,4 +1,4 @@
-package proyectos;
+		package proyectos;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

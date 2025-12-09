@@ -183,10 +183,10 @@
 </div>
 
 <jsp:include page="formulario.jsp" />
-<<<<<<< HEAD
 
-=======
->>>>>>> 2531eddb660f058cf7da72333808b969186ac37b
+
+
+
 <!-- MENSAJE FLOTANTE (éxito/error) -->
 <div id="mensaje" class="hidden fixed top-4 right-4 z-50 max-w-md">
     <div id="mensajeContenido" class="px-6 py-4 rounded-lg shadow-lg text-white flex items-center justify-between">

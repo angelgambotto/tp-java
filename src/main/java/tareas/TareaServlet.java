@@ -126,8 +126,9 @@ public class TareaServlet extends HttpServlet {
         	String estadoEtapa=edao.getOne(idEtapa).getEstado();
 
         	
-            List<Usuario> usuariosDisponibles = udao.getAll();
+            List<Usuario> usuariosDisponibles  = udao.getAll();
             List<CategoriaTarea> categorias = cdao.getAll();
+          
             int idEt=Integer.parseInt(request.getParameter("idEtapa"));
         	List<Tarea> tar=tdao.getByEtapaId(idEt);
         	request.setAttribute("tareas", tar);
@@ -137,6 +138,7 @@ public class TareaServlet extends HttpServlet {
         		request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);;
         		}
         	request.setAttribute("etapa", et);
+        	
         	request.setAttribute("EtapaFinalizada", estadoEtapa.equals("Done"));
             request.setAttribute("usuarios", usuariosDisponibles);
             request.setAttribute("categorias", categorias);
@@ -169,9 +171,9 @@ public class TareaServlet extends HttpServlet {
             List<Usuario> usuariosAsignados = tdao.getUsuariosAsignados(idTarea);
             request.setAttribute("tarea", tarea);
             request.setAttribute("etapa", eta);
+            request.setAttribute("usuariosAsignados", usuariosAsignados);
             request.setAttribute("EtapaFinalizada", estadoEtapa.equals("Done"));
             request.setAttribute("usuarios", usuariosDisponibles);
-          
             request.setAttribute("categorias", categorias); 
             request.setAttribute("idEtapa", idEtapa);
             request.setAttribute("abrirModal", true); 
@@ -329,7 +331,47 @@ public class TareaServlet extends HttpServlet {
 		}
 		
 			System.out.println(ids);
+
 			Integer idTarea=tdao.insert(tarea, ids);
+			
+
+		
+			// ===================== ENVÍO DE MAIL =====================
+			for (Integer idUser : ids) {
+			    Usuario u = udao.getOne(idUser);
+
+			    if (u != null) {
+			    	String asunto = "Nueva tarea asignada: " + tarea.getNombre();
+
+			    	String cuerpo =
+			    		    "<div style='font-family: Arial, sans-serif; background:#f4f4f4; padding:20px;'>"
+			    		  + "  <div style='max-width:600px; margin:auto; background:#ffffff; padding:20px; border-radius:8px;'>"
+			    		  + "    <h2 style='color:#1a73e8;'>Nueva tarea asignada</h2>"
+			    		  + "    <p>Hola <strong>" + u.getNombreCompleto() + "</strong>,</p>"
+			    		  + "    <p>Se te ha asignado una nueva tarea.</p>"
+
+			    		  + "    <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;'>"
+
+			    		  + "    <h3 style='color:#444;'>Detalles de la tarea</h3>"
+			    		  + "    <p><strong>Tarea:</strong> " + tarea.getNombre() + "<br>"
+			    		  + "       <strong>Descripción:</strong> " + tarea.getDescripcion() + "<br>"
+			    		  + "       <strong>Fecha inicio:</strong> " + tarea.getFechaInicio() + "<br>"
+			    		  + "       <strong>Fecha fin:</strong> " + tarea.getFechaFin() + "</p>"
+
+			    		  + "    <p>Ingresá al sistema para revisarla.</p>"
+			    		  + "  </div>"
+			    		  + "</div>";
+
+
+			        try {
+			            emailService.enviar(u.getMail(), asunto, cuerpo);
+			        } catch (Exception ex) {
+			            ex.printStackTrace();
+			            System.out.println("[ERROR] No se pudo enviar mail a " + u.getMail());
+			        }
+			    }
+			}
+
 			response.sendRedirect("TareaServlet?action=detalle&idTarea="+idTarea+"&idEtapa=" + tarea.getIdEtapa());
 		}
 		catch(DAOException e) {
