@@ -29,6 +29,7 @@
 
 <%
     Etapa etapa = (Etapa) request.getAttribute("etapa");
+	System.out.println("la etapa que se recibe en unaEtapa es :  "+ etapa);
     List<Tarea> tareas = (List<Tarea>) request.getAttribute("tareas");
     List<CategoriaTarea> categorias = (List<CategoriaTarea>) request.getAttribute("categorias");
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -125,7 +126,7 @@
     </svg>
     Nueva Tarea
 </button>
-                    <button onclick="window.location.href='EtapaServlet?action=edit&id=<%= etapa.getId() %>&idProyecto=<%= etapa.getIdProyecto() %>'" 
+                    <button onclick="window.location.href='EtapaServlet?action=edit&id=<%= etapa.getId() %>'" 
                             class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center">
                         <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -482,6 +483,7 @@
     </div>
 </div>
 
+<jsp:include page="../etapas/formulario.jsp" />
 <jsp:include page="../tareas/formulario.jsp" />
 
 <script>
@@ -489,7 +491,7 @@ function toggleModal(modalId) {
     const modal = document.getElementById(modalId);
     modal.classList.toggle("hidden");
 }
-<% if (request.getAttribute("abrirModal") != null) { %>
+<% if (request.getAttribute("abrirModalTarea") != null) { %>
 document.addEventListener("DOMContentLoaded", function() {
 
     document.getElementById("modalFormTarea").classList.remove("hidden");

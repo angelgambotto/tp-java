@@ -15,6 +15,7 @@ import horasReporte.HorasReporte;
 import horasReporte.HorasReporteDAO;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -208,7 +209,7 @@ public class HoraTrabajadaServlet extends HttpServlet {
     	int cantidad = Integer.parseInt(request.getParameter("cantidad"));
     	String detalle = request.getParameter("detalle");
     	String fechaStr = request.getParameter("fecha");
-    	 
+    	System.out.println("idTarea"+idTarea+"idEmpleado"+idEmpleado);
          Date fecha = null;
          try {
              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
@@ -224,6 +225,7 @@ public class HoraTrabajadaServlet extends HttpServlet {
     	
     	switch(action) {
     	case "new":
+    		System.out.println("estuve aqui");
     		HoraTrabajada hora = new HoraTrabajada();
     		hora.setIdTarea(idTarea);
     		hora.setIdEmpleado(idEmpleado);
@@ -233,6 +235,8 @@ public class HoraTrabajadaServlet extends HttpServlet {
     		try {
 				hdao.insert(hora);
 			} catch (DAOException e) {
+				
+				System.out.println("el error es:" +e.getMessage());
 				request.setAttribute("error", e);
 			}
     		

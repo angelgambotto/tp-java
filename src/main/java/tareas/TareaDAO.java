@@ -20,23 +20,19 @@ import utils.ConexionDB;
 
 public class TareaDAO {
 
-	public Integer insert(Tarea tarea, List<Integer> usuarios) throws DAOException {
+	public Integer insert(Tarea tarea) throws DAOException {
 	    String sql = "INSERT INTO tarea (nombre, descripcion, estado, fechaInicio, fechaFin, idEtapa, idCategoria) VALUES (?,?,?,?,?,?,?)";
-	    String sql2 = "INSERT INTO tarea_usuario (idTarea, idEmpleado) VALUES (?,?)";
+	    
 	    
 	    Connection con = null;
 	    PreparedStatement ps = null;
-	    PreparedStatement ps2 = null;
+	    
 	    ResultSet rs = null;
 	    Integer id=null;
 	    try {
 	        con = ConexionDB.getConexion();
 	        con.setAutoCommit(false);
 	        
-	        System.out.println("===== INSERTANDO RELACIONES =====");
-	        System.out.println("Lista usuarios antes del if: " + usuarios);
-	        
-	       
 	        ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 	        ps.setString(1, tarea.getNombre());
 	        ps.setString(2, tarea.getDescripcion());
@@ -56,14 +52,7 @@ public class TareaDAO {
 	        }
 	        
 	 
-	        ps2 = con.prepareStatement(sql2);
-	        for (Integer idUsuario : usuarios) {
-	            System.out.println("El id de la tarea es: " + tarea.getId());
-	            System.out.println("El id del usuario es: " + idUsuario);
-	            ps2.setInt(1, tarea.getId());
-	            ps2.setInt(2, idUsuario);
-	            ps2.executeUpdate();
-	        }
+	       
 	        
 	        
 	        con.commit();
@@ -87,7 +76,7 @@ public class TareaDAO {
 	        try {
 	            if (rs != null) rs.close();
 	            if (ps != null) ps.close();
-	            if (ps2 != null) ps2.close();
+	            
 	            if (con != null) {
 	                con.setAutoCommit(true);
 	                con.close();
@@ -98,12 +87,10 @@ public class TareaDAO {
 	    }
 	}
 	 
-	 public void update(Tarea tarea, List<Integer> usuariosSeleccionados) throws DAOException {
+	 public void update(Tarea tarea) throws DAOException {
 
 		    String sqlUpdate = "UPDATE tarea SET nombre=?, descripcion=?, fechaInicio=?, fechaFin=?, idCategoria=?,estado=? WHERE id=?";
-		    String sqlUsuariosActuales = "SELECT idEmpleado FROM tarea_usuario WHERE idTarea=?";
-		    String sqlInsertUsuario = "INSERT INTO tarea_usuario (idTarea, idEmpleado) VALUES (?, ?)";
-		    String sqlDeleteUsuario = "DELETE FROM tarea_usuario WHERE idTarea=? AND idEmpleado=?";
+		    
 
 		    try {
 		        Connection con=ConexionDB.getConexion();
@@ -116,33 +103,7 @@ public class TareaDAO {
 		        ps.setString(6, tarea.getEstado());
 		        ps.setInt(7, tarea.getId());
 		        ps.executeUpdate();
-		        PreparedStatement psUsuariosAct = con.prepareStatement(sqlUsuariosActuales);
-		        psUsuariosAct.setInt(1, tarea.getId());
-		        ResultSet rs = psUsuariosAct.executeQuery();
-		        List<Integer> usuariosActualesBD = new ArrayList<>();
-
-		        while (rs.next()) {
-		            usuariosActualesBD.add(rs.getInt(1));
-		        }
-
-		       
-		        PreparedStatement psInsert = con.prepareStatement(sqlInsertUsuario);
-		        for (Integer u : usuariosSeleccionados) {
-		            if (!usuariosActualesBD.contains(u)) {
-		                psInsert.setInt(1, tarea.getId());
-		                psInsert.setInt(2, u);
-		                psInsert.executeUpdate();
-		            }
-		        }
-		       
-		        PreparedStatement psDelete = con.prepareStatement(sqlDeleteUsuario);
-		        for (Integer u : usuariosActualesBD) {
-		            if (!usuariosSeleccionados.contains(u)) {
-		                psDelete.setInt(1, tarea.getId());
-		                psDelete.setInt(2, u);
-		                psDelete.executeUpdate();
-		            }
-		        }
+		        
 
 		    } catch (SQLException e) {
 		        throw new DAOException("Error actualizando tarea", e);

@@ -30,6 +30,7 @@
     //LinkedList<Usuario> supervisores = (LinkedList<Usuario>) request.getAttribute("supervisores");
     //List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");  // <-- CAMBIO AQUÍ: List en vez de LinkedList
 	Integer idEtapa=(Integer) request.getAttribute("id");
+    Integer idProyecto=(Integer) request.getAttribute("idProyecto");
 %>
 <div id="insert-update" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %>">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
@@ -37,8 +38,8 @@
       <%= (idEtapa == null || idEtapa == 0) ? "Agregar Etapa" : "Editar Etapa" %>
         </h2>
         <form action="EtapaServlet" method="post" class="space-y-4">
-            <input type="hidden" name="id" value="${id}" />
-            <input type="hidden" name="idProyecto" value="${idProyecto}" />
+            <input type="hidden" name="id" value="<%=idEtapa%>" />
+            <input type="hidden" name="idProyecto" value="<%=idProyecto%>" />
 
             <div>
                 <label class="block font-medium">Nombre:</label>
