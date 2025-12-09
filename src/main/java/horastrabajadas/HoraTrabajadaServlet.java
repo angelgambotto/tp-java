@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import comentarios.ComentarioDAO;
 import etapas.Etapa;
 import etapas.EtapaDAO;
 import exceptions.DAOException;
@@ -38,6 +39,7 @@ public class HoraTrabajadaServlet extends HttpServlet {
 	private EtapaDAO edao;
 	private UsuariosDAO udao;
 	private HorasReporteDAO rdao;
+	private ComentarioDAO cdao;
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
        
 	
@@ -48,6 +50,7 @@ public class HoraTrabajadaServlet extends HttpServlet {
 		hdao = new HoraTrabajadaDAO();
 		udao = new UsuariosDAO();
 		rdao = new HorasReporteDAO();
+		cdao = new ComentarioDAO();
 	}
 
 	/**
@@ -79,6 +82,34 @@ public class HoraTrabajadaServlet extends HttpServlet {
             request.setAttribute("error", "Error al cargar tareas: " + e.getMessage());
         }
     }
+    
+    private void cargarDatosUnaTarea(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	try {
+    		//1. OBTENER TAREA
+    		int idTarea = request.getParameter("idTarea") == null || request.getParameter("idTarea").isEmpty()
+                    ? 0 : Integer.parseInt(request.getParameter("idTarea"));
+    		request.setAttribute("tarea", tdao.getOne(idTarea));
+    		
+    		//2. OBTENER HORAS
+    		request.setAttribute("horas", hdao.getAllByIdTarea(idTarea));
+    		
+    		//3. OBTENER COMENTARIOS
+    		request.setAttribute("comentarios", cdao.getAllByIdTarea(idTarea));
+    		
+    		//4. OBTENER EMPLEADOS ASIGNADOS
+    		request.setAttribute("empleadosAsignados", tdao.getUsuariosAsignados(idTarea));
+    		
+    		//5. OBTENER EMPLEADOS DISPONIBLES
+    		int idEtapa =  (tdao.getOne(idTarea)).getIdEtapa();
+    		Etapa etapa = edao.getOne(idEtapa);
+    		int idProyecto = etapa.getIdProyecto();
+    		request.setAttribute("empleadosDisponibles", pdao.getUsuariosAsignados(idProyecto));
+    		
+    	} catch(DAOException e) {
+    		request.setAttribute("error", "Error al cargar los datos para UnaTarea: " + e.getMessage());
+    	}
+    }
+    
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		System.out.println("ACTION = " + request.getParameter("action")+" en GET");
 		//Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
@@ -91,18 +122,25 @@ public class HoraTrabajadaServlet extends HttpServlet {
 			try {
 	            int idTarea = Integer.parseInt(request.getParameter("idTarea"));
 	            int idEmpleado = Integer.parseInt(request.getParameter("idEmpleado"));
-
+	            String origin = request.getParameter("origin");
 	            // Setear atributos para el modal
 	            request.setAttribute("idTarea", idTarea);
 	            request.setAttribute("idEmpleado", idEmpleado);
-	            request.setAttribute("abrirModal", true);
+	            request.setAttribute("abrirModalHoras", true);
+	            request.setAttribute("origin", origin);
 
-	            // OBTENER DATOS DE NUEVO (tareas, proyectos, usuario)
-	            // (puedes tener un método que cargue todo)
-	            cargarDatosMisTareas(request, response);
 
-	            // FORWARD A LA MISMA PÁGINA
-	            request.getRequestDispatcher("/tareas/mis-tareas.jsp").forward(request, response);
+	            if(origin.equals("unaTarea")) {
+	            	cargarDatosUnaTarea(request, response);
+	            	request.getRequestDispatcher("/tareas/unaTarea.jsp").forward(request, response);
+	            } else {
+	            	
+	            	// OBTENER DATOS DE NUEVO (tareas, proyectos, usuario)
+	            	// (puedes tener un método que cargue todo)
+	            	cargarDatosMisTareas(request, response);
+	            	// FORWARD A LA MISMA PÁGINA
+	            	request.getRequestDispatcher("/tareas/mis-tareas.jsp").forward(request, response);
+	            }
 	         // VOLVEMOS A LA PÁGINA ANTERIOR (la que el usuario tenía abierta)
 	            //response.sendRedirect(request.getHeader("Referer")); NO FUNCIONA ME INHABILITA LA CARGA
 	            return;
@@ -242,18 +280,18 @@ public class HoraTrabajadaServlet extends HttpServlet {
     		
     	}
     	
-    	String returnUrl = request.getParameter("returnUrl");
-        if (returnUrl != null && !returnUrl.isEmpty() && returnUrl.contains("TareaServlet")) {
-            response.sendRedirect(returnUrl);
-        } else {
-            // fallback por si acaso
-            response.sendRedirect("TareaServlet?action=mis-tareas");
+    	String origin = request.getParameter("origin");
+        
+        if ("unaTarea".equals(origin)) {
+            // Recargamos los datos de la tarea individual
+           cargarDatosUnaTarea(request, response);
+           request.getRequestDispatcher("/tareas/unaTarea.jsp").forward(request, response);
+            
+        } else { 
+            cargarDatosMisTareas(request, response);
+            request.getRequestDispatcher("/tareas/mis-tareas.jsp").forward(request, response);
         }
-    	// OBTENER DATOS DE NUEVO (tareas, proyectos, usuario)
-        // (puedes tener un método que cargue todo)
-        //cargarDatosMisTareas(request, response);
-        //response.sendRedirect("TareaServlet?action=detalle&idTarea=" + idTarea);
-        //request.getRequestDispatcher("/tareas/mis-tareas.jsp").forward(request, response);
+        
         return;
 	}
 

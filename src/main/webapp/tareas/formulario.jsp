@@ -23,7 +23,7 @@
         </h2>
 
        <form action="TareaServlet" method="post" class="overflow-y-auto flex-1 space-y-4 pr-2">
-
+			<input type="hidden" name="origin" value="${param.origin}">
             <input type="hidden" name="action" value="<%= tarea == null ? "insert" : "update" %>">
             <input type="hidden" name="idEtapa"
                    value="<%= idEtapa != null ? idEtapa : (tarea != null ? tarea.getIdEtapa() : "") %>">

@@ -103,7 +103,7 @@
 
                             <!-- ACCIONES -->
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="HoraTrabajadaServlet?action=new&idTarea=<%= t.getId() %>&idEmpleado=<%= usuario.getId() %>"
+                                <a href="HoraTrabajadaServlet?action=new&idTarea=<%= t.getId() %>&idEmpleado=<%= usuario.getId() %>&origin=mis-tareas"
                                    class="text-indigo-600 hover:text-indigo-900">
                                     Agregar horas
                                 </a>

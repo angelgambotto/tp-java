@@ -1,9 +1,7 @@
 package tareas;
 import usuarios.UsuariosDAO;
 import utils.mail.EmailService;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.sql.Date;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -14,10 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import proyectos.Proyecto;
 import proyectos.ProyectoDAO;
 import usuarios.Usuario;
-
 import java.io.IOException;
-import java.time.LocalDate;
-
 import etapas.Etapa;
 import etapas.EtapaDAO;
 import exceptions.DAOException;
@@ -112,7 +107,6 @@ public class TareaServlet extends HttpServlet {
         	List<Tarea> tareas=tdao.getByEtapaId(idEtapa);
        
         	categorias=cdao.getAll();
-        	System.out.println("categorias"+categorias);
         	
         	Etapa e=edao.getOne(idEtapa);
         	request.setAttribute("categorias", categorias);
@@ -254,16 +248,6 @@ public class TareaServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		
-		// DESPUES VER DE NO PERMITIRLE CIERTAS COSAS AL EMPLEADO
-		/*Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
-	    if (usuario == null || !"administrador".equalsIgnoreCase(usuario.getRol())) {
-	        response.sendRedirect("TareaServlet"); // o "mis-tareas"
-		
-	        response.sendRedirect("TareaServlet?action=mis-tareas");
-	        return;
-	    }*/
 		
 		String action=request.getParameter("action");
 		switch(action) {
