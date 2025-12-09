@@ -13,12 +13,13 @@
 Integer idEmpleadoObj = (Integer) request.getAttribute("idEmpleado");
 int idTarea = (idTareaObj != null) ? idTareaObj : 0;
 int idEmpleado = (idEmpleadoObj != null) ? idEmpleadoObj : 0;
+String origin = (String) request.getAttribute("origin");
 
 %>
 </head>
 <body>
 
-<div id="insert" class="fixed inset-0 bg-gray-900 bg-opacity-50 <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %> flex items-center justify-center">
+<div id="insert" class="fixed inset-0 bg-gray-900 bg-opacity-50 <%= (request.getAttribute("abrirModalHoras") != null) ? "" : "hidden" %> flex items-center justify-center">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
         <h2 class="text-2xl font-bold mb-4">Agregar horas trabajadas</h2>
         <form action="HoraTrabajadaServlet" method="post" class="space-y-4">
@@ -26,6 +27,7 @@ int idEmpleado = (idEmpleadoObj != null) ? idEmpleadoObj : 0;
             <input type="hidden" name="idEmpleado" value="<%= idEmpleado != 0 ? idEmpleado : 0 %>" />
             <input type="hidden" name="action" value="new"/>
 			<input type="hidden" name="returnUrl" value="<%= request.getHeader("Referer") %>">
+			<input type="hidden" name="origin" value="<%= origin %>">
              <div>
                 <label class="block font-medium">Fecha:</label>
                 <input type="datetime-local" 
@@ -33,7 +35,13 @@ int idEmpleado = (idEmpleadoObj != null) ? idEmpleadoObj : 0;
 				       required
 				       class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100" />
 		     </div>
-            
+            <div>
+            <label class="block font-medium">Detalle:</label>
+            <input type="text" 
+            		name="detalle" 
+            		required
+            		class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"/>
+            </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Horas trabajadas:</label>
                 <input type="number" 
@@ -41,7 +49,7 @@ int idEmpleado = (idEmpleadoObj != null) ? idEmpleadoObj : 0;
                        min="1" 
                        step="1"
                        required
-                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
                        placeholder="Ej: 2">
             </div>
             

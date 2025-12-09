@@ -72,7 +72,10 @@ public class ProyectoServlet extends HttpServlet {
 
 	private List<Proyecto> cargarMisProyectos(HttpServletRequest request) {
 	    try {
-	    	Usuario usu = (Usuario) request.getAttribute("usuario");
+	    	System.out.println("===ENTRO A CARGAR MIS PROYECTOS ===");
+	    	//Usuario usu = (Usuario) request.getAttribute("usuario");
+	    	Usuario usu = (Usuario) request.getSession().getAttribute("usuario");
+	    	System.out.println("idusuario: "+usu.getId());
 	        return dao.getByIdEmpleado(usu.getId());
 	    } catch (DAOException e) {
 	        request.setAttribute("error", "No se pudieron cargar los proyectos del empleado: " + e.getMessage());
@@ -127,7 +130,7 @@ public class ProyectoServlet extends HttpServlet {
 		request.setAttribute("usuario", usuario);
 		
 	   // boolean esAdmin = "administrador".equals(rol);
-	   boolean esEmpleado = "Empleado".equals(rol);
+	   boolean esEmpleado = "empleado".equals(rol);
 	   boolean esCliente = "Cliente".equals(rol);
     	
     	String action = request.getParameter("action");

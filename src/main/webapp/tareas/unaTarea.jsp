@@ -189,7 +189,7 @@ window.addEventListener("DOMContentLoaded", function() {
                 <h2 class="text-lg font-semibold text-gray-800">Registro de Horas</h2>
                  <% if (rol.equalsIgnoreCase("empleado") || rol.equalsIgnoreCase("administrador")) { %>
 	          
-                <a href="HoraTrabajadaServlet?action=new&idTarea=<%= tarea.getId() %>&idEmpleado=<%= usuario.getId() %>" 
+                <a href="HoraTrabajadaServlet?action=new&idTarea=<%= tarea.getId() %>&idEmpleado=<%= usuarioActual.getId() %>&origin=unaTarea" 
                         class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition text-sm">
                     + Registrar Horas
                 </a>
@@ -246,8 +246,8 @@ window.addEventListener("DOMContentLoaded", function() {
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Empleado</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Detalle</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Horas</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -269,24 +269,16 @@ window.addEventListener("DOMContentLoaded", function() {
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 text-sm text-gray-900"><%= nombreEmp %></td>
                                     <td class="px-6 py-4 text-sm text-gray-600"><%= h.getFecha() != null ? sdf.format(h.getFecha()) : "—" %></td>
+                                    <td class="px-6 py-4"><%= h.getDetalle() %></td>
                                     <td class="px-6 py-4">
                                         <span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">
                                             <%= h.getCantidad() %> horas
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-sm">
-                                     <% if (rol.equalsIgnoreCase("empleado")) { %>
-	          
-                                        <button onclick="eliminarHora(<%= h.getIdTarea() %>, <%= h.getIdEmpleado() %>, '<%= sdf.format(h.getFecha()) %>')" 
-                                                class="text-red-600 hover:text-red-900">
-                                            Eliminar
-                                        </button>
-                                        <%} %>
-                                    </td>
                                 </tr>
                             <% } %>
                             <tr class="bg-blue-50 font-semibold">
-                                <td colspan="2" class="px-6 py-4 text-sm text-gray-700">Total de horas</td>
+                                <td colspan="3" class="px-6 py-4 text-sm text-gray-700">Total de horas</td>
                                 <td class="px-6 py-4">
                                     <span class="bg-blue-600 text-white text-sm font-bold px-4 py-1.5 rounded-full">
                                         <%= totalHoras %> horas
