@@ -58,11 +58,19 @@ public class ProyectoDAO {
         }
     }
     public void delete(int id) throws DAOException {
+    	String sqlEmpleados = "DELETE FROM proyecto_usuario WHERE idProyecto = ?";
         String sql = "DELETE FROM Proyecto WHERE id = ?";
         try (Connection con = ConexionDB.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
+        		PreparedStatement ps1 = con.prepareStatement(sqlEmpleados)) {
+        	ps1.setInt(1, id);
+        	ps1.executeUpdate();
+        } catch (SQLException e) {
+        	throw new DAOException("Error al eliminar el proyecto con id: " + id, e);
+        }
+        try (Connection con = ConexionDB.getConexion();
+             PreparedStatement ps2 = con.prepareStatement(sql)) {
+            ps2.setInt(1, id);
+            ps2.executeUpdate();
         } catch (SQLException e) {
         	throw new DAOException("Error al eliminar el proyecto con id: " + id, e);
         }

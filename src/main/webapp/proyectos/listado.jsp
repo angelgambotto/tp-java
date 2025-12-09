@@ -125,7 +125,7 @@
                                 <!--  <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 relative"> -->
                                 <!-- Descomentar para activar redireccion a EtapaServletal ahcer click sobre una card-->
                                 <div class=" proyecto_card bg-gray-50 p-4 rounded-lg border border-gray-200 relative cursor-pointer" onclick="window.location.href='EtapaServlet?action=list&idProyecto=<%= pro.getId() %>';" >
-                                
+                                	 <% if(rol.equalsIgnoreCase("administrador")) {%>
                                     <!-- Menú de tres puntos arriba derecha -->
                                     <div class="absolute top-2 right-2">
                                         <button class="menu-button text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-200" aria-label="Opciones">
@@ -140,7 +140,7 @@
                                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Eliminar</a>
                                         </div>
                                     </div>
-
+									<% } %>
                                     <!-- Contenido de la card -->
                                     <h4 class="font-semibold text-gray-900 mb-2"><%= pro.getNombre() %></h4>
                                     <p class="text-sm text-gray-600 mb-3"><%= pro.getDescripcion() %></p>
