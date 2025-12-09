@@ -1,7 +1,7 @@
 package tareas;
 
 import java.sql.Date;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import categoriaTarea.CategoriaTarea;
@@ -17,7 +17,7 @@ public class Tarea {
 	private Date fechaFin;
 	private int idEtapa;
 	private int idCategoria;
-	private List<Usuario> usuarios;
+	private List<Usuario> usuarios = new ArrayList<>();;
 	
 	public int getId() {
 		return id;
