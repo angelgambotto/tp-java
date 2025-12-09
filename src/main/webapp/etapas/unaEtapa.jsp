@@ -375,8 +375,11 @@
                                    onclick="event.stopPropagation()">
                                     Editar
                                 </a>
-
-                                <form action="TareaServlet" method="post" style="display:inline" 
+								<a href="TareaServlet?action=delete&idTarea=<%= t.getId() %>&idEtapa=<%= etapa.getId() %>"
+                                   class="text-red-600 hover:text-red-900 mr-3">
+                                    Eliminar
+                                </a>
+                               <!--  <form action="TareaServlet" method="post" style="display:inline" 
                                       onsubmit="event.stopPropagation(); return confirm('¿Eliminar tarea <%= t.getNombre() %>?');">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="idTarea" value="<%= t.getId() %>">
@@ -386,7 +389,7 @@
                                     </button>
                                     
                                     <% } %>
-                                </form>
+                                </form> -->
                             </td>
                         </tr>
                     <% } %>
@@ -483,6 +486,8 @@
 </div>
 
 <jsp:include page="../tareas/formulario.jsp" />
+<jsp:include page="modalEliminarTarea.jsp" />
+
 
 <script>
 function toggleModal(modalId) {
@@ -495,6 +500,12 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("modalFormTarea").classList.remove("hidden");
 });
 <% } %>
+
+function toggleModalEliminar(nameModal) {
+    const modal = document.getElementById(nameModal);
+    modal.classList.toggle('hidden');
+}
+
 function cambiarVista(vista) {
     const vistaTabla = document.getElementById('vistaTabla');
     const vistaKanban = document.getElementById('vistaKanban');
