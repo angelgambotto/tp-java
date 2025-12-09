@@ -182,15 +182,33 @@ public class TareaDAO {
 		}
 
 		public void delete(int id) throws DAOException {
-			String sql = "DELETE FROM tarea WHERE id = ?";
-			String sql2="DELETE FROM tarea_usuario where idTarea=?";
-			try (Connection con = ConexionDB.getConexion()){
-					PreparedStatement ps2=con.prepareStatement(sql2);
-		            ps2.setInt(1, id);
-		            ps2.executeUpdate();
-					PreparedStatement ps = con.prepareStatement(sql);
-					ps.setInt(1, id);
-		            ps.executeUpdate();
+			String sqlHoras = "DELETE FROM hora_trabajada WHERE idTarea = ?";
+			String sqlComentario = "DELETE FROM comentario WHERE idTarea = ?";
+			String sqlTareaUsuario = "DELETE FROM tarea_usuario WHERE idTarea = ?";
+			String sqlTarea = "DELETE FROM tarea WHERE id = ?";
+
+		    try (Connection con = ConexionDB.getConexion()) {
+		    	
+		    	try (PreparedStatement ps2 = con.prepareStatement(sqlHoras)) {
+		    		ps2.setInt(1, id);
+		    		ps2.executeUpdate();
+		    	}
+		    	try (PreparedStatement ps3 = con.prepareStatement(sqlComentario)) {
+		    		ps3.setInt(1, id);
+		    		ps3.executeUpdate();
+		    	}
+
+		        try (PreparedStatement ps1 = con.prepareStatement(sqlTareaUsuario)) {
+		            ps1.setInt(1, id);
+		            ps1.executeUpdate();
+		        }
+
+
+		        // Finalmente borrar la tarea
+		        try (PreparedStatement ps4 = con.prepareStatement(sqlTarea)) {
+		            ps4.setInt(1, id);
+		            ps4.executeUpdate();
+		        }
 		            
 
 		        } catch (SQLException e) {
@@ -224,7 +242,7 @@ public class TareaDAO {
 		                
 		            }
 			} catch (SQLException e) {
-	        	throw new DAOException("Error al eliminar la tarea con id: "+ id, e);
+	        	throw new DAOException("Error al obtener la tarea con id: "+ id, e);
 	        }
 			return tarea;
 		}
