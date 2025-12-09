@@ -18,6 +18,7 @@ import etapas.EtapaDAO;
 import exceptions.DAOException;
 import categoriaTarea.CategoriaTarea;
 import categoriaTarea.CategoriaTareaDAO;
+import clientes.Cliente;
 import comentarios.Comentario;
 import comentarios.ComentarioDAO;
 import horastrabajadas.HoraTrabajada;
@@ -69,7 +70,8 @@ public class TareaServlet extends HttpServlet {
              request.setAttribute("error", e.getMessage());
              return new ArrayList<>();
          }
-     }
+     } */
+     
      private Tarea cargarTareaSeguro(HttpServletRequest request, int id) {
          try {
              return tdao.getOne(id);
@@ -77,7 +79,7 @@ public class TareaServlet extends HttpServlet {
              request.setAttribute("error", e.getMessage());
              return new Tarea();
          }
-     }*/
+     }
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -234,12 +236,28 @@ public class TareaServlet extends HttpServlet {
             request.setAttribute("tab",tab);
         	request.getRequestDispatcher("/tareas/unaTarea.jsp").forward(request, response);
             break;
-        }
-        
-		}
-		catch(DAOException e) {
-			System.out.println("DAOException en : " + e.getMessage());
-			e.printStackTrace();
+            
+        case "delete":
+        	
+    		int deleteId = Integer.parseInt(request.getParameter("idTarea"));
+    		int idEtapaToDelete = Integer.parseInt(request.getParameter("idEtapa"));
+    		if (deleteId != 0) {
+    			try {
+    				Tarea t = cargarTareaSeguro(request, deleteId);
+    				request.setAttribute("tarea", t);
+    				Etapa etapaDelete = edao.getOne(idEtapaToDelete);
+    				request.setAttribute("etapa", etapaDelete);
+    				request.setAttribute("abrirModalEliminar", true);
+    				
+    			} catch(NumberFormatException e1) {
+    				request.setAttribute("error", e1 );
+    			}
+    			
+    		}
+    		request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request,response);
+            break;
+        } //cierra switch
+        } catch(DAOException e) {
 			throw new ServletException("Error en tareaservlet get");
 		}
 	
@@ -257,7 +275,7 @@ public class TareaServlet extends HttpServlet {
 		case "update":
 			actualizarTarea(request,response);
 			break;
-		case "delete":
+		case "confirmDelete":
 			borrarTarea(request,response);
 		break;
 		case "asignar":
