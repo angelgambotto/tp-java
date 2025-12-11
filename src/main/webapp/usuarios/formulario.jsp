@@ -7,7 +7,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Listado de usuarios</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Formulario de Usuarios</title>
 <script src="https://cdn.tailwindcss.com"></script>
 
 <%Usuario user=(Usuario) request.getAttribute("user");
@@ -17,9 +17,9 @@ List<Cliente> clientes=(List<Cliente>) request.getAttribute("clientes");
 </head>
 <body>
 
-<div id="insert/update" class="fixed inset-0 bg-gray-900 bg-opacity-50 <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %> flex items-center justify-center">
-    <div class="bg-white rounded-lg p-6 w-full max-w-md">
-        <h2 class="text-2xl font-bold mb-4"><%=user!=null?"Editar usuario":"Crear usuario" %></h2>
+<div id="insert/update" class="fixed inset-0 bg-gray-900 bg-opacity-50 <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %> flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md max-h-screen overflow-y-auto"> <h2 class="text-2xl font-bold mb-4"><%=user!=null?"Editar usuario":"Crear usuario" %></h2>
+        
         <form action="UsuariosServlet" method="post" class="space-y-4">
             <input type="hidden" name="id" value="<%= user != null ? user.getId() : 0 %>"  />
 
@@ -35,7 +35,8 @@ List<Cliente> clientes=(List<Cliente>) request.getAttribute("clientes");
                 <label class="block font-medium">Apellido:</label>
                 <input type="text" name="apellido" 
                 value="<%=user != null?user.getApellido():"" %>"
-                       required
+                   
+                    required
                        class="w-full border border-gray-300 rounded px-3 py-2"/>
             </div>
             <div>
@@ -58,36 +59,41 @@ List<Cliente> clientes=(List<Cliente>) request.getAttribute("clientes");
             <div>
                 <label class="block font-medium">Clave:</label>
                 <input type="password" name="clave"  
-                 
                        class="w-full border border-gray-300 rounded px-3 py-2"/>
             </div>
+            
            <div>
-           <label class="block font-medium">Rol:</label>
-           <select name="rol" required class="w-full border border-gray-300 rounded px-3 py-2">
-           
-           <option value="">Seleccione un rol</option>
-	        <option value="Administrador" <%= (user != null && "Administrador".equals(user.getRol())) ? "selected" : "" %>>
-	            Administrador
-	        </option>
-	       <option value="Empleado" <%= (user != null && "Empleado".equals(user.getRol())) ? "selected" : "" %>>
-			    Empleado
-			</option>
-	        <option value="Cliente" <%= (user != null && "Cliente".equals(user.getRol())) ? "selected" : "" %>>
-	            Usuario Cliente
-	        </option>
-	        </select>
+               <label class="block font-medium">Rol:</label>
+               <select name="rol" id="rolSelector" required 
+                       class="w-full border border-gray-300 rounded px-3 py-2"
+                       onchange="manejarRol(this.value)">
+               
+               <option value="">Seleccione un rol</option>
+                <option value="Administrador" <%= (user != null && "Administrador".equals(user.getRol())) ? "selected" : "" %>>
+                    Administrador
+                </option>
+               <option value="Empleado" <%= (user != null && "Empleado".equals(user.getRol())) ? "selected" : "" %>>
+                    Empleado
+                </option>
+                <option value="Cliente" <%= (user != null && "Cliente".equals(user.getRol())) ? "selected" : "" %>>
+                    Usuario Cliente
+                </option>
+                </select>
            </div>
-            <div>
+           
+            <div id="campoSupervisor" class="hidden"> 
                 <label class="block font-medium">Supervisor:</label>
-                <select name="supervisor"  class="w-full border border-gray-300 rounded px-3 py-2">
+                <select name="supervisor" class="w-full border border-gray-300 rounded px-3 py-2">
                     <option value="">Sin supervisor</option>
                     <%
                         if (empleados != null) {
-                            for (Usuario s : empleados) {  
+                            for (Usuario s : empleados) 
+                            {  
                                 String selected = "";
                                 if (request.getAttribute("user") != null) {
                                     Usuario selectedUsuario = (Usuario) request.getAttribute("user");
-                                    if (selectedUsuario.getSupervisor()!=null && (s.getId() == selectedUsuario.getSupervisor())) {
+                                    // Nota: Se corrige la condición del supervisor en el JSP
+                                    if (selectedUsuario.getSupervisor() != null && (s.getId() == selectedUsuario.getSupervisor())) {
                                         selected = "selected";
                                     }
                                 }
@@ -99,9 +105,10 @@ List<Cliente> clientes=(List<Cliente>) request.getAttribute("clientes");
                     %>
                 </select>
             </div>
-            <div>
+            
+            <div id="campoCliente" class="hidden"> 
                 <label class="block font-medium">Cliente:</label>
-                <select name="cliente"  class="w-full border border-gray-300 rounded px-3 py-2">
+                <select name="cliente" class="w-full border border-gray-300 rounded px-3 py-2">
                     <option value="">Sin cliente</option>
                     <%
                         if (clientes != null) {
@@ -109,7 +116,8 @@ List<Cliente> clientes=(List<Cliente>) request.getAttribute("clientes");
                             	String selected = "";
                             	if (request.getAttribute("user") != null) {
                                     Usuario selectedUsuario = (Usuario) request.getAttribute("user");
-                                    if (selectedUsuario.getSupervisor()!=null && (c.getId() == selectedUsuario.getIdCliente())) {
+                                    // Nota: Se corrige la condición del cliente en el JSP
+                                    if (selectedUsuario.getIdCliente() != 0 && (c.getId() == selectedUsuario.getIdCliente())) {
                                         selected = "selected";
                                     }
                                 }
@@ -137,7 +145,38 @@ List<Cliente> clientes=(List<Cliente>) request.getAttribute("clientes");
     </div>
    </div>
 
+<script>
+    // Toggle modal function (debe estar disponible globalmente)
+    function toggleModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.classList.toggle('hidden');
+    }
+
+    // Lógica para mostrar/ocultar campos basada en el Rol
+    document.addEventListener('DOMContentLoaded', function() {
+        const rolSelector = document.getElementById('rolSelector');
+        // Inicializar la vista al cargar (importante para el modo 'Editar')
+        if (rolSelector) {
+            manejarRol(rolSelector.value);
+        }
+    });
+
+    function manejarRol(rolSeleccionado) {
+        const campoSupervisor = document.getElementById('campoSupervisor');
+        const campoCliente = document.getElementById('campoCliente');
+
+        // 1. Ocultar ambos campos por defecto
+        campoSupervisor.classList.add('hidden');
+        campoCliente.classList.add('hidden');
+
+        // 2. Mostrar el campo correspondiente
+        if (rolSeleccionado === 'Empleado') {
+            campoSupervisor.classList.remove('hidden');
+        } else if (rolSeleccionado === 'Cliente') {
+            campoCliente.classList.remove('hidden');
+        }
+    }
+</script>
+
 </body>
 </html>
-
-
