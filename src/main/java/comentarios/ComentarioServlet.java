@@ -7,10 +7,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import proyectos.Proyecto;
+import proyectos.ProyectoDAO;
 import tareas.TareaDAO;
 import tareas.Tarea;
 import comentarios.Comentario;
 import comentarios.ComentarioDAO;
+import etapas.Etapa;
+import etapas.EtapaDAO;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,12 +47,16 @@ public class ComentarioServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ComentarioDAO cdao;
 	private TareaDAO tdao;
+	private EtapaDAO edao;
+	private ProyectoDAO pdao;
     private EmailService emailService;
 
 	
 	public void init() {
 		tdao = new TareaDAO();
 		cdao = new ComentarioDAO();
+		edao = new EtapaDAO();
+		pdao = new ProyectoDAO();
 		
 		this.emailService = (EmailService) getServletContext().getAttribute("emailService");
 	}
@@ -80,6 +88,8 @@ public class ComentarioServlet extends HttpServlet {
 				System.out.println("entro al crear comentario");
 	            Tarea tarea = tdao.getOne(idTarea);
 	            List<Usuario> asignados = tdao.getUsuariosAsignados(tarea.getId());
+	            Etapa etapa = edao.getOne(tarea.getIdEtapa());
+	            Proyecto pro = pdao.getById(etapa.getIdProyecto());
 	            String texto = request.getParameter("texto");
 	            
 	            // Checkeo que sea parte
@@ -89,6 +99,10 @@ public class ComentarioServlet extends HttpServlet {
 	                    pertenece = true;
 	                    break;
 	                }
+	            }
+	            int idSup = pro.getSupervisor().getId();
+	            if(idSup == usuario.getId()) {
+	            	pertenece = true;
 	            }
 	            if (!pertenece && !"administrador".equalsIgnoreCase(rol)) {
 	            	response.sendRedirect("ProyectoServlet");

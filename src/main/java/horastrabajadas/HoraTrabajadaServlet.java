@@ -108,6 +108,10 @@ public class HoraTrabajadaServlet extends HttpServlet {
     		//6. CARGAR EL PROYECTO PARA PARTE DEL SUPERVISOR
     		request.setAttribute("proyecto", pdao.getById(idProyecto));
     		
+    		//7. CARGAR ADMINISTRADORES
+    		List<Usuario> administradores = udao.getPorRol("Administrador");
+        	request.setAttribute("administradores", administradores);
+    		
     	} catch(DAOException e) {
     		request.setAttribute("error", "Error al cargar los datos para UnaTarea: " + e.getMessage());
     	}

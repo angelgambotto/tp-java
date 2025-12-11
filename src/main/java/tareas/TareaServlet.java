@@ -106,7 +106,6 @@ public class TareaServlet extends HttpServlet {
         if (action == null) {
             action = esAdmin ? "list" : "mis-tareas";
         }
-        
         switch(action) {
         case "list":
         	//if (!esAdmin) {
@@ -237,6 +236,8 @@ public class TareaServlet extends HttpServlet {
         	List<Usuario> disponibles = pdao.getUsuariosAsignados(etapa.getIdProyecto());
         	List<Comentario> comentarios = comdao.getAllByIdTarea(tareaDetalle.getId());
         	List<HoraTrabajada> horas = htdao.getAllByIdTarea(tareaDetalle.getId());
+        	List<Usuario> administradores = udao.getPorRol("Administrador");
+        	request.setAttribute("administradores", administradores);
         	
 		    System.out.println("==========================");
             System.out.println("Tarea seleccionada: "+tareaDetalle);
@@ -247,6 +248,7 @@ public class TareaServlet extends HttpServlet {
         	request.setAttribute("tarea", tareaDetalle);
         	request.setAttribute("empleadosAsignados", asignados);
         	request.setAttribute("empleadosDisponibles", disponibles);
+
         	request.setAttribute("comentarios", comentarios);
         	request.setAttribute("horas", horas);
             request.setAttribute("usuario", usuario);
