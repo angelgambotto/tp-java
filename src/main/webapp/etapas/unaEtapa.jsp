@@ -35,7 +35,7 @@
     List<Tarea> tareas = (List<Tarea>) request.getAttribute("tareas");
     List<CategoriaTarea> categorias = (List<CategoriaTarea>) request.getAttribute("categorias");
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-    
+    String estadoEtapa=etapa.getEstado();
     // Calcular estadísticas
     int tareasToDo = 0;
     int tareasInProgress = 0;
@@ -57,6 +57,20 @@
 %>
 
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+	<!-- BOTÓN VOLVER -->
+    <div class="mb-4">
+	    <a href="EtapaServlet?action=list&idProyecto=<%= etapa.getIdProyecto() %>"
+	       class="flex items-center gap-2 text-gray-600 hover:text-gray-800 font-medium transition">
+	        
+	        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+	                  d="M15 19l-7-7 7-7"></path>
+	        </svg>
+	
+	        Volver al Proyecto
+	    </a>
+	</div>
+
 
     <!-- HEADER DE LA ETAPA -->
     <% if (etapa != null) { %>
@@ -270,10 +284,15 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
                 <p class="text-sm">No hay tareas creadas aún.</p>
+                
+                <%if(!"Done".equals(estadoEtapa)){ %>
                 <button onclick="window.location.href='TareaServlet?action=new&idEtapa=<%= etapa.getId() %>'" 
                         class="mt-4 text-blue-600 hover:text-blue-700 text-sm font-medium">
                     + Crear primera tarea
                 </button>
+                <%}else{ %>
+                <p class="text-sm">La etapa finalizó. No se pueden crear tareas.</p>
+                <%} %>
             </div>
         <% } else { %>
             <!-- Vista móvil: Cards -->

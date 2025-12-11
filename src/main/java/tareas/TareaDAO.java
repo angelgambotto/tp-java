@@ -38,7 +38,11 @@ public class TareaDAO {
 	        ps.setString(2, tarea.getDescripcion());
 	        ps.setString(3, tarea.getEstado());
 	        ps.setDate(4, new Date(tarea.getFechaInicio().getTime()));
-	        ps.setDate(5, new Date(tarea.getFechaFin().getTime()));
+	        if (tarea.getFechaFin() != null) {
+	            ps.setDate(5, new Date(tarea.getFechaFin().getTime()));
+	        } else {
+	            ps.setNull(5, java.sql.Types.DATE);
+	        }
 	        ps.setInt(6, tarea.getIdEtapa());
 	        ps.setInt(7, tarea.getIdCategoria());
 	        ps.executeUpdate();

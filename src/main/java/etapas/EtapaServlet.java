@@ -73,7 +73,7 @@ public class EtapaServlet extends HttpServlet {
 
     private List<Usuario> cargarUsuariosSeguro(HttpServletRequest request) {
 	    try {
-	        return udao.getAll();
+	        return udao.getPorRol("Empleado");
 	    } catch (DAOException e) {
 	        request.setAttribute("error", "No se pudieron cargar los clientes: " + e.getMessage());
 	        return new ArrayList<>();

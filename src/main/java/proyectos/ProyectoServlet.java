@@ -54,7 +54,7 @@ public class ProyectoServlet extends HttpServlet {
 	//metodo para cargar los usuarios y no tener problemas con el bloque try catch
 	private List<Usuario> cargarUsuariosSeguro(HttpServletRequest request) {
 	    try {
-	        return usuarioDao.getAll();
+	        return usuarioDao.getPorRol("supervisor");
 	    } catch (DAOException e) {
 	        request.setAttribute("error", "No se pudieron cargar los usuarios: " + e.getMessage());
 	        return new ArrayList<>();

@@ -342,17 +342,32 @@ public class TareaServlet extends HttpServlet {
 		tarea.setDescripcion(request.getParameter("descripcion"));
 		tarea.setEstado(request.getParameter("estado"));
 		tarea.setFechaInicio(Date.valueOf(request.getParameter("fechaInicio")));
-		tarea.setFechaFin(Date.valueOf(request.getParameter("fechaFin")));
+		String fechaFinStr=request.getParameter("fechaFin");
+		if(fechaFinStr==null||fechaFinStr.trim().isEmpty()){
+			tarea.setFechaFin(null);
+		}
+		else {
+			tarea.setFechaFin(Date.valueOf(fechaFinStr));
+		}
 		tarea.setIdEtapa(Integer.parseInt(request.getParameter("idEtapa")));
 		tarea.setIdCategoria(Integer.parseInt(request.getParameter("idCategoria")));
 		System.out.println("===== DEBUG INSERT TAREA =====");
 		System.out.println("hasta el insertar llegue");
-		
+		Etapa e=edao.getOne(Integer.parseInt(request.getParameter("idEtapa")));
+		String estadoEtapa=e.getEstado();
+		if(estadoEtapa.equals("Done")){
+			request.setAttribute("error", "No se puede crear una tarea cuando la etapa está finalizada");
+			request.setAttribute("tareas", tdao.getByEtapaId(tarea.getIdEtapa()));
+			request.setAttribute("categorias", cdao.getAll());
+			request.setAttribute("etapa", edao.getOne(tarea.getIdEtapa()));
+			request.getRequestDispatcher("etapas/unaEtapa.jsp");
+		}
 		
 		
 		
 
 			Integer idTarea=tdao.insert(tarea);
+			
 			
 
 		
