@@ -1,3 +1,4 @@
+<%@page import="proyectos.Proyecto"%>
 <%@page import="usuarios.Usuario"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
@@ -28,6 +29,7 @@
 <jsp:include page="../header.jsp" />
 
 <%
+	Proyecto pro = (Proyecto) request.getAttribute("proyecto");
     Etapa etapa = (Etapa) request.getAttribute("etapa");
 	System.out.println("la etapa que se recibe en unaEtapa es :  "+ etapa);
     List<Tarea> tareas = (List<Tarea>) request.getAttribute("tareas");
@@ -110,7 +112,8 @@
 
                 <div class="flex flex-col sm:flex-row gap-2 flex-shrink-0">
                    
-                    <% if (rol.equalsIgnoreCase("administrador")) { %>
+                    <% if (rol.equalsIgnoreCase("administrador") ||
+                    		usuarioActual.getId() == pro.getSupervisor().getId()) { %>
 	          
                     <button 
     <% if ("Done".equals(etapa.getEstado())) { %> 
@@ -369,7 +372,8 @@
                             </td>
 
                             <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                 <% if (rol.equalsIgnoreCase("administrador")) { %>
+                                 <% if (rol.equalsIgnoreCase("administrador") ||
+                                 		usuarioActual.getId() == pro.getSupervisor().getId()) { %>
 	          
                                 <a href="TareaServlet?action=edit&idTarea=<%= t.getId() %>&idEtapa=<%= etapa.getId() %>"
                                    class="text-indigo-600 hover:text-indigo-900 mr-3"
@@ -380,17 +384,7 @@
                                    class="text-red-600 hover:text-red-900 mr-3">
                                     Eliminar
                                 </a>
-                               <!--  <form action="TareaServlet" method="post" style="display:inline" 
-                                      onsubmit="event.stopPropagation(); return confirm('¿Eliminar tarea <%= t.getNombre() %>?');">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="idTarea" value="<%= t.getId() %>">
-                                    <input type="hidden" name="idEtapa" value="<%= etapa.getId() %>">
-                                    <button type="submit" onclick="event.stopPropagation();" class="text-red-600 hover:text-red-900 bg-transparent border-0 p-0 cursor-pointer">
-                                        Eliminar
-                                    </button>
-                                    
                                     <% } %>
-                                </form> -->
                             </td>
                         </tr>
                     <% } %>

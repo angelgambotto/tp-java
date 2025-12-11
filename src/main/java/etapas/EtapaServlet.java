@@ -193,6 +193,7 @@ public class EtapaServlet extends HttpServlet {
              catch(DAOException e) {
             	 request.setAttribute("error", e.getMessage());
              }
+             request.setAttribute("proyecto", p);
              request.setAttribute("ProyectoFinalizado", p.getEstado().equals("Done"));
              request.setAttribute("id", etapa.getId());
              request.setAttribute("etapa", etapa);
@@ -228,6 +229,7 @@ public class EtapaServlet extends HttpServlet {
              }
              break;
         case "detalleCliente":
+        	request.setAttribute("proyecto", proyecto);
         	destino="proyectos/detalleProyectoCliente.jsp";
         }
 
@@ -242,7 +244,7 @@ public class EtapaServlet extends HttpServlet {
             throws ServletException, IOException {
     	System.out.println("pase por el doPost");
         Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
-        if (usuario == null || !"Administrador".equalsIgnoreCase(usuario.getRol())) {
+        if (usuario == null || !(("Administrador".equalsIgnoreCase(usuario.getRol()) ||"empleado".equalsIgnoreCase(usuario.getRol())))) {
             response.sendRedirect("login.jsp");
             return;
         }
