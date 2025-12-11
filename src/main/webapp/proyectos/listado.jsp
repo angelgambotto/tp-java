@@ -167,7 +167,8 @@
                                      onclick="window.location.href='EtapaServlet?action=list&idProyecto=<%= pro.getId() %>';">
                                     
                                     <!-- Menú de tres puntos -->
-                                    <% if(rol.equalsIgnoreCase("administrador")) { %>
+                                    <% Usuario supervisor = pro.getSupervisor(); 
+                                    if(rol.equalsIgnoreCase("administrador")|| (supervisor.getId() == usuarioActual.getId())) { %>
                                     <div class="absolute top-2 right-2">
                                         <button class="menu-button text-gray-400 hover:text-gray-700 p-1 rounded-full hover:bg-white transition" 
                                                 aria-label="Opciones"

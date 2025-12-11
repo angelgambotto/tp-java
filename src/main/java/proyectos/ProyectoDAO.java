@@ -217,16 +217,18 @@ public class ProyectoDAO {
 	 
     public List<Proyecto> getByIdEmpleado(int idEmpleado) throws DAOException {
         String sql = """
-        				SELECT p.* 
-        				FROM proyecto_usuario pu
-        				inner join proyecto p
+        				SELECT DISTINCT p.* 
+        				FROM proyecto p
+        				left join proyecto_usuario pu
         		 			on pu.idProyecto = p.id 
         				WHERE pu.IdEmpleado = ?
+        					OR p.idSupervisor = ?
         				""";
         List<Proyecto> lista = new ArrayList<>();
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, idEmpleado);
+            ps.setInt(2, idEmpleado);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
             	Proyecto pro = new Proyecto();

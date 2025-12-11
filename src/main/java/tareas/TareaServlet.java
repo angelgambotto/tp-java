@@ -80,6 +80,14 @@ public class TareaServlet extends HttpServlet {
              return new Tarea();
          }
      }
+     private Proyecto cargarProSeguro(HttpServletRequest request, int id) {
+         try {
+             return pdao.getById(id);
+         } catch (DAOException e) {
+             request.setAttribute("error", e.getMessage());
+             return new Proyecto();
+         }
+     }
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -106,21 +114,24 @@ public class TareaServlet extends HttpServlet {
             //    return;
             //}
         	int idEtapa=Integer.parseInt(request.getParameter("idEtapa"));
+
         	List<Tarea> tareas=tdao.getByEtapaId(idEtapa);
-       
+        	Etapa e=edao.getOne(idEtapa);
+        	int idProyecto = e.getIdProyecto();
+        	Proyecto p = cargarProSeguro(request, idProyecto);
+        	
         	categorias=cdao.getAll();
         	
-        	Etapa e=edao.getOne(idEtapa);
         	request.setAttribute("categorias", categorias);
         	request.setAttribute("etapa", e);
         	request.setAttribute("tareas", tareas);
+        	request.setAttribute("proyecto", p);
         	request.setAttribute("esAdmin", true);
         	request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);
         	break;
         case "new":
         	idEtapa = Integer.parseInt(request.getParameter("idEtapa"));
         	String estadoEtapa=edao.getOne(idEtapa).getEstado();
-
         	
             List<Usuario> usuariosDisponibles  = udao.getAll();
             List<CategoriaTarea> categorias = cdao.getAll();
@@ -128,7 +139,11 @@ public class TareaServlet extends HttpServlet {
             int idEt=Integer.parseInt(request.getParameter("idEtapa"));
         	List<Tarea> tar=tdao.getByEtapaId(idEt);
         	request.setAttribute("tareas", tar);
+        	
         	Etapa et=edao.getOne(idEtapa);
+        	int idProNew = et.getIdProyecto();
+        	Proyecto proNew = cargarProSeguro(request, idProNew);
+        	request.setAttribute("proyecto", proNew);
         	if ("Done".equals(estadoEtapa)) {
         		request.setAttribute("error", "No se pueden agregar tareas en una etapa finalizada.");
         		request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);;
@@ -140,9 +155,6 @@ public class TareaServlet extends HttpServlet {
             request.setAttribute("categorias", categorias);
             request.setAttribute("idEtapa", idEtapa);
             request.setAttribute("abrirModalTarea", true);
-            
-            
-
             
             
             request.getRequestDispatcher("etapas/unaEtapa.jsp").forward(request, response);
@@ -158,6 +170,9 @@ public class TareaServlet extends HttpServlet {
                 idEtapa = tarea.getIdEtapa();
             }
             Etapa eta = edao.getOne(idEtapa);
+            int idProyec = eta.getIdProyecto();
+        	Proyecto proyec = cargarProSeguro(request, idProyec);
+        	request.setAttribute("proyecto", proyec);
             List<HoraTrabajada> hs = htdao.getAllByIdTarea(tarea.getId());
             List<Usuario> asig = tdao.getUsuariosAsignados(idTarea);
         	List<Usuario> dispo = pdao.getUsuariosAsignados(eta.getIdProyecto());
@@ -213,8 +228,10 @@ public class TareaServlet extends HttpServlet {
         	String tab = request.getParameter("tab");
         	int idE=Integer.parseInt(request.getParameter("idEtapa"));
         	int idT=Integer.parseInt(request.getParameter("idTarea"));
-        	
         	Etapa etapa = edao.getOne(idE);
+        	int idPDetalle = etapa.getIdProyecto();
+        	Proyecto proDetalle = cargarProSeguro(request, idPDetalle);
+        	
         	Tarea tareaDetalle = tdao.getOne(idT);
         	List<Usuario> asignados = tdao.getUsuariosAsignados(idT);
         	List<Usuario> disponibles = pdao.getUsuariosAsignados(etapa.getIdProyecto());
@@ -233,6 +250,7 @@ public class TareaServlet extends HttpServlet {
         	request.setAttribute("comentarios", comentarios);
         	request.setAttribute("horas", horas);
             request.setAttribute("usuario", usuario);
+            request.setAttribute("proyecto", proDetalle);
             request.setAttribute("tab",tab);
         	request.getRequestDispatcher("/tareas/unaTarea.jsp").forward(request, response);
             break;
@@ -246,7 +264,11 @@ public class TareaServlet extends HttpServlet {
     				Tarea t = cargarTareaSeguro(request, deleteId);
     				request.setAttribute("tarea", t);
     				Etapa etapaDelete = edao.getOne(idEtapaToDelete);
+    				int idProDelete = etapaDelete.getIdProyecto();
+    				Proyecto proDelete = cargarProSeguro(request, idProDelete);
+    				
     				request.setAttribute("etapa", etapaDelete);
+    				request.setAttribute("proyecto", proDelete);
     				request.setAttribute("abrirModalEliminar", true);
     				
     			} catch(NumberFormatException e1) {
@@ -320,17 +342,32 @@ public class TareaServlet extends HttpServlet {
 		tarea.setDescripcion(request.getParameter("descripcion"));
 		tarea.setEstado(request.getParameter("estado"));
 		tarea.setFechaInicio(Date.valueOf(request.getParameter("fechaInicio")));
-		tarea.setFechaFin(Date.valueOf(request.getParameter("fechaFin")));
+		String fechaFinStr=request.getParameter("fechaFin");
+		if(fechaFinStr==null||fechaFinStr.trim().isEmpty()){
+			tarea.setFechaFin(null);
+		}
+		else {
+			tarea.setFechaFin(Date.valueOf(fechaFinStr));
+		}
 		tarea.setIdEtapa(Integer.parseInt(request.getParameter("idEtapa")));
 		tarea.setIdCategoria(Integer.parseInt(request.getParameter("idCategoria")));
 		System.out.println("===== DEBUG INSERT TAREA =====");
 		System.out.println("hasta el insertar llegue");
-		
+		Etapa e=edao.getOne(Integer.parseInt(request.getParameter("idEtapa")));
+		String estadoEtapa=e.getEstado();
+		if(estadoEtapa.equals("Done")){
+			request.setAttribute("error", "No se puede crear una tarea cuando la etapa está finalizada");
+			request.setAttribute("tareas", tdao.getByEtapaId(tarea.getIdEtapa()));
+			request.setAttribute("categorias", cdao.getAll());
+			request.setAttribute("etapa", edao.getOne(tarea.getIdEtapa()));
+			request.getRequestDispatcher("etapas/unaEtapa.jsp");
+		}
 		
 		
 		
 
 			Integer idTarea=tdao.insert(tarea);
+			
 			
 
 		

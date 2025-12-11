@@ -105,6 +105,9 @@ public class HoraTrabajadaServlet extends HttpServlet {
     		int idProyecto = etapa.getIdProyecto();
     		request.setAttribute("empleadosDisponibles", pdao.getUsuariosAsignados(idProyecto));
     		
+    		//6. CARGAR EL PROYECTO PARA PARTE DEL SUPERVISOR
+    		request.setAttribute("proyecto", pdao.getById(idProyecto));
+    		
     	} catch(DAOException e) {
     		request.setAttribute("error", "Error al cargar los datos para UnaTarea: " + e.getMessage());
     	}

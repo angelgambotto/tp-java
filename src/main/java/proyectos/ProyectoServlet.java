@@ -54,7 +54,7 @@ public class ProyectoServlet extends HttpServlet {
 	//metodo para cargar los usuarios y no tener problemas con el bloque try catch
 	private List<Usuario> cargarUsuariosSeguro(HttpServletRequest request) {
 	    try {
-	        return usuarioDao.getAll();
+	        return usuarioDao.getPorRol("supervisor");
 	    } catch (DAOException e) {
 	        request.setAttribute("error", "No se pudieron cargar los usuarios: " + e.getMessage());
 	        return new ArrayList<>();
@@ -169,6 +169,8 @@ public class ProyectoServlet extends HttpServlet {
                 request.setAttribute("cliente", proEdit.getCliente());
                 request.setAttribute("fechaCreacion", sdf.format(proEdit.getFechaCreacion()));
                 request.setAttribute("supervisorId", proEdit.getSupervisor().getId());
+                System.out.println("Supervisor: " + proEdit.getSupervisor());
+
                 boolean tienePendientes = false;
                 try {
                     tienePendientes = etapaDAO.tieneEtapasIncompletas(proEdit.getId());
@@ -177,8 +179,11 @@ public class ProyectoServlet extends HttpServlet {
                    request.setAttribute("error", "error al obtener etapas incompletas del proyecto con id:"+proEdit.getId());
                 }
                 request.setAttribute("tieneEtapasPendientes", tienePendientes);
+                request.setAttribute("clientes", cargarClientesSeguro(request));
+	        	request.setAttribute("supervisores", cargarUsuariosSeguro(request));
                 request.setAttribute("abrirModal", true);
-                break;
+                request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
+                return;
 
             case "delete":
                 int deleteId = Integer.parseInt(request.getParameter("id"));
@@ -240,6 +245,7 @@ public class ProyectoServlet extends HttpServlet {
     	
     	List<Usuario> asig = cargarAsignadosSeguro(request, id);
     	Boolean esta = asig.contains(usuario);
+    	System.out.println("===DOPOST ESTA: "+esta);
 	    if (esta == false && !("Administrador".equalsIgnoreCase(usuario.getRol()) || "Empleado".equalsIgnoreCase(usuario.getRol()))) {
 	        response.sendRedirect("login.jsp");
 	        return; 

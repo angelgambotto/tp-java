@@ -1,3 +1,4 @@
+<%@page import="proyectos.Proyecto"%>
 <%@page import="adjuntosComentario.AdjuntosComentarioDAO"%>
 <%@page import="adjuntosComentario.AdjuntosComentario"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -46,9 +47,23 @@ window.addEventListener("DOMContentLoaded", function() {
     SimpleDateFormat sdfTime = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     Usuario usuarioActual = (Usuario) session.getAttribute("usuario");
     String rol = usuarioActual.getRol();
+    Proyecto pro = (Proyecto) request.getAttribute("proyecto");
 %>
 
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+
+	<!-- BOTÓN VOLVER -->
+	<div class="mb-4">
+	    <a href="TareaServlet?action=list&idEtapa=<%= tarea.getIdEtapa() %>"
+	       class="flex items-center gap-2 text-gray-600 hover:text-gray-800 font-medium transition">
+	        
+	        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+	        </svg>
+	
+	        Volver a Etapa
+	    </a>
+	</div>
 
     <!-- HEADER DE LA TAREA -->
     <% if (tarea != null) { %>
@@ -88,7 +103,8 @@ window.addEventListener("DOMContentLoaded", function() {
 
                 <!-- Botón de editar -->
                 <div class="flex-shrink-0">
-                  <% if (rol.equalsIgnoreCase("administrador")) { %>
+                  <% if (rol.equalsIgnoreCase("administrador") ||
+                  		usuarioActual.getId() == pro.getSupervisor().getId()) { %>
 	          
                     <a href="TareaServlet?action=edit&idTarea=<%= tarea.getId() %>" 
                        class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center">
@@ -110,7 +126,8 @@ window.addEventListener("DOMContentLoaded", function() {
                         </svg>
                         Personas Asignadas
                     </h3>
-                     <% if (rol.equalsIgnoreCase("administrador")) { %>
+                     <% if (rol.equalsIgnoreCase("administrador") ||
+                     		usuarioActual.getId() == pro.getSupervisor().getId()) { %>
 	          
                     <button onclick="toggleModal('modalAsignarEmpleado')" 
                             class="text-sm bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-4 rounded-lg transition">
@@ -146,7 +163,8 @@ window.addEventListener("DOMContentLoaded", function() {
     boolean puedeVerContenido = false;
 
     // 1. Es administrador?
-    if ("administrador".equalsIgnoreCase(rol)) {
+    if ("administrador".equalsIgnoreCase(rol) ||
+    		usuarioActual.getId() == pro.getSupervisor().getId()) {
         puedeVerContenido = true;
     }
     // 2. Si no es admin, revisamos si está asignado a la tarea

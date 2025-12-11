@@ -69,7 +69,7 @@ if (tarea != null) {
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div>
                     <label class="block text-gray-700 mb-1">Fecha Inicio</label>
-                    <input type="date" name="fechaInicio" class="w-full border rounded-lg px-4 py-2"
+                    <input type="date" required name="fechaInicio" class="w-full border rounded-lg px-4 py-2"
                            value="<%= tarea != null && tarea.getFechaInicio() != null ? new java.text.SimpleDateFormat("yyyy-MM-dd").format(tarea.getFechaInicio()) : "" %>">
                 </div>
 

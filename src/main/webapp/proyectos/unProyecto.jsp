@@ -66,6 +66,20 @@
 %>
 
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+	<!-- BOTÓN VOLVER -->
+    <div class="mb-4">
+	    <a href="ProyectoServlet"
+	       class="flex items-center gap-2 text-gray-600 hover:text-gray-800 font-medium transition">
+	        
+	        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+	                  d="M15 19l-7-7 7-7"></path>
+	        </svg>
+	
+	        Volver a Proyectos
+	    </a>
+	</div>
+
 
     <!-- ENCABEZADO DEL PROYECTO -->
     <% if (pro != null) { %>
@@ -80,7 +94,8 @@
 	                    </span>
 	                </p>
 	            </div>
-	            <% if (rol.equalsIgnoreCase("administrador")) { %>
+	            <% if (rol.equalsIgnoreCase("administrador") ||
+	            		usu.getId() == pro.getSupervisor().getId()) { %>
 	            <a 
     <%= "Done".equals(pro.getEstado()) ? "" : "href=\"EtapaServlet?action=new&idProyecto=" + pro.getId() + "\"" %>
     class="
@@ -102,7 +117,8 @@
                         </svg>
                         Personas Asignadas
                     </h3>
-                      <% if (rol.equalsIgnoreCase("administrador")) { %>
+                      <% if (rol.equalsIgnoreCase("administrador") ||
+      	            		usu.getId() == pro.getSupervisor().getId()) { %>
 	          
                     <button onclick="toggleModal('modalAsignarEmpleado')" 
                             class="text-sm bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-4 rounded-lg transition">
@@ -519,7 +535,8 @@
 	                        <div><strong>Fin:</strong> <%= e.getFechaFin() != null ? sdf.format(e.getFechaFin()) : "—"%></div>
 	                    </td>
 	                    <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm font-medium">
-	                     <% if (rol.equalsIgnoreCase("administrador")) { %>
+	                     <% if (rol.equalsIgnoreCase("administrador") ||
+	     	            		usu.getId() == pro.getSupervisor().getId()) { %>
 	          
 	                        <a href="EtapaServlet?action=edit&id=<%= e.getId() %>&idProyecto=<%= pro.getId() %>"
 	                           class="text-indigo-600 hover:text-indigo-900 mr-3 lg:mr-4"
