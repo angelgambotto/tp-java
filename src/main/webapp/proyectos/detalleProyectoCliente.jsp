@@ -21,7 +21,7 @@
 <%
     Proyecto proyecto = (Proyecto) request.getAttribute("proyecto");
     List<Etapa> etapas = (List<Etapa>) request.getAttribute("etapas");
-    Integer horasTotales = (Integer) request.getAttribute("horasTotales");
+    Integer horasTotales = (Integer) request.getAttribute("horas");
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     
     // Calcular estadísticas
@@ -74,8 +74,9 @@
                 <div class="flex flex-wrap items-center gap-2 mb-2">
                     <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800"><%= proyecto.getNombre() %></h1>
                     <span class="px-3 py-1 text-xs font-semibold rounded-full
-                        <%= "Activo".equals(proyecto.getEstado()) ? "bg-green-100 text-green-800" :
-                            "Completo".equals(proyecto.getEstado()) ? "bg-blue-100 text-blue-800" :
+                        <%= "Done".equals(proyecto.getEstado()) ? "bg-green-100 text-green-800" :
+                            "In Progress".equals(proyecto.getEstado()) ? "bg-blue-100 text-blue-800" :
+                            "To Do".equals(proyecto.getEstado()) ? "bg-bg-yellow-500 text-yellow-500" :
                             "bg-gray-100 text-gray-800" %>">
                         <%= proyecto.getEstado() %>
                     </span>
@@ -89,7 +90,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                         <span class="font-medium">Supervisor:</span>
-                        <span class="ml-1">Juan Pérez</span> <!-- Obtener del proyecto -->
+                        <span class="ml-1"><%= proyecto.getSupervisor().getNombreCompleto() %></span>
                     </div>
                     <% if (proyecto.getFechaCreacion() != null) { %>
                     <div class="flex items-center">

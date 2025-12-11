@@ -1,8 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
 <%@ page import="proyectos.Proyecto" %>
 <%@ page import="etapas.Etapa" %>
 <%@ page import="usuarios.Usuario" %>
+<%@ page import="proyectoHorasDTO.ProyectoHoras" %>
 
 <!DOCTYPE html>
 <html>
@@ -19,6 +22,13 @@
 
 <%
     List<Proyecto> proyectos = (List<Proyecto>) request.getAttribute("proyectos");
+	List<ProyectoHoras> horas = (List<ProyectoHoras>) request.getAttribute("horas");
+	Map<Integer, Integer> horasPorProyecto = new HashMap<>();
+	if (horas != null) {
+		for (ProyectoHoras dto : horas) {
+		    horasPorProyecto.put(dto.getIdProyecto(), dto.getTotalHoras());
+		}
+	}
     Usuario cliente = (Usuario) session.getAttribute("usuario");
 %>
 
@@ -75,15 +85,16 @@
                 int totalEtapas = etapas != null ? etapas.size() : 0;
                 int etapasCompletadas = 0;
                 int totalTareas = 0;
-                int tareasCompletadas = 0;
-                int horasTotales = 0; // Calcular desde HorasTrabajadas
+                
+                int horasTotales = 0;
+                if (horasPorProyecto.containsKey(proyecto.getId())) {
+                	horasTotales = horasPorProyecto.get(proyecto.getId());
+                }
                 
                 if (etapas != null) {
                     for (Etapa e : etapas) {
                         if ("Done".equals(e.getEstado())) etapasCompletadas++;
-                        // Aquí calcular tareas de cada etapa
-                        // totalTareas += e.getTareas().size();
-                        // tareasCompletadas += contar tareas "Done"
+                        totalTareas += e.getTareas().size();
                     }
                 }
                 
@@ -105,8 +116,9 @@
                             <p class="text-sm text-blue-100"><%= proyecto.getDescripcion() %></p>
                         </div>
                         <span class="px-3 py-1 text-xs font-semibold rounded-full flex-shrink-0 ml-2
-                            <%= "Activo".equals(proyecto.getEstado()) ? "bg-green-100 text-green-800" :
-                                "Completo".equals(proyecto.getEstado()) ? "bg-blue-100 text-blue-800" :
+                            <%= "Done".equals(proyecto.getEstado()) ? "bg-green-100 text-green-800" :
+                                "In Progress".equals(proyecto.getEstado()) ? "bg-blue-100 text-blue-800" :
+                                "To Do".equals(proyecto.getEstado()) ? "bg-bg-yellow-500 text-yellow-500" :                                    
                                 "bg-gray-100 text-gray-800" %>">
                             <%= proyecto.getEstado() %>
                         </span>
@@ -118,7 +130,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                         <span class="font-medium">Supervisor:</span>
-                        <span class="ml-1">Juan Pérez</span> <!-- Obtener del proyecto -->
+                        <span class="ml-1"><%= proyecto.getSupervisor().getNombreCompleto() %></span> <!-- Obtener del proyecto -->
                     </div>
                 </div>
                 

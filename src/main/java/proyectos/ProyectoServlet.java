@@ -5,6 +5,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import proyectoHorasDTO.ProyectoHoras;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -119,6 +121,15 @@ public class ProyectoServlet extends HttpServlet {
 	        return new ArrayList<>();
 	    }
 	}
+	
+    private List<ProyectoHoras> cargarProyectoHorasClienteSeguro(HttpServletRequest request, int id) {
+    	try {
+    		return dao.obtenerHorasPorCliente(id);
+    	} catch (DAOException e) {
+    		request.setAttribute("error", "No se pudieron cargar los clientes: " + e.getMessage());
+	        return new ArrayList<>();
+    	}
+    }
 
     @Override
     public void init() {
@@ -212,15 +223,16 @@ public class ProyectoServlet extends HttpServlet {
                 
             case "mis-proyectos":
             	request.setAttribute("proyectos", cargarMisProyectos(request));
-            	//request.setAttribute("clientes", cargarClientesSeguro(request));
-                //request.setAttribute("supervisores", cargarUsuariosSeguro(request));
             	request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
             	break; 
+            	
             case "cliente":
             	request.setAttribute("proyectos", cargarMisProyectosCliente(request));
-            	System.out.println(cargarMisProyectosCliente(request));
-            	request.setAttribute("cliente", cargarClienteSeguro(request));
-                //request.setAttribute("supervisores", cargarUsuariosSeguro(request));
+            	Cliente cli = cargarClienteSeguro(request);
+            	request.setAttribute("cliente", cli);
+            	List<ProyectoHoras> horas = cargarProyectoHorasClienteSeguro(request, cli.getId());
+            	System.out.println("Horas de los proyectos: "+horas);
+            	request.setAttribute("horas", horas);
             	request.getRequestDispatcher("proyectos/proyectosCliente.jsp").forward(request, response);
             	break;
         }

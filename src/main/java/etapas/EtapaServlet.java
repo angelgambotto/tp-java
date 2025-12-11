@@ -12,6 +12,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import proyectoHorasDTO.ProyectoHoras;
 import proyectos.Proyecto;
 import proyectos.ProyectoDAO;
 import tareas.Tarea;
@@ -79,6 +80,16 @@ public class EtapaServlet extends HttpServlet {
 	        return new ArrayList<>();
 	    }
 	}
+    
+    
+    private ProyectoHoras cargarProyectoHorasClienteSeguro(HttpServletRequest request, int idC, int idP) {
+    	try {
+    		return pdao.obtenerHorasPorClienteProyecto(idC, idP);
+    	} catch (DAOException e) {
+    		request.setAttribute("error", "No se pudieron cargar los clientes: " + e.getMessage());
+	        return new ProyectoHoras(0, 0);
+    	}
+    }
     
     // DO GET 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -230,6 +241,8 @@ public class EtapaServlet extends HttpServlet {
              break;
         case "detalleCliente":
         	request.setAttribute("proyecto", proyecto);
+        	ProyectoHoras horas = cargarProyectoHorasClienteSeguro(request, proyecto.getCliente().getId(), proyecto.getId());
+        	request.setAttribute("horas", horas.getTotalHoras());
         	destino="proyectos/detalleProyectoCliente.jsp";
         }
 

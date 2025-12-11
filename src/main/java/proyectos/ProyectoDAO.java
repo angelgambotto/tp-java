@@ -14,6 +14,7 @@ import clientes.Cliente;
 import clientes.ClienteDAO;
 import etapas.EtapaDAO;
 import exceptions.DAOException;
+import proyectoHorasDTO.ProyectoHoras;
 import utils.ConexionDB;
 import java.sql.Date;
 import usuarios.Usuario;
@@ -296,7 +297,74 @@ public class ProyectoDAO {
         }
         return lista;
     }
+    
+ // Fragmento de ProyectoDAO.java (o ProyectoDAOImpl.java)
 
+    public List<ProyectoHoras> obtenerHorasPorCliente(int idCliente) throws DAOException {
+        List<ProyectoHoras> resultados = new ArrayList<>();
+        
+        String sql = """
+        		SELECT p.id proyecto, SUM(ht.cantidad) horas 
+        		FROM proyecto p 
+        		INNER JOIN etapa e ON e.idProyecto = p.id 
+        		INNER JOIN tarea t ON t.idEtapa = e.id 
+        		INNER JOIN hora_trabajada ht ON ht.idTarea = t.id 
+        		WHERE p.idCliente = ?
+        		GROUP BY p.id;
+        		""";
+
+        try (Connection conn = ConexionDB.getConexion();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+             
+            ps.setInt(1, idCliente);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int idProyecto = rs.getInt("proyecto");
+                    int horas = rs.getInt("horas");
+                    
+                    ProyectoHoras dto = new ProyectoHoras(idProyecto, horas);
+                    resultados.add(dto);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Error al obtener los proyectos del empleado: " + idCliente, e);
+        }
+        return resultados;
+    }
+
+    public ProyectoHoras obtenerHorasPorClienteProyecto(int idCliente, int idProyecto) throws DAOException {
+        ProyectoHoras resultados = new ProyectoHoras();
+        
+        String sql = """
+        		SELECT p.id proyecto, SUM(ht.cantidad) horas 
+        		FROM proyecto p 
+        		INNER JOIN etapa e ON e.idProyecto = p.id 
+        		INNER JOIN tarea t ON t.idEtapa = e.id 
+        		INNER JOIN hora_trabajada ht ON ht.idTarea = t.id 
+        		WHERE p.idCliente = ? and p.id = ?
+        		GROUP BY p.id;
+        		""";
+
+        try (Connection conn = ConexionDB.getConexion();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+             
+            ps.setInt(1, idCliente);
+            ps.setInt(2, idProyecto);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int idP = rs.getInt("proyecto");
+                    int horas = rs.getInt("horas");
+                    
+                    resultados = new ProyectoHoras(idP, horas);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Error al obtener los proyectos del empleado: " + idCliente, e);
+        }
+        return resultados;
+    }
 }
 
 

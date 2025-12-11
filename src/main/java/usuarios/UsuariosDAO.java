@@ -161,7 +161,7 @@ public class UsuariosDAO {
 	        stmt.setString(7, salt);
 	        if (user.getSupervisor() != null) stmt.setInt(8, user.getSupervisor());
 	        else stmt.setNull(8, java.sql.Types.INTEGER);
-	        if (user.getIdCliente() != null) stmt.setInt(8, user.getIdCliente());
+	        if (user.getIdCliente() != null) stmt.setInt(9, user.getIdCliente());
 	        else stmt.setNull(9, java.sql.Types.INTEGER);
 	        stmt.executeUpdate();
 	        ResultSet rs = stmt.getGeneratedKeys();
@@ -170,6 +170,7 @@ public class UsuariosDAO {
 	        rs.close();
 	        stmt.close();
 	    } catch (SQLException e) {
+	    	System.out.println("El error al ingresar el cliente es: "+e);
 	        throw new DAOException("Error al agregar al usuario: " + user.getMail(), e);
 	    }
 	}

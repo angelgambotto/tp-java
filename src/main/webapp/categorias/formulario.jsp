@@ -15,7 +15,7 @@
 <body>
 
 <div id="insert/update" class="fixed inset-0 bg-gray-900 bg-opacity-50 <%= (request.getAttribute("abrirModal") != null) ? "" : "hidden" %> flex items-center justify-center">
-    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md max-h-screen overflow-y-auto">
         <h2 class="text-2xl font-bold mb-4"><%=cat!=null?"Editar categoriaTarea":"Crear categoriaTarea" %></h2>
          <form action="CategoriaTareaServlet" method="post" class="space-y-4">
             <input type="hidden" name="id" value="<%= cat != null ? cat.getId() : 0 %>" />
