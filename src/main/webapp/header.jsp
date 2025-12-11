@@ -36,7 +36,6 @@
                             break;
                         case "cliente":
                             %>
-                            <a href="ProyectoServlet" class="hover:underline transition">Mis proyectos</a>
                             <a href="ProyectoServlet?action=cliente" class="hover:underline transition">Mis proyectos</a>
                             <%
                             break;
