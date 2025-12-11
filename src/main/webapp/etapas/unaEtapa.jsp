@@ -55,6 +55,20 @@
 %>
 
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+	<!-- BOTÓN VOLVER -->
+    <div class="mb-4">
+	    <a href="EtapaServlet?action=list&idProyecto=<%= etapa.getIdProyecto() %>"
+	       class="flex items-center gap-2 text-gray-600 hover:text-gray-800 font-medium transition">
+	        
+	        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+	                  d="M15 19l-7-7 7-7"></path>
+	        </svg>
+	
+	        Volver al Proyecto
+	    </a>
+	</div>
+
 
     <!-- HEADER DE LA ETAPA -->
     <% if (etapa != null) { %>
