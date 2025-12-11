@@ -1,3 +1,4 @@
+<%@page import="usuarios.UsuariosDAO"%>
 <%@page import="proyectos.Proyecto"%>
 <%@page import="adjuntosComentario.AdjuntosComentarioDAO"%>
 <%@page import="adjuntosComentario.AdjuntosComentario"%>
@@ -48,6 +49,7 @@ window.addEventListener("DOMContentLoaded", function() {
     Usuario usuarioActual = (Usuario) session.getAttribute("usuario");
     String rol = usuarioActual.getRol();
     Proyecto pro = (Proyecto) request.getAttribute("proyecto");
+    List<Usuario> administradores = (List<Usuario>) request.getAttribute("administradores");
 %>
 
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -283,6 +285,18 @@ window.addEventListener("DOMContentLoaded", function() {
                 						}
                 	                }
                 				}
+                	            if(pro.getSupervisor().getId() == idEmp){
+                	            	nombreEmp = pro.getSupervisor().getApellido() + ", " + pro.getSupervisor().getNombre(); 
+                	            }
+                	            if(administradores != null){
+                	            	for (Usuario u : administradores){
+                	            		if(u.getId() == idEmp){
+                	            			nombreEmp = u.getApellido() + ", " +u.getNombre();
+                	  						break;
+                	            		}
+                	            	}
+                	            }
+                	            
                             %>
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 text-sm text-gray-900"><%= nombreEmp %></td>
@@ -360,16 +374,27 @@ window.addEventListener("DOMContentLoaded", function() {
                 <% } else { 
                     for (Comentario c : comentarios) { 
                     	int idEmp = c.getIdEmpleado();
-                	            String nombreEmp = "NN";
-                	            String iniciales = "NN";
-                	            if (empleadosAsignados != null) {
-                	                for (Usuario e : empleadosAsignados) {
-                						if (e.getId() == idEmp) {
-                	  						nombreEmp = e.getApellido() + ", " +e.getNombre();
-                	  						iniciales = e.getNombre().substring(0, 1) + e.getApellido().substring(0, 1);
-                	  						break;
-                						}
-                	                }
+         	            String nombreEmp = "NN";
+         	            String iniciales = "NN";
+         	            if (empleadosAsignados != null) {
+         	                for (Usuario e : empleadosAsignados) {
+         						if (e.getId() == idEmp) {
+         	  						nombreEmp = e.getApellido() + ", " +e.getNombre();
+         	  						iniciales = e.getNombre().substring(0, 1) + e.getApellido().substring(0, 1);
+         	  						break;
+         						}
+         	                }
+        	                if(pro.getSupervisor().getId() == idEmp){
+            	            	nombreEmp = pro.getSupervisor().getApellido() + ", " + pro.getSupervisor().getNombre(); 
+            	            }
+            	            if(administradores != null){
+            	            	for (Usuario u : administradores){
+            	            		if(u.getId() == idEmp){
+            	            			nombreEmp = u.getApellido() + ", " +u.getNombre();
+            	  						break;
+            	            		}
+            	            	}
+            	            }
                 				}%>
                         <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
                             <div class="flex items-start gap-3">
