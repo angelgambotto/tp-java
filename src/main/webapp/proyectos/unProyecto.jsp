@@ -509,8 +509,7 @@
                             Editar
                         </a>
                         <a href="EtapaServlet?action=delete&id=<%= e.getId() %>&idProyecto=<%= pro.getId() %>"
-                           class="text-red-600 hover:text-red-900"
-                           onclick="event.stopPropagation(); return confirm('¿Eliminar etapa <%= e.getNombre() %>?')">
+                           class="text-red-600 hover:text-red-900">
                             Eliminar
                         </a>
                     </div>
@@ -558,8 +557,7 @@
 	     	            		usu.getId() == pro.getSupervisor().getId()) { %>
 	          
 	                        <a href="EtapaServlet?action=edit&id=<%= e.getId() %>&idProyecto=<%= pro.getId() %>"
-	                           class="text-indigo-600 hover:text-indigo-900 mr-3 lg:mr-4"
-	                           onclick="event.stopPropagation()">
+	                           class="text-indigo-600 hover:text-indigo-900 mr-3 lg:mr-4">
 	                            Editar
 	                        </a>
 	                        <a href="EtapaServlet?action=delete&id=<%= e.getId() %>&idProyecto=<%= pro.getId() %>"

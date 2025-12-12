@@ -192,7 +192,7 @@ public class UsuariosDAO {
 	        stmt.setString(7, user.getMail());
 	        if (user.getSupervisor() != null) stmt.setInt(8, user.getSupervisor());
 	        else stmt.setNull(8, java.sql.Types.INTEGER);
-	        if (user.getIdCliente() != null) stmt.setInt(8, user.getIdCliente());
+	        if (user.getIdCliente() != null) stmt.setInt(9, user.getIdCliente());
 	        else stmt.setNull(9, java.sql.Types.INTEGER);
 	        stmt.setInt(10, user.getId());
 

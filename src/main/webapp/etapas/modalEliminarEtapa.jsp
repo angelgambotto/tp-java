@@ -1,4 +1,4 @@
-<%@page import="proyectos.Proyecto"%>
+<%@page import="proyectos.Proyecto, etapas.Etapa"%>
 <% Proyecto pro = (Proyecto) request.getAttribute("proyecto");
 	String nombre = (pro != null && pro.getNombre() != null) ? pro.getNombre()  : "Desconocido" ;
 %>
