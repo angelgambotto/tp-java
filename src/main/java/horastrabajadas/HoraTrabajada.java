@@ -1,0 +1,47 @@
+package horastrabajadas;
+
+import java.util.Date;
+
+public class HoraTrabajada {
+	private int idTarea;
+	private int idEmpleado;
+	private Date fecha;
+	private int cantidad;
+	private String detalle;
+	
+	public int getIdTarea() {
+		return idTarea;
+	}
+	public void setIdTarea(int idTarea) {
+		this.idTarea = idTarea;
+	}
+	public int getIdEmpleado() {
+		return idEmpleado;
+	}
+	public void setIdEmpleado(int idEmpleado) {
+		this.idEmpleado = idEmpleado;
+	}
+	public Date getFecha() {
+		return fecha;
+	}
+	public void setFecha(Date fecha) {
+		this.fecha = fecha;
+	}
+	public int getCantidad() {
+		return cantidad;
+	}
+	public void setCantidad(int cantidad) {
+		this.cantidad = cantidad;
+	}
+	public String getDetalle() {
+		return detalle;
+	}
+	public void setDetalle(String detalle) {
+		this.detalle = detalle;
+	}
+	
+	public HoraTrabajada() {
+		super();
+	}
+	
+}
