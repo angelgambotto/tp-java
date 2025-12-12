@@ -142,8 +142,7 @@ public class ProyectoServlet extends HttpServlet {
 	        return new ArrayList<>();
     	}
     }
-    
-    //private void cargarDatosUnaEtapa(HttpServletRequest request, HttpServletResponse response) { }
+
 
     @Override
     public void init() {
@@ -245,8 +244,15 @@ public class ProyectoServlet extends HttpServlet {
                 	
 	            	request.getRequestDispatcher("/proyectos/unProyecto.jsp").forward(request, response);
 	            } else {
-	            	
+		        	request.setAttribute("supervisores", cargarUsuariosSeguro(request));
+		        	if (esEmpleado) {
+		        		request.setAttribute("proyectos", cargarMisProyectos(request));
+		        	} else {
+		        		request.setAttribute("proyectos", cargarProyectosSeguro(request));		        		
+		        	}
+		        	request.setAttribute("clientes", cargarClientesSeguro(request));
 	            	request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
+	            	return;
 	            }
                 return;
 

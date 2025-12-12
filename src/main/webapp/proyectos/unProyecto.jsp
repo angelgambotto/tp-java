@@ -398,11 +398,13 @@
                                 
                     <div class="flex justify-between items-start mb-2">
                         <h4 class="font-semibold text-gray-900 text-xs sm:text-sm"><%= tarea.getNombre() %></h4>
+                        <!-- LO COMENTEN PQ NO ESTABA HACIENDO NADA... 
                         <button class="text-gray-400 hover:text-gray-600 flex-shrink-0">
                             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
                             </svg>
                         </button>
+                         -->
                     </div>
                     
                     <p class="text-xs text-gray-600 mb-3 line-clamp-2"><%= tarea.getDescripcion() %></p>
