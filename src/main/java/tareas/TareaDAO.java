@@ -50,25 +50,16 @@ public class TareaDAO {
 	       
 	        rs = ps.getGeneratedKeys();
 	        if (rs.next()) {
-	            System.out.println("El id de la tarea es: " + rs.getInt(1));
 	            id=rs.getInt(1);
 	            tarea.setId(id);
 	        }
-	        
-	 
-	       
-	        
-	        
 	        con.commit();
-	       
-	        System.out.println("transacción completada ");
-	        return id;
+	       return id;
 	    } catch (SQLException e) {
 	       
 	        if (con != null) {
 	            try {
 	                con.rollback();
-	                System.out.println("✗ Rollback ejecutado debido a error");
 	            } catch (SQLException ex) {
 	                ex.printStackTrace();
 	            }

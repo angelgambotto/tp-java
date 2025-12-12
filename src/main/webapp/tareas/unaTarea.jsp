@@ -598,7 +598,6 @@ function eliminarAsignacion(idEmpleado, idTarea) {
 }
 
 function eliminarComentario(id) {
-    if (confirm('¿Desea eliminar este comentario?')) {
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = 'ComentarioServlet';
@@ -617,7 +616,6 @@ function eliminarComentario(id) {
         form.appendChild(comInput);
         document.body.appendChild(form);
         form.submit();
-    }
 }
 
 function filtrarEmpleados() {

@@ -56,9 +56,7 @@ public class ClienteServlet extends HttpServlet {
                 break;
             case "edit":
                 int editId = Integer.parseInt(request.getParameter("id"));
-                System.out.println("El id a editar es:"+editId);
                 Cliente cliEdit = cargarCliSeguro(request, editId);
-                System.out.println("El id obtenido es:"+cliEdit.getId());               
                 request.setAttribute("cliente", cliEdit);
                 request.setAttribute("abrirModal", true);
                 break;

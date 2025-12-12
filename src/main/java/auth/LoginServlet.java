@@ -66,7 +66,7 @@ public class LoginServlet extends HttpServlet {
 		if(user!=null) {
 			HttpSession session = request.getSession();
 		    session.setAttribute("usuario", user);
-		    System.out.println(user.getRol().toLowerCase());
+		    
 		    switch (user.getRol().toLowerCase()) {
 		        case "administrador":
 		            response.sendRedirect(request.getContextPath() + "/ProyectoServlet");
@@ -99,7 +99,4 @@ public class LoginServlet extends HttpServlet {
 	    utils.ConexionDB.shutdownCleanupThread();
 	    super.destroy();
 	}
-
-
-
-}
+} //cierra servlet

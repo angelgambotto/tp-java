@@ -126,7 +126,6 @@ public class EtapaServlet extends HttpServlet {
         
         // --- FIJAR DESTINO PARA REDIRECCIONAR O MANTENER LA PAGINA ---
         String destino = (String) request.getAttribute("destino");
-        System.out.println("destino: "+destino);
         if (destino == null) destino = "proyectos/unProyecto.jsp";
         
         // --- CARGAR PROYECTO Y ETAPAS (SIEMPRE) ---
@@ -146,7 +145,6 @@ public class EtapaServlet extends HttpServlet {
 
         // --- PASAR DATOS COMUNES ---
         List<CategoriaTarea> categorias=cargarCategoriasSeguro(request);
-        System.out.println("categoria tarea en servlet:"+ categorias);
         request.setAttribute("categorias", categorias);
         request.setAttribute("proyecto", proyecto);
         request.setAttribute("etapas", etapas);
@@ -154,17 +152,7 @@ public class EtapaServlet extends HttpServlet {
         request.setAttribute("usuarios", cargarUsuariosSeguro(request));
         request.setAttribute("usuariosAsignados", usuariosAsignados);
 
-        System.out.println("idProyecto que recibe la etapa: " + idProyecto);
-        System.out.println("Etapas encontradas: " + etapas.size());
-        for (Etapa e : etapas) {
-            System.out.println("Etapa: " + e.getNombre() + " | Estado: " + e.getEstado());
-        }
         
-        System.out.println("=== EDIT DEBUG ===");
-        System.out.println("action: " + action);
-        System.out.println("id parámetro: " + request.getParameter("idEtapa"));
-        System.out.println("idProyecto: " + request.getParameter("idProyecto"));
-
         // ACCIONES 
         
         switch(action) {
@@ -224,8 +212,7 @@ public class EtapaServlet extends HttpServlet {
         case "delete":
         
         	 int deleteId = Integer.parseInt(request.getParameter("id"));
-        		System.out.println("el id a eliminar es :"+deleteId);
-             Etapa eta = cargarEtaSeguro(request, deleteId);
+        	 Etapa eta = cargarEtaSeguro(request, deleteId);
              request.setAttribute("etapa", eta);
              
              // ESTO HABRIA QUE PASARLO AL DOPOST SI QUEREMOS CONFIRMACION
@@ -260,15 +247,14 @@ public class EtapaServlet extends HttpServlet {
     // DO POST 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-    	System.out.println("pase por el doPost");
-        Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
+    	
+    	Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
         if (usuario == null || !(("Administrador".equalsIgnoreCase(usuario.getRol()) ||"empleado".equalsIgnoreCase(usuario.getRol())))) {
             response.sendRedirect("login.jsp");
             return;
         }
 
         String idStr = request.getParameter("id");
-        System.out.println("idString "+idStr);
         int id = (idStr == null || idStr.isEmpty() || idStr.equals("null")) ? 0 : Integer.parseInt(idStr);
         List<Tarea> tareas=new ArrayList<>();
         
@@ -284,7 +270,7 @@ public class EtapaServlet extends HttpServlet {
      // --- VALIDAR idProyecto ---
         int idProyecto = 0;
         String idProyectoParam = request.getParameter("idProyecto");
-        System.out.println("idProyectoparam"+idProyectoParam);
+        
         if (idProyectoParam == null || idProyectoParam.trim().isEmpty()) {
             request.setAttribute("error", "Falta idProyecto");
             request.setAttribute("idProyecto", 0);
@@ -360,16 +346,7 @@ public class EtapaServlet extends HttpServlet {
         eta.setIdProyecto(idProyecto);
         eta.setTareas(new java.util.LinkedList<>());
         
-        //PARA DEBUG
-        System.out.println("=== ETAPA GUARDADA ===");
-        System.out.println("ID: " + id);
-        System.out.println("Nombre: " + nombre);
-        System.out.println("Estado: " + estado);
-        System.out.println("idProyecto: " + idProyecto);
-        System.out.println("Fecha Inicio: " + sqlInicio);
-        System.out.println("Fecha Tentativa: " + sqlTentativa);
-        System.out.println("Fecha Fin: " + sqlFin);
-
+        
         // INSERT O UPDATE
         try {
         	// DETECTAR SI CAMBIÓ EL ESTADO
@@ -447,13 +424,12 @@ public class EtapaServlet extends HttpServlet {
             request.setAttribute("id", eta.getId());
             try {
                 tareas=tdao.getByEtapaId(id);
-                System.out.println("las tareas son (en el try):"+tareas);}
+                }
                 catch(DAOException ex) {
                 	request.setAttribute("error", ex.getMessage());
                 };
             request.setAttribute("tareas", tareas);
             request.setAttribute("destino", "etapas/unaEtapa.jsp");
-            System.out.println("pase por aca");
             doGet(request, response); 
             return;
         }

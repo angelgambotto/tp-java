@@ -170,8 +170,7 @@ public class UsuariosDAO {
 	        rs.close();
 	        stmt.close();
 	    } catch (SQLException e) {
-	    	System.out.println("El error al ingresar el cliente es: "+e);
-	        throw new DAOException("Error al agregar al usuario: " + user.getMail(), e);
+	    	throw new DAOException("Error al agregar al usuario: " + user.getMail(), e);
 	    }
 	}
 

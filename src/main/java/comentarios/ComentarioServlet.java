@@ -85,7 +85,6 @@ public class ComentarioServlet extends HttpServlet {
 		
 		case "new":
 			try {
-				System.out.println("entro al crear comentario");
 	            Tarea tarea = tdao.getOne(idTarea);
 	            List<Usuario> asignados = tdao.getUsuariosAsignados(tarea.getId());
 	            Etapa etapa = edao.getOne(tarea.getIdEtapa());
@@ -119,7 +118,7 @@ public class ComentarioServlet extends HttpServlet {
 	            comentario.setFecha(hoy);
 	            //recupero el id para los adjuntos
 	            int idComentario = cdao.insert(comentario);
-	            System.out.println("idComentario insertado" + idComentario);
+	            
 	            // 2. SUBIR ARCHIVOS (si los hay)
 	            String uploadPath = getServletContext().getRealPath("") 
                         + File.separator + "uploads" 
@@ -136,17 +135,14 @@ public class ComentarioServlet extends HttpServlet {
 		              String fileName = getFileName(part);
 		              
 		              if (fileName != null && !fileName.isEmpty()) {
-		                  System.out.println("Subiendo archivo: " + fileName + " (" + part.getSize() + " bytes)");
 		
 		                  String extension = fileName.contains(".") 
 		                      ? fileName.substring(fileName.lastIndexOf(".")) : "";
 		                  String nombreGuardado = idComentario + "_" + System.currentTimeMillis() + extension;
 		
 		                  File archivoDestino = new File(uploadDir, nombreGuardado);
-		                  
-		                  // ¡ESTE ES EL QUE FUNCIONA!
-		                  part.write(archivoDestino.getAbsolutePath());  // ← MÉTODO MÁGICO DE Part
-		                  System.out.println("Archivo físicamente guardado en: " + archivoDestino.getAbsolutePath());     
+		                 
+		                  part.write(archivoDestino.getAbsolutePath());     
 		                  // Guardar en base de datos
 	                        AdjuntosComentario adjunto = new AdjuntosComentario();
 	                        adjunto.setIdComentario(idComentario);
@@ -156,10 +152,8 @@ public class ComentarioServlet extends HttpServlet {
 	                        adjunto.setTamanoKb((int) (part.getSize() / 1024));
 	                        adjunto.setTipoMime(part.getContentType());
 	                        
-	                        System.out.println("ENTRO AL DAO ADJUNTOS");
 	                        AdjuntosComentarioDAO.insertar(adjunto);
-	                        System.out.println("SALIO DEL DAO ADJUNTOS");
-	                        
+	                       
 		                    }
 		                }
 		      }
@@ -215,7 +209,6 @@ public class ComentarioServlet extends HttpServlet {
 		case "delete":
 			try {
 				int idComentario = Integer.parseInt(request.getParameter("idComentario"));
-				System.out.println("comentario a borrar: "+idComentario);
 				Comentario c = cdao.getById(idComentario);
 				
 				idTarea = c.getIdTarea();

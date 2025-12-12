@@ -43,17 +43,11 @@ public class EtapaDAO {
 	                new java.sql.Date(etapa.getFechaTentativa().getTime()) : null);
 	            ps.setInt(7, etapa.getIdProyecto());
 	            
-	            // para debug
-	            int filas = ps.executeUpdate();
-	            System.out.println("FILAS INSERTADAS: " + filas);  
-
-	            // Para ver si se insertó de verdad
+	            ps.executeUpdate();
+	            
 	            ResultSet rs = ps.getGeneratedKeys();
 	            if (rs.next()) {
 	                 id=rs.getInt(1);
-	            	System.out.println("ID NUEVO: " + id);
-	            	// ← ¿Aparece?
-	                
 	            }
 	            return id;
 

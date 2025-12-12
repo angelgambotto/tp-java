@@ -92,11 +92,8 @@ public class ProyectoServlet extends HttpServlet {
 
 	private List<Proyecto> cargarMisProyectos(HttpServletRequest request) {
 	    try {
-	    	System.out.println("===ENTRO A CARGAR MIS PROYECTOS ===");
-	    	//Usuario usu = (Usuario) request.getAttribute("usuario");
 	    	Usuario usu = (Usuario) request.getSession().getAttribute("usuario");
-	    	System.out.println("idusuario: "+usu.getId());
-	        return dao.getByIdEmpleado(usu.getId());
+	    	return dao.getByIdEmpleado(usu.getId());
 	    } catch (DAOException e) {
 	        request.setAttribute("error", "No se pudieron cargar los proyectos del empleado: " + e.getMessage());
 	        return new ArrayList<>();
@@ -197,8 +194,7 @@ public class ProyectoServlet extends HttpServlet {
                 request.setAttribute("fechaCreacion", sdf.format(proEdit.getFechaCreacion()));
                 request.setAttribute("supervisorId", proEdit.getSupervisor().getId());
                 request.setAttribute("origin", origin);
-                System.out.println("Supervisor: " + proEdit.getSupervisor());
-
+                
                 boolean tienePendientes = false;
                 try {
                     tienePendientes = etapaDAO.tieneEtapasIncompletas(proEdit.getId());
@@ -291,7 +287,6 @@ public class ProyectoServlet extends HttpServlet {
             	Cliente cli = cargarClienteSeguro(request);
             	request.setAttribute("cliente", cli);
             	List<ProyectoHoras> horas = cargarProyectoHorasClienteSeguro(request, cli.getId());
-            	System.out.println("Horas de los proyectos: "+horas);
             	request.setAttribute("horas", horas);
             	request.getRequestDispatcher("proyectos/proyectosCliente.jsp").forward(request, response);
             	break;
@@ -309,7 +304,7 @@ public class ProyectoServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	System.out.println(">>> Entró a post proyecto <<<");
+    	
     	Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
     	
     	int id = request.getParameter("id") == null || request.getParameter("id").isEmpty()
@@ -317,14 +312,14 @@ public class ProyectoServlet extends HttpServlet {
     	
     	List<Usuario> asig = cargarAsignadosSeguro(request, id);
     	Boolean esta = asig.contains(usuario);
-    	System.out.println("===DOPOST ESTA: "+esta);
-	    if (esta == false && !("Administrador".equalsIgnoreCase(usuario.getRol()) || "Empleado".equalsIgnoreCase(usuario.getRol()))) {
+    	
+    	if (esta == false && !("Administrador".equalsIgnoreCase(usuario.getRol()) || "Empleado".equalsIgnoreCase(usuario.getRol()))) {
 	        response.sendRedirect("login.jsp");
 	        return; 
 	    }
 	    
 	    String action=request.getParameter("action");
-	    System.out.println("action: "+ action);
+	    
 	    if (action == null) {
 	    	action = "insert-update";
 	    }
@@ -334,7 +329,6 @@ public class ProyectoServlet extends HttpServlet {
 			insertarProyecto(request,response, id, usuario);
 			break;
 		case "asignar":
-			System.out.println(">>> Entró a asignarUsuarios <<<");
 			asignarUsuarios(request,response, id);
 			break;
 		
@@ -378,8 +372,7 @@ public class ProyectoServlet extends HttpServlet {
        		String origin = request.getParameter("origin");
             
             if ("unProyecto".equals(origin)) {
-            	System.out.println("ENTRE A DO POST UPDATE UN PROYECTO");
-                
+            	
             	//1. CARGO EL PROYECTO
             	Proyecto proyec = cargarProSeguro(request, id);
             	request.setAttribute("proyecto", proyec);
@@ -425,8 +418,7 @@ public class ProyectoServlet extends HttpServlet {
     
     private void asignarUsuarios(HttpServletRequest request, HttpServletResponse response, int id)
             throws IOException, ServletException {
-    	System.out.println(">>> Entró estro a asignarUsuarios <<<");
-        try {
+    	try {
             String[] usuariosForm = request.getParameterValues("usuarios");
 
             List<Integer> usuariosSeleccionados = new ArrayList<>();

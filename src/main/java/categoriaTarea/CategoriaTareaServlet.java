@@ -65,7 +65,6 @@ public class CategoriaTareaServlet extends HttpServlet {
 	    	case "delete":
 	    		
 	    	try{
-	    		System.out.println("el id al eliminar la categoria: "+request.getParameter("id"));
 	    		idCategoria=Integer.parseInt(request.getParameter("id"));
 	    		CategoriaTarea cat = dao.getById(idCategoria);
 	    		if (cat != null) {

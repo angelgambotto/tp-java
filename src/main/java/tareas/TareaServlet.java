@@ -235,23 +235,18 @@ public class TareaServlet extends HttpServlet {
         	List<Comentario> comentarios = comdao.getAllByIdTarea(tareaDetalle.getId());
         	List<HoraTrabajada> horas = htdao.getAllByIdTarea(tareaDetalle.getId());
         	List<Usuario> administradores = udao.getPorRol("Administrador");
-        	request.setAttribute("administradores", administradores);
         	
-		    System.out.println("==========================");
-            System.out.println("Tarea seleccionada: "+tareaDetalle);
-            System.out.println("Usuarios asignados: "+asignados);
-            System.out.println("==========================");
-            
+        	request.setAttribute("administradores", administradores);
         	request.setAttribute("etapa", etapa);
         	request.setAttribute("tarea", tareaDetalle);
         	request.setAttribute("empleadosAsignados", asignados);
         	request.setAttribute("empleadosDisponibles", disponibles);
-
         	request.setAttribute("comentarios", comentarios);
         	request.setAttribute("horas", horas);
             request.setAttribute("usuario", usuario);
             request.setAttribute("proyecto", proDetalle);
             request.setAttribute("tab",tab);
+            
         	request.getRequestDispatcher("/tareas/unaTarea.jsp").forward(request, response);
             break;
             
@@ -316,9 +311,6 @@ public class TareaServlet extends HttpServlet {
 		int idTarea = Integer.parseInt(idTareaParam);
 	    int idEtapa = Integer.parseInt(idEtapaParam);
 	   
-	    
-	    System.out.println("el valor de id tarea es: "+ idTarea);
-	    System.out.println("El valor de id etapa es:  "+idEtapa);
 	    int idProyecto=0;
 		try{
 			tdao.delete(idTarea);
@@ -328,8 +320,6 @@ public class TareaServlet extends HttpServlet {
 		}
 		catch(DAOException e) {
 			request.setAttribute("error al eliminar la tarea: ", e);
-			System.out.println("no puedo borrar tarea"+e.getMessage());
-		
 		}
 	
 		response.sendRedirect("TareaServlet?action=list&idEtapa="+idEtapa);
@@ -351,8 +341,6 @@ public class TareaServlet extends HttpServlet {
 		}
 		tarea.setIdEtapa(Integer.parseInt(request.getParameter("idEtapa")));
 		tarea.setIdCategoria(Integer.parseInt(request.getParameter("idCategoria")));
-		System.out.println("===== DEBUG INSERT TAREA =====");
-		System.out.println("hasta el insertar llegue");
 		Etapa e=edao.getOne(Integer.parseInt(request.getParameter("idEtapa")));
 		String estadoEtapa=e.getEstado();
 		if(estadoEtapa.equals("Done")){
@@ -398,8 +386,8 @@ public class TareaServlet extends HttpServlet {
 	        tdao.update(tarea);
 	        
 	        List<Usuario> usuarios=tdao.getUsuariosAsignados(tarea.getId());
-	        System.out.println("los usuarios de la tarea son:"+usuarios);
-//obtener usuarios asignados a la tarea para poder mandar mail
+	        
+	        //obtener usuarios asignados a la tarea para poder mandar mail
 	        for (Usuario u : usuarios) {
                 
                 if (u != null) {

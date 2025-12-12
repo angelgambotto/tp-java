@@ -118,9 +118,7 @@ public class HoraTrabajadaServlet extends HttpServlet {
     }
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		System.out.println("ACTION = " + request.getParameter("action")+" en GET");
-		//Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
-		//String rol = usuario != null ? usuario.getRol().toLowerCase() : "";
+		
 		String action = (request.getParameter("action")) == null ? "misHoras" : request.getParameter("action") ;
 		
 		switch(action) {
@@ -143,7 +141,6 @@ public class HoraTrabajadaServlet extends HttpServlet {
 	            } else {
 	            	
 	            	// OBTENER DATOS DE NUEVO (tareas, proyectos, usuario)
-	            	// (puedes tener un método que cargue todo)
 	            	cargarDatosMisTareas(request, response);
 	            	// FORWARD A LA MISMA PÁGINA
 	            	request.getRequestDispatcher("/tareas/mis-tareas.jsp").forward(request, response);
@@ -159,17 +156,12 @@ public class HoraTrabajadaServlet extends HttpServlet {
 			break;
 		
 		case "misHoras":
-			System.out.println(action);
 			// OBTENER DATOS DE NUEVO (tareas, proyectos, usuario)
-            // (puedes tener un método que cargue todo)
             cargarDatosMisTareas(request, response);
             response.sendRedirect("TareaServlet?action=mis-tareas");
 			break;
 			
 		case "reporte":
-			
-			System.out.println("====================");
-			System.out.println("DEBUG REPORTES");
 			
 			Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
 
@@ -179,7 +171,7 @@ public class HoraTrabajadaServlet extends HttpServlet {
 	        }
 
 	        String lista = request.getParameter("lista");
-	        System.out.println("Lista: "+lista);
+	        
 	        if ("null".equals(lista) || lista == null) {
 	        	lista = "usuarios";
 	        }
@@ -199,13 +191,11 @@ public class HoraTrabajadaServlet extends HttpServlet {
 	                case "usuarios":
 	                    request.setAttribute("data", rdao.horasPorUsuario(desde, hasta));
 	                    request.setAttribute("tipo", "usuarios");
-	                    System.out.println("Entro a usuarios");
 	                    break;
 
 	                case "usuariosProyecto":
 	                    request.setAttribute("data", rdao.horasPorUsuarioProyecto(desde, hasta));
 	                    request.setAttribute("tipo", "usuariosProyecto");
-	                    System.out.println("Entro a usuariosProyectos");
 	                    break;
 
 	                case "usuariosProyectoEtapa":
@@ -222,8 +212,7 @@ public class HoraTrabajadaServlet extends HttpServlet {
 	                request.setAttribute("error", e.getMessage());
 	                System.out.println("error de dao");
 	        }
-	        System.out.println("====================");
-            request.getRequestDispatcher("/horasTrabajadas/reporte.jsp").forward(request, response);    
+	        request.getRequestDispatcher("/horasTrabajadas/reporte.jsp").forward(request, response);    
 	        
 		    break;
 		
@@ -236,9 +225,7 @@ public class HoraTrabajadaServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		System.out.println("ACTION = " + request.getParameter("action")+" en POST");
-
+		
 		Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
 		
 	    if (usuario == null) {
@@ -254,8 +241,7 @@ public class HoraTrabajadaServlet extends HttpServlet {
     	int cantidad = Integer.parseInt(request.getParameter("cantidad"));
     	String detalle = request.getParameter("detalle");
     	String fechaStr = request.getParameter("fecha");
-    	System.out.println("idTarea"+idTarea+"idEmpleado"+idEmpleado);
-         Date fecha = null;
+    	Date fecha = null;
          try {
              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
              fecha = sdf.parse(fechaStr);
@@ -270,7 +256,6 @@ public class HoraTrabajadaServlet extends HttpServlet {
     	
     	switch(action) {
     	case "new":
-    		System.out.println("estuve aqui");
     		HoraTrabajada hora = new HoraTrabajada();
     		hora.setIdTarea(idTarea);
     		hora.setIdEmpleado(idEmpleado);

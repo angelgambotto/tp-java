@@ -25,8 +25,7 @@ public class ProyectoDAO {
         String sql = "INSERT INTO Proyecto (nombre, descripcion, estado, idCliente, fechaCreacion, idSupervisor) VALUES (?,?,?,?,?,?)";
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-        	System.out.println(pro.getSupervisor().getId());
-            ps.setString(1, pro.getNombre());
+        	ps.setString(1, pro.getNombre());
             ps.setString(2, pro.getDescripcion());
             ps.setString(3, pro.getEstado());
             ps.setInt(4, pro.getCliente().getId());
