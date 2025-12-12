@@ -99,7 +99,7 @@ public class EtapaDAO {
 	            ps.executeUpdate();
 
 	        } catch (SQLException e) {
-	        	throw new DAOException("Error al eliminar la etapa con id: "+ id, e);
+	        	throw new DAOException("No se pudo eliminar la etapa, posiblemente tenga tareas asociadas. Primero elimine todas las tareas", e);
 	        }
 	}
 	public boolean tieneEtapasIncompletas(int idProyecto) throws DAOException {

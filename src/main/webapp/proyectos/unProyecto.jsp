@@ -555,8 +555,7 @@
 	                            Editar
 	                        </a>
 	                        <a href="EtapaServlet?action=delete&id=<%= e.getId() %>&idProyecto=<%= pro.getId() %>"
-	                           class="text-red-600 hover:text-red-900"
-	                           onclick="event.stopPropagation(); return confirm('¿Eliminar etapa <%= e.getNombre() %>?')">
+	                           class="text-red-600 hover:text-red-900">
 	                            Eliminar
 	                        </a>
 	                        <% } %>
@@ -633,6 +632,19 @@
     </div>
 </div>
 
+<!-- MENSAJE FLOTANTE -->
+<div id="mensajeEtapa" class="hidden fixed top-4 right-4 z-50 max-w-md">
+    <div id="mensajeContenido" class="px-6 py-4 rounded-lg shadow-lg text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <svg id="mensajeIcono" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span id="mensajeTexto"></span>
+        </div>
+        <button onclick="document.getElementById('mensaje').classList.add('hidden')" 
+                class="ml-4 text-2xl font-bold hover:opacity-70">×</button>
+    </div>
+</div>
 
 
 <script>
@@ -682,6 +694,45 @@ window.onclick = function(event) {
             modal.classList.add('hidden');
         }
     });
+}
+
+//Mensajes flotantes
+document.addEventListener("DOMContentLoaded", function() {
+    <%
+    String exito = (String) session.getAttribute("mensajeExito");
+    String error = (String) session.getAttribute("mensajeError");
+    if (exito != null) {
+        session.removeAttribute("mensajeExito");
+    %>
+        mostrarMensaje("<%= exito %>", "verde");
+    <%
+    } else if (error != null) {
+        session.removeAttribute("mensajeError");
+    %>
+        mostrarMensaje("<%= error %>", "rojo");
+    <%
+    }
+    %>
+});
+
+function mostrarMensaje(texto, color) {
+    const div = document.getElementById('mensajeEtapa');
+    const contenido = document.getElementById('mensajeContenido');
+    const textoSpan = document.getElementById('mensajeTexto');
+    const icono = document.getElementById('mensajeIcono');
+    
+    textoSpan.textContent = texto;
+    
+    if (color === "verde") {
+        contenido.className = "px-6 py-4 rounded-lg shadow-lg text-white flex items-center justify-between bg-green-600";
+        icono.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>';
+    } else {
+        contenido.className = "px-6 py-4 rounded-lg shadow-lg text-white flex items-center justify-between bg-red-600";
+        icono.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+    }
+    
+    div.classList.remove('hidden');
+    setTimeout(() => div.classList.add('hidden'), 6000);
 }
 </script>
 

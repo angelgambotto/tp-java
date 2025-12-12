@@ -231,13 +231,20 @@ public class EtapaServlet extends HttpServlet {
              // ESTO HABRIA QUE PASARLO AL DOPOST SI QUEREMOS CONFIRMACION
              try {
                  edao.delete(deleteId);
+                 request.setAttribute("etapas", cargarEtapasSeguro(request));
+                 // ÉXITO: se borró bien
+                 request.getSession().setAttribute("mensajeExito", 
+                     "Etapa '" + eta.getNombre() + "' eliminada correctamente");
+                 request.getRequestDispatcher(destino).forward(request, response);
+                 return;
                  
              } catch (DAOException e) {
-                 request.setAttribute("error", e.getMessage());
-                 System.out.println("no me puedo borrar por"+ e.getMessage());
                  
-                 
+            	// ERROR: tiene etapas, tareas, etc.
+                 request.getSession().setAttribute("mensajeError", 
+                     "No se pudo eliminar la etapa, posiblemente tenga tareas asociadas. Primero elimine todas las tareas");    
              }
+             
              break;
         case "detalleCliente":
         	request.setAttribute("proyecto", proyecto);
