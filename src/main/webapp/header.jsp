@@ -28,15 +28,15 @@
                             <% break;
                         case "empleado":
                             %>
-                            <a href="ProyectoServlet" class="hover:underline transition">Mis proyectos</a>
+                            <a href="ProyectoServlet" class="hover:underline transition">Mis Proyectos</a>
                             <%
                             %>
-                            <a href="TareaServlet" class="hover:underline transition">Mis tareas</a>
+                            <a href="TareaServlet" class="hover:underline transition">Mis Tareas</a>
                             <%
                             break;
                         case "cliente":
                             %>
-                            <a href="ProyectoServlet?action=cliente" class="hover:underline transition">Mis proyectos</a>
+                            <a href="ProyectoServlet?action=cliente" class="hover:underline transition">Mis Proyectos</a>
                             <%
                             break;
                         default:
@@ -89,21 +89,19 @@
                                 <a href="ProyectoServlet" class="py-2 px-3 hover:bg-blue-500 rounded transition">Proyectos</a>
                                 <a href="ClienteServlet" class="py-2 px-3 hover:bg-blue-500 rounded transition">Clientes</a>
                                 <a href="CategoriaTareaServlet" class="py-2 px-3 hover:bg-blue-500 rounded transition">Categorías</a>
+                                <a href="HoraTrabajadaServlet?action=reporte" class="py-2 px-3 hover:bg-blue-500 rounded transition">Reportes</a>
                                 <% break;
-                            case "supervisor":
-                                %>
-                                <a href="ProyectoServlet" class="py-2 px-3 hover:bg-blue-500 rounded transition">Proyectos</a>
-                                <a href="TareaServlet" class="py-2 px-3 hover:bg-blue-500 rounded transition">Mis tareas</a>
-                                <%
-                                break;
                             case "empleado":
+                            	%>
+                                <a href="ProyectoServlet" class="py-2 px-3 hover:bg-blue-500 rounded transition">Mis Proyectos</a>
+                                <%
                                 %>
-                                <a href="TareaServlet" class="py-2 px-3 hover:bg-blue-500 rounded transition">Mis tareas</a>
+                                <a href="TareaServlet" class="py-2 px-3 hover:bg-blue-500 rounded transition">Mis Tareas</a>
                                 <%
                                 break;
-                            case "usuario":
+                            case "cliente":
                                 %>
-                                <a href="TareaServlet" class="py-2 px-3 hover:bg-blue-500 rounded transition">Mis tareas</a>
+                                <a href="ProyectoServlet?action=cliente" class="py-2 px-3 hover:bg-blue-500 rounded transition">Mis Proyectos</a>
                                 <%
                                 break;
                             default:

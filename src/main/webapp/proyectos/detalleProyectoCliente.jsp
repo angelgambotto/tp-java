@@ -76,7 +76,8 @@
                     <span class="px-3 py-1 text-xs font-semibold rounded-full
                         <%= "Done".equals(proyecto.getEstado()) ? "bg-green-100 text-green-800" :
                             "In Progress".equals(proyecto.getEstado()) ? "bg-blue-100 text-blue-800" :
-                            "To Do".equals(proyecto.getEstado()) ? "bg-bg-yellow-500 text-yellow-500" :
+                            "To Do".equals(proyecto.getEstado()) ? "bg-yellow-100 text-yellow-800" :
+                            "Canceled".equals(proyecto.getEstado()) ? "bg-red-100 text-red-800":
                             "bg-gray-100 text-gray-800" %>">
                         <%= proyecto.getEstado() %>
                     </span>

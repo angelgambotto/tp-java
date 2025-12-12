@@ -203,21 +203,19 @@ public class TareaServlet extends HttpServlet {
             break;
         case "mis-tareas":
             List<Tarea> misTareas = tdao.getByUsuarioId(usuario.getId());
+            List<Etapa> etapas = new ArrayList<Etapa>();
             List<Proyecto> proyectos = new ArrayList<Proyecto>();
+            
             for (Tarea tarea2 : misTareas) {
-				Proyecto pro = pdao.getById((edao.getOne(tarea2.getIdEtapa()).getIdProyecto()));
+            	Etapa etapa2 = edao.getOne(tarea2.getIdEtapa());
+				Proyecto pro = pdao.getById(etapa2.getIdProyecto());
 				proyectos.add(pro);
-				
-				// IMPRIMIR CADA PROYECTO
-		        System.out.println("Tarea: " + tarea2.getNombre() + 
-		                         " | Proyecto ID: " + pro.getId() + 
-		                         " | Nombre proyecto: " + pro.getNombre());
+				etapas.add(etapa2);
             }
 		    
-            System.out.println("Total proyectos: " + proyectos.size());
-		    System.out.println("==========================");
 			
             request.setAttribute("tareas", misTareas);
+            request.setAttribute("etapas", etapas);
             request.setAttribute("proyectos", proyectos);
             request.setAttribute("usuario", usuario);
             request.setAttribute("esEmpleado", true);

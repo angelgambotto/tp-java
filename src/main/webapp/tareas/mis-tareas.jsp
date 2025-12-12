@@ -1,12 +1,12 @@
 <%@page import="usuarios.Usuario"%>
-<%@ page import="java.util.List, tareas.Tarea, proyectos.Proyecto" %>
+<%@ page import="java.util.List, tareas.Tarea, proyectos.Proyecto, etapas.Etapa" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Mis Tareas</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
         function toggleModal(nameModal) {
@@ -15,107 +15,123 @@
         }
     </script>
 </head>
-<body>
+<body class="bg-gray-100 font-sans">
 <jsp:include page="../header.jsp" />
-<div class="container mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-6">Mis Tareas</h1>
 
-    <% List<Tarea> tareas = (List<Tarea>) request.getAttribute("tareas"); 
-    	List<Proyecto> proyectos = (List<Proyecto>) request.getAttribute("proyectos");
-    	Usuario usuario = (Usuario) request.getAttribute("usuario");
-    %>
+<% 
+    List<Tarea> tareas = (List<Tarea>) request.getAttribute("tareas");
+	List<Etapa> etapas = (List<Etapa>) request.getAttribute("etapas");
+    List<Proyecto> proyectos = (List<Proyecto>) request.getAttribute("proyectos");
+    Usuario usuario = (Usuario) request.getAttribute("usuario");
+%>
+
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+
+    <div class="bg-white rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-6">
+        <div class="flex items-center gap-3">
+            <div class="bg-indigo-100 p-3 rounded-lg">
+                <svg class="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Mis Tareas</h1>
+                 <p class="text-sm sm:text-base text-gray-600">Tareas asignadas a <%= usuario.getNombre() %> <%= usuario.getApellido() %></p>
+            </div>
+        </div>
+    </div>
+
     <% if (tareas.isEmpty()) { %>
-        <p class="text-gray-500">No tienes tareas asignadas.</p>
+        <div class="bg-white rounded-lg shadow p-8 text-center">
+            <p class="text-gray-500">No tienes tareas asignadas.</p>
+        </div>
     <% } else { %>
-        <table class="min-w-full">
-            
-            <thead class="bg-gray-50 border-b">
+    
+        <div class="bg-white rounded-lg shadow overflow-x-auto">
+            <table class="w-full whitespace-nowrap">
+                <thead class="bg-gray-50 border-b">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Proyecto</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Etapa</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tarea</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripcion</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha inicio</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha fin</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F. Inicio</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F. Fin</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[150px]">Acciones</th>
                     </tr>
                 </thead>
-           <tbody class="bg-white divide-y divide-gray-200">
-                    <% 
-                        for (int i = 0; i < tareas.size(); i++) { 
-                            Tarea t = tareas.get(i);
-                            Proyecto p = proyectos.get(i); // Proyecto correspondiente
-                    %>
-                        <tr class="hover:bg-gray-50">
-                            <!-- NOMBRE DEL PROYECTO -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-indigo-600">
-                                    <%= p.getNombre() %>
-                                </div>
+               <tbody class="bg-white divide-y divide-gray-200">
+                <% 
+                    for (int i = 0; i < tareas.size(); i++) { 
+                        Tarea t = tareas.get(i);
+                        Etapa e = etapas.get(i);
+                        Proyecto p = proyectos.get(i); // Proyecto correspondiente
+
+                        // Lógica de colores de Badge
+                        String estado = t.getEstado();
+                        String badgeClass = "bg-gray-100 text-gray-800";
+                        if ("To Do".equals(estado)) {
+                            badgeClass = "bg-yellow-100 text-yellow-800";
+                        } else if ("In Progress".equals(estado)) {
+                            badgeClass = "bg-blue-100 text-blue-800";
+                        } else if ("Done".equals(estado)) {
+                            badgeClass = "bg-green-100 text-green-800";
+                        } else if ("Canceled".equals(estado)) {
+                            badgeClass = "bg-red-100 text-red-800";
+                        }
+                %>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-indigo-600">
+                                <%= p.getNombre() %>
+                            </div>
+                        </td>
+
+						<td class="px-6 py-4">
+                            <div class="text-sm text-gray-600">
+                                <%= e.getNombre() %>
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-gray-900">
+                                <%= t.getNombre() %>
+                            </div>
+                            <div class="text-xs text-gray-500 max-w-xs truncate">
+                                <%= t.getDescripcion() != null ? t.getDescripcion() : "—"%>
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full <%= badgeClass %>">
+                                <%= estado %>
+                            </span>
+                        </td>
+
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            <%= t.getFechaInicio() %>
+                        </td>
+
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            <%= t.getFechaFin() != null ? t.getFechaFin() : "—" %>
+                        </td>
+
+                        <td class="px-6 py-4 text-center whitespace-nowrap">
+                            <a href="TareaServlet?action=detalle&idTarea=<%= t.getId() %>&idEtapa=<%= t.getIdEtapa() %>"
+                               class="text-indigo-600 hover:text-indigo-900">
+                                Ver Tarea
+                            </a>
                             </td>
-
-                            <!-- ETAPA -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    <%= t.getIdEtapa() %>
-                                </div>
-                            </td>
-
-                            <!-- NOMBRE DE LA TAREA -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">
-                                    <%= t.getNombre() %>
-                                </div>
-                            </td>
-
-                            <!-- DESCRIPCIÓN -->
-                            <td class="px-6 py-4">
-                                <div class="text-sm text-gray-600 max-w-xs truncate">
-                                    <%= t.getDescripcion() != null ? t.getDescripcion() : "—"%>
-                                </div>
-                            </td>
-
-                            <!-- ESTADO -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                    <%= "To Do".equals(t.getEstado()) ? "bg-yellow-100 text-yellow-800" :
-                                        "In Progress".equals(t.getEstado()) ? "bg-blue-100 text-blue-800" :
-                                        "Done".equals(t.getEstado()) ? "bg-green-100 text-green-800" :
-                                        "bg-red-100 text-red-800" %>">
-                                    <%= t.getEstado() %>
-                                </span>
-                            </td>
-
-                            <!-- FECHA INICIO -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <%= t.getFechaInicio() %>
-                            </td>
-
-                            <!-- FECHA FIN -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <% if (t.getFechaFin() != null) { %>
-                                    <%= t.getFechaFin() %>
-                                <% } else { %>
-                                    <span class="text-gray-400">—</span>
-                                <% } %>
-                            </td>
-
-                            <!-- ACCIONES -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-							    <a href="TareaServlet?action=detalle&idTarea=<%= t.getId() %>&idEtapa=<%= t.getIdEtapa() %>"
-							       class="text-indigo-600 hover:text-indigo-900">
-							        Ver tarea
-							    </a>
-							</td>
-
-                        </tr>
-                    <% } %>
+                    </tr>
+                <% } %>
                 </tbody>
-        </table>
+            </table>
+        </div>
     <% } %>
-<jsp:include page="../horasTrabajadas/formulario.jsp" />
 
 </div>
+
+<jsp:include page="../horasTrabajadas/formulario.jsp" />
+
 </body>
 </html>
