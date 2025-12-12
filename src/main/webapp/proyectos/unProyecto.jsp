@@ -97,16 +97,25 @@
 	            <% if (rol.equalsIgnoreCase("administrador") ||
 	            		usu.getId() == pro.getSupervisor().getId()) { %>
 	            <a 
-    <%= "Done".equals(pro.getEstado()) ? "" : "href=\"EtapaServlet?action=new&idProyecto=" + pro.getId() + "\"" %>
-    class="
-        text-white font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center whitespace-nowrap
-        <%= "Done".equals(pro.getEstado())
-            ? "bg-gray-400 cursor-not-allowed opacity-60 pointer-events-none" 
-            : "bg-blue-600 hover:bg-blue-700" 
-        %>
-    ">
-    + Nueva Etapa
-</a> <%} %>
+				    <%= "Done".equals(pro.getEstado()) ? "" : "href=\"EtapaServlet?action=new&idProyecto=" + pro.getId() + "\"" %>
+				    class="
+				        text-white font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center whitespace-nowrap
+				        <%= "Done".equals(pro.getEstado())
+				            ? "bg-gray-400 cursor-not-allowed opacity-60 pointer-events-none" 
+				            : "bg-blue-600 hover:bg-blue-700" 
+				        %>
+				    ">
+				    + Nueva Etapa
+				</a>
+				<button onclick="window.location.href='ProyectoServlet?action=edit&id=<%= pro.getId() %>&origin=unProyecto'" 
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center">
+                        <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Editar Proyecto
+                    </button> 
+
+<%} %>
 	        </div>
 	        <!-- EMPLEADOS ASIGNADOS -->
             <div class="border-t pt-4">
@@ -676,6 +685,6 @@ window.onclick = function(event) {
 
 <!-- INCLUIR EL MODAL DE FORMULARIO -->
 <jsp:include page="../etapas/formulario.jsp" />
-
+<jsp:include page="formulario.jsp" />
 </body>
 </html>

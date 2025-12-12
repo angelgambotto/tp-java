@@ -15,10 +15,13 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import categoriaTarea.CategoriaTarea;
+import categoriaTarea.CategoriaTareaDAO;
 import usuarios.Usuario;
 import usuarios.UsuariosDAO;
 import clientes.Cliente;
 import clientes.ClienteDAO;
+import etapas.Etapa;
 import etapas.EtapaDAO;
 import exceptions.DAOException;
 
@@ -32,6 +35,7 @@ public class ProyectoServlet extends HttpServlet {
     private UsuariosDAO usuarioDao;
     private ClienteDAO clienteDAO;
     private EtapaDAO etapaDAO;
+    private CategoriaTareaDAO cdao;
     
 	//metodo para cargar los clientes y no tener problemas con el bloque try catch
 	private List<Cliente> cargarClientesSeguro(HttpServletRequest request) {
@@ -59,6 +63,14 @@ public class ProyectoServlet extends HttpServlet {
 	        return usuarioDao.getPorRol("empleado");
 	    } catch (DAOException e) {
 	        request.setAttribute("error", "No se pudieron cargar los usuarios: " + e.getMessage());
+	        return new ArrayList<>();
+	    }
+	}
+	private List<CategoriaTarea> cargarCategoriasSeguro(HttpServletRequest request) {
+	    try {
+	        return cdao.getAll();
+	    } catch (DAOException e) {
+	        request.setAttribute("error", "No se pudieron cargar las categorias: " + e.getMessage());
 	        return new ArrayList<>();
 	    }
 	}
@@ -130,6 +142,8 @@ public class ProyectoServlet extends HttpServlet {
 	        return new ArrayList<>();
     	}
     }
+    
+    //private void cargarDatosUnaEtapa(HttpServletRequest request, HttpServletResponse response) { }
 
     @Override
     public void init() {
@@ -137,6 +151,7 @@ public class ProyectoServlet extends HttpServlet {
         usuarioDao = new UsuariosDAO();
         clienteDAO = new ClienteDAO();
         etapaDAO=new EtapaDAO();
+        cdao = new CategoriaTareaDAO();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -168,11 +183,13 @@ public class ProyectoServlet extends HttpServlet {
                 String currentDate = sdf.format(new Date());
                 request.setAttribute("fechaCreacion", currentDate);
                 request.setAttribute("tieneEtapasPendientes", true);
-       		 	request.setAttribute("abrirModal", true);
+       		 	request.setAttribute("abrirModalPro", true);
         		break;
             case "edit":
                 int editId = Integer.parseInt(request.getParameter("id"));
                 Proyecto proEdit = cargarProSeguro(request, editId);
+                String origin = request.getParameter("origin");
+                
                 request.setAttribute("id", proEdit.getId());
                 request.setAttribute("nombre", proEdit.getNombre());
                 request.setAttribute("descripcion", proEdit.getDescripcion());
@@ -180,6 +197,7 @@ public class ProyectoServlet extends HttpServlet {
                 request.setAttribute("cliente", proEdit.getCliente());
                 request.setAttribute("fechaCreacion", sdf.format(proEdit.getFechaCreacion()));
                 request.setAttribute("supervisorId", proEdit.getSupervisor().getId());
+                request.setAttribute("origin", origin);
                 System.out.println("Supervisor: " + proEdit.getSupervisor());
 
                 boolean tienePendientes = false;
@@ -192,8 +210,44 @@ public class ProyectoServlet extends HttpServlet {
                 request.setAttribute("tieneEtapasPendientes", tienePendientes);
                 request.setAttribute("clientes", cargarClientesSeguro(request));
 	        	request.setAttribute("supervisores", cargarUsuariosSeguro(request));
-                request.setAttribute("abrirModal", true);
-                request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
+                request.setAttribute("abrirModalPro", true);
+                
+                if(origin.equals("unProyecto")) {
+                	//1. CARGO EL PROYECTO
+                	//int idPro = Integer.parseInt(request.getParameter("id"));
+                	//Proyecto pro = cargarProSeguro(request, idPro);
+                	request.setAttribute("proyecto", proEdit);
+                	//2. CARGO LAS ETAPAS
+                	try {
+            			List<Etapa> etapas = etapaDAO.getByProyectoId(editId);
+            			request.setAttribute("etapas", etapas);
+            		} catch (DAOException e) {
+            			request.setAttribute("error", "No se pudieron cargar las etapas: " + e.getMessage());
+            	        return;
+            		}
+                	
+                	//3. CARGO EMPLEADOS ASIGNADOS
+                	List<Usuario> asignados = cargarAsignadosSeguro(request, editId);
+                	request.setAttribute("usuariosAsignados", asignados);
+                	
+                	//4. CARGA EMPLEADOS DISPONIBLES
+                	List<Usuario> disponibles = cargarUsuariosSeguro(request);
+                	request.setAttribute("usuarios", disponibles);
+                	
+                	
+                	//5. CARGO CATEGORIAS
+                	List<CategoriaTarea> categorias = cargarCategoriasSeguro(request);
+                	request.setAttribute("categorias", categorias);
+                	
+                	//6. CARGO EL USUARIO
+                	request.setAttribute("usuario", usuario);
+                	//cargarDatosUnaEtapa(request, response);
+                	
+	            	request.getRequestDispatcher("/proyectos/unProyecto.jsp").forward(request, response);
+	            } else {
+	            	
+	            	request.getRequestDispatcher("proyectos/listado.jsp").forward(request, response);
+	            }
                 return;
 
             case "delete":
@@ -271,7 +325,7 @@ public class ProyectoServlet extends HttpServlet {
 	    
 		switch(action) {
 		case "insert-update":
-			insertarProyecto(request,response, id);
+			insertarProyecto(request,response, id, usuario);
 			break;
 		case "asignar":
 			System.out.println(">>> Entró a asignarUsuarios <<<");
@@ -282,7 +336,7 @@ public class ProyectoServlet extends HttpServlet {
         
     } //cierra el doPost
 
-    private void insertarProyecto(HttpServletRequest request,HttpServletResponse response, int id) throws IOException, ServletException{
+    private void insertarProyecto(HttpServletRequest request,HttpServletResponse response, int id, Usuario usuario) throws IOException, ServletException{
        
        //para hacer el update/insert
        String nombre = request.getParameter("nombre");
@@ -315,6 +369,42 @@ public class ProyectoServlet extends HttpServlet {
        try {        	
        	if (id > 0) {
        		dao.update(pro);
+       		String origin = request.getParameter("origin");
+            
+            if ("unProyecto".equals(origin)) {
+            	System.out.println("ENTRE A DO POST UPDATE UN PROYECTO");
+                
+            	//1. CARGO EL PROYECTO
+            	Proyecto proyec = cargarProSeguro(request, id);
+            	request.setAttribute("proyecto", proyec);
+            	//2. CARGO LAS ETAPAS
+            	try {
+        			List<Etapa> etapas = etapaDAO.getByProyectoId(id);
+        			request.setAttribute("etapas", etapas);
+        		} catch (DAOException e) {
+        			request.setAttribute("error", "No se pudieron cargar las etapas: " + e.getMessage());
+        	        return;
+        		}
+            	
+            	//3. CARGO EMPLEADOS ASIGNADOS
+            	List<Usuario> asignados = cargarAsignadosSeguro(request, id);
+            	request.setAttribute("usuariosAsignados", asignados);
+            	
+            	//4. CARGA EMPLEADOS DISPONIBLES
+            	List<Usuario> disponibles = cargarUsuariosSeguro(request);
+            	request.setAttribute("usuarios", disponibles);
+            	
+            	
+            	//5. CARGO CATEGORIAS
+            	List<CategoriaTarea> categorias = cargarCategoriasSeguro(request);
+            	request.setAttribute("categorias", categorias);
+            	
+            	//6. CARGO EL USUARIO
+            	request.setAttribute("usuario", usuario);
+            	
+            	request.getRequestDispatcher("/proyectos/unProyecto.jsp").forward(request, response);
+            	return;
+            } 
        	} else {
        		dao.insert(pro);
        	}

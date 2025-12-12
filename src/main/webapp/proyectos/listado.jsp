@@ -178,7 +178,7 @@
                                             </svg>
                                         </button>
                                         <div class="project-menu absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-10 hidden border border-gray-200">
-                                            <a href="ProyectoServlet?action=edit&id=<%= pro.getId() %>"
+                                            <a href="ProyectoServlet?action=edit&id=<%= pro.getId() %>&origin=listado"
                                                onclick="event.stopPropagation()"
                                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
