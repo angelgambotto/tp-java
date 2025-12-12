@@ -129,7 +129,7 @@
                       <% if (rol.equalsIgnoreCase("administrador") ||
       	            		usu.getId() == pro.getSupervisor().getId()) { %>
 	          
-                    <button onclick="toggleModal('modalAsignarEmpleado')" 
+                    <button onclick=<%= "Done".equals(pro.getEstado()) ? "" : "toggleModal('modalAsignarEmpleado')" %>
                             class="text-sm bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-4 rounded-lg transition">
                         + Asignar Persona
                     </button>
@@ -366,7 +366,8 @@
 	                </svg>
 	                <p class="text-sm">Sin tareas</p>
 	                
-	               <% if (rol.equalsIgnoreCase("administrador")) { %>          
+	               <% if ((rol.equalsIgnoreCase("administrador") ||
+     	            		usu.getId() == pro.getSupervisor().getId()) && !"Done".equals(etapa.getEstado())) { %>          
 	                <a href="TareaServlet?action=new&idEtapa=<%= etapa.getId() %>" 
 	                   class="text-blue-600 hover:text-blue-700 text-xs font-medium mt-2 inline-block">
 	                    + Agregar tarea
@@ -398,13 +399,7 @@
                                 
                     <div class="flex justify-between items-start mb-2">
                         <h4 class="font-semibold text-gray-900 text-xs sm:text-sm"><%= tarea.getNombre() %></h4>
-                        <!-- LO COMENTEN PQ NO ESTABA HACIENDO NADA... 
-                        <button class="text-gray-400 hover:text-gray-600 flex-shrink-0">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                            </svg>
-                        </button>
-                         -->
+                        
                     </div>
                     
                     <p class="text-xs text-gray-600 mb-3 line-clamp-2"><%= tarea.getDescripcion() %></p>

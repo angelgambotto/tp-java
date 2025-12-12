@@ -44,26 +44,26 @@
                 <textarea name="descripcion" rows="3"
                           class="w-full border rounded-lg px-4 py-2"><%= tarea != null ? tarea.getDescripcion() : "" %></textarea>
             </div>
-<%Boolean f=(Boolean)request.getAttribute("EtapaFinalizada"); 
-boolean etapaFinalizada = (f != null && f);
-System.out.println("etapaFinalizada:"+ etapaFinalizada);
-if (tarea != null) {
-    System.out.println("tareaID: " + tarea.getId());  
-}
-%>
+			<%Boolean f=(Boolean)request.getAttribute("EtapaFinalizada"); 
+			boolean etapaFinalizada = (f != null && f);
+			System.out.println("etapaFinalizada:"+ etapaFinalizada);
+			if (tarea != null) {
+			    System.out.println("tareaID: " + tarea.getId());  
+			}
+			%>
             <div class="mb-4">
                 <label class="block text-gray-700 mb-1">Estado</label>
                 <select name="estado" class="w-full border rounded-lg px-4 py-2" <%= etapaFinalizada ? "disabled" : "" %>>
                     <% if (tarea!=null) { %>
-        <option value="Done" <%= "Done".equals(request.getAttribute("estado")) ? "selected" : "" %>>Done</option>
-    <% } %>
+        			<option value="Done" <%= "Done".equals(request.getAttribute("estado")) ? "selected" : "" %>>Done</option>
+    				<% } %>
                     <option value="To Do" <%= tarea != null && "To Do".equals(tarea.getEstado()) ? "selected" : "" %>>To Do</option>
                     <option value="In Progress" <%= tarea != null && "In Progress".equals(tarea.getEstado()) ? "selected" : "" %>>In Progress</option>
                     
                 </select>
                 <% if (etapaFinalizada) { %>
-    <input type="hidden" name="estado" value="<%= tarea.getEstado() %>">
-<% } %>
+    			<input type="hidden" name="estado" value="<%= tarea.getEstado() %>">
+				<% } %>
             </div>
 
             <div class="grid grid-cols-2 gap-4 mb-6">
@@ -75,7 +75,7 @@ if (tarea != null) {
 
                 <div>
                     <label class="block text-gray-700 mb-1">Fecha Fin</label>
-                    <input type="date" name="fechaFin" class="w-full border rounded-lg px-4 py-2"
+                    <input type="date" required name="fechaFin" class="w-full border rounded-lg px-4 py-2"
                            value="<%= tarea != null && tarea.getFechaFin() != null ? new java.text.SimpleDateFormat("yyyy-MM-dd").format(tarea.getFechaFin()) : "" %>">
                 </div>
             </div>
@@ -99,12 +99,12 @@ if (tarea != null) {
     
             <div class="flex justify-end space-x-4">
                 <button type="button"
-        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-lg"
-        data-id-etapa="<%= idEtapa %>"
-        data-id-tarea="<%= (tarea!=null)?tarea.getId():"" %>"
-        onclick="toggleModal('modalFormTarea')">
-    Cancelar
-</button>
+				        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-lg"
+				        data-id-etapa="<%= idEtapa %>"
+				        data-id-tarea="<%= (tarea!=null)?tarea.getId():"" %>"
+				        onclick="toggleModal('modalFormTarea')">
+				    Cancelar
+				</button>
 
                 <button type="submit"
                         class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg">

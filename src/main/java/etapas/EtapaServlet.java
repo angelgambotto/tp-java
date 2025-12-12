@@ -253,9 +253,7 @@ public class EtapaServlet extends HttpServlet {
         	destino="proyectos/detalleProyectoCliente.jsp";
         }
 
-        // CARGAR ETAPAS DE NUEVO
-        System.out.println("las etapas son: "+etapas);
-        //request.setAttribute("etapas", cargarEtapasSeguro(request));
+        
         request.getRequestDispatcher(destino).forward(request, response);
     }
 
