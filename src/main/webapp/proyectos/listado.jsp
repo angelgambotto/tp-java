@@ -178,14 +178,22 @@
                                             </svg>
                                         </button>
                                         <div class="project-menu absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-10 hidden border border-gray-200">
-                                            <a href="ProyectoServlet?action=edit&id=<%= pro.getId() %>&origin=listado"
-                                               onclick="event.stopPropagation()"
-                                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                                            <button id="btnEditar"
+	                                            <% if ("Done".equals(pro.getEstado()) || "Canceled".equals(pro.getEstado())) { %> 
+											        disabled 
+											        class="block w-full px-4 py-2 text-sm text-gray-500 bg-gray-200 
+               												cursor-not-allowed opacity-70 flex items-center gap-2 text-left" 
+											    <% } else { %>
+											        onclick="event.stopPropagation(); window.location.href='ProyectoServlet?action=edit&id=<%= pro.getId() %>&origin=listado'"
+											         class="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 
+               												flex items-center gap-2 text-left"
+            									<% } %>
+											   >
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                                 </svg>
                                                 Editar
-                                            </a>
+                                            </button>
                                             <a href="ProyectoServlet?action=delete&id=<%= pro.getId() %>"
                                                onclick="event.stopPropagation()"
                                                class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
@@ -270,6 +278,11 @@
 </div>
 
 <script>
+
+document.getElementById("btnEditar").addEventListener("click", function(event) {
+    event.stopPropagation();
+});
+
 // Filtrado de proyectos
 document.addEventListener("DOMContentLoaded", () => {
     const searchInput = document.getElementById("searchInput");

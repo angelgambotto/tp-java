@@ -107,8 +107,14 @@
 				    ">
 				    + Nueva Etapa
 				</a>
-				<button onclick="window.location.href='ProyectoServlet?action=edit&id=<%= pro.getId() %>&origin=unProyecto'" 
+				<button 
+				<% if ("Done".equals(pro.getEstado()) || "Canceled".equals(pro.getEstado())) { %> 
+					        disabled 
+					        class="bg-gray-400 cursor-not-allowed text-white font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center" 
+					    <% } else { %>
+							onclick="window.location.href='ProyectoServlet?action=edit&id=<%= pro.getId() %>&origin=unProyecto'" 
                             class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center">
+					    <% } %>
                         <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                         </svg>
@@ -129,9 +135,16 @@
                       <% if (rol.equalsIgnoreCase("administrador") ||
       	            		usu.getId() == pro.getSupervisor().getId()) { %>
 	          
-                    <button onclick=<%= "Done".equals(pro.getEstado()) ? "" : "toggleModal('modalAsignarEmpleado')" %>
-                            class="text-sm bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-4 rounded-lg transition">
-                        + Asignar Persona
+                    <button <% if("Done".equals(pro.getEstado()) || "Canceled".equals(pro.getEstado())){%> 
+                    			disabled 
+                    			class="bg-gray-400 cursor-not-allowed text-white 
+                    			font-medium py-2 px-4 sm:px-6 rounded-lg shadow transition text-center" 
+                    		<% } else{%> 
+                    			onclick="toggleModal('modalAsignarEmpleado')" 
+                    		<%} %> 
+                    			class="text-sm bg-green-600 hover:bg-green-700 text-white
+                    			 font-medium py-1.5 px-4 rounded-lg transition"> 
+                    		+ Asignar Persona 
                     </button>
                     <% } %>
                 </div>
