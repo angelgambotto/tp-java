@@ -4,9 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class ConexionDB {
-    private static final String URL = "jdbc:mysql://localhost/gestionproyecto";
-    private static final String USER = "javaAdmin";
-    private static final String PASS = "123";
+    private static final String URL  = ConfigLoader.get("DB_URL");
+    private static final String USER = ConfigLoader.get("DB_USER");
+    private static final String PASS = ConfigLoader.get("DB_PASS");
 
     public static Connection getConexion() {
         try {

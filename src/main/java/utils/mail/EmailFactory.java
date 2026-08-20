@@ -1,4 +1,5 @@
 package utils.mail;
+import utils.ConfigLoader;
 
 public class EmailFactory {
 
@@ -10,8 +11,8 @@ public class EmailFactory {
     public static EmailService crearEmailService(boolean modoReal) {
         if (modoReal) {
             return new GmailEmailService(
-                "alertaplanera@gmail.com",
-                "gilzkizxcrsqcqyg "   // generada en Google
+                ConfigLoader.get("GMAIL_USER"),
+                ConfigLoader.get("GMAIL_APP_PASSWORD"),
             );
         } 
         return new ConsoleEmailService();

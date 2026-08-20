@@ -1,0 +1,5 @@
+DB_URL=jdbc:mysql://localhost/gestionproyecto
+DB_USER=javaAdmin
+DB_PASS=
+GMAIL_USER=
+GMAIL_APP_PASSWORD=
